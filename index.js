@@ -371,7 +371,6 @@ CLIENT.addListener('error', function(message) {
 for(var i in CONFIG.plugins) {
 	var pluginName = CONFIG.plugins[i]+".js";
 	PLUGINS.loadPlugin(pluginName);
-	LOG.debug('MODULE LOADED: %s', pluginName);
 }
 try {
 	process.on('SIGINT', function() {

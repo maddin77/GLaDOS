@@ -28,9 +28,6 @@
         "selfSigned": false,
         "certExpired": false,
         "floodProtection": false,
-        "floodProtectionDelay": 1000,
-        "stripColors": false,
-        "channelPrefixes": "&#",
-        "messageSplit": 512
+        "floodProtectionDelay": 1000
     }
 }

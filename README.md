@@ -8,7 +8,7 @@ moar plugins
 1. Installiere [node.js](http://nodejs.org/).
 2. Installiere alle abhängigkeiten mit npm:
 <pre>$ npm install</pre>
-3. unter `config/` die Datei `default.config.json` in `config.json` umbenennen und den Wünschen nach anpassen (s.u).
+3. unter `config/` die Datei `default.config.json` in `config.json` umbenennen und den Wünschen nach anpassen (siehe [konfiguration](#konfiguration)).
 4. per `node pfad/zu/james` bzw. `node index.js` starten.
 5. ...
 6. profit.
@@ -45,10 +45,7 @@ moar plugins
         "selfSigned": false, //selbst signierte zertifikate erlauben ja/nein
         "certExpired": false, //abgelaufene zertifikate erlauben ja/nein
         "floodProtection": false, //verhindert, das zu viele nachrichten auf einmal an den server gesendet werden
-        "floodProtectionDelay": 1000, //s.o
-        "stripColors": false, //farben entfernen ja/nein
-        "channelPrefixes": "&#",
-        "messageSplit": 512
+        "floodProtectionDelay": 1000 //s.o
     }
 }
 ```
