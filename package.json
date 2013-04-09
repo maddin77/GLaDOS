@@ -12,7 +12,7 @@
 	],
 	"repository": {
 		"type": "git",
-		"url": "https://m4ddin@bitbucket.org/m4ddin/james.git"
+		"url": "https://github.com/maddin77/James.git"
 	},
 	"dependencies": {
 		"cheerio": "0.10.7",
