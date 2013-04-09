@@ -6,12 +6,14 @@ moar plugins
 ## Installation
 
 1. Installiere [node.js](http://nodejs.org/).
-2. Installiere alle abhängigkeiten mit npm:
+2. `$ git clone git@github.com:maddin77/James.git`
+3. `$ cd James`
+4. Installiere alle abhängigkeiten mit npm:
 <pre>$ npm install</pre>
-3. unter `config/` die Datei `default.config.json` in `config.json` umbenennen und den Wünschen nach anpassen (siehe [konfiguration](#konfiguration)).
-4. per `node pfad/zu/james` bzw. `node index.js` starten.
-5. ...
-6. profit.
+5. unter `config/` die Datei `default.config.json` in `config.json` umbenennen und den Wünschen nach anpassen (siehe [konfiguration](#konfiguration)).
+6. per `node pfad/zu/james` bzw. `node index.js`(innerhalb des Ordner) starten.
+7. ...
+8. profit.
 
 ## Konfiguration
 ```javascript
