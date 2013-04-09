@@ -19,7 +19,6 @@
 		"crypto": "0.0.3",
 		"irc": "0.3.6",
 		"moment": "2.0.0",
-		"mysql": "2.0.0-alpha7",
 		"request": "2.12.0",
 		"nosqlite": "0.1.1"
 	},
