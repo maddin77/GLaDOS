@@ -6,7 +6,7 @@ moar plugins
 ## Installation
 
 1. Installiere [node.js](http://nodejs.org/).
-2. `$ git clone git@github.com:maddin77/James.git`
+2. `$ git clone https://github.com/maddin77/James.git`
 3. `$ cd James`
 4. Installiere alle abhängigkeiten mit npm:
 <pre>$ npm install</pre>
