@@ -223,7 +223,7 @@ CLIENT.addListener('notice', function(nick, to, text, message) {
 });
 
 CLIENT.addListener('ping', function(server) {
-	LOG.log('[{@green}%s{@reset}] - Ping/Pong', server);
+	LOG.debug('[{@green}%s{@reset}] - Ping/Pong', server);
 	SERVER.lastping = new Date();
 	for(var p in PLUGINS.plugins) {
 		var pl = PLUGINS.plugins[p];
