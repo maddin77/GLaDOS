@@ -1,0 +1,53 @@
+{
+    "commandChar": "!",
+    "permissions": [],
+    "quitMSG": "bye",
+    "version": "1337^drölf",
+
+    "plugins": [],
+
+    "webservices": {
+        "enabled": false,
+        "port": 13356,
+        "chacheUpdateInterval": 600000
+    },
+
+    "loggin": {
+        "log": true,
+        "debug": true,
+        "error": true
+    },
+
+    "matchSmilies": [":D", ":(", ";)", ":)", ":P", ":>", ":p", ";D", "-.-", "=D"],
+
+    "irc": {
+        "server": "chat.kerat.net",
+        "nick": "",
+        "userName": "",
+        "realName": "",
+        "password": "",
+        "port": 6667,
+        "debug": false,
+        "showErrors": false,
+        "autoRejoin": true,
+        "autoConnect": true,
+        "channels": ["#dev"],
+        "secure": false,
+        "selfSigned": false,
+        "certExpired": false,
+        "floodProtection": false,
+        "floodProtectionDelay": 1000,
+        "stripColors": false,
+        "channelPrefixes": "&#",
+        "messageSplit": 512
+    },
+
+    "mysql": {
+        "host": "127.0.0.1",
+        "port": 3306,
+        "user": "root",
+        "password": "",
+        "database": "",
+        "debug": false
+    }
+}
