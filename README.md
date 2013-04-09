@@ -11,9 +11,10 @@ moar plugins
 4. Installiere alle abhängigkeiten mit npm:
 <pre>$ npm install</pre>
 5. unter `config/` die Datei `default.config.json` in `config.json` umbenennen und den Wünschen nach anpassen (siehe [konfiguration](#konfiguration)).
-6. per `node pfad/zu/james` bzw. `node index.js`(innerhalb des Ordner) starten.
-7. ...
-8. profit.
+6. Den Ordner `data/` erstellen. 
+7. per `node pfad/zu/james` bzw. `node index.js`(innerhalb des Ordner) starten.
+8. ...
+9. profit.
 
 ## Konfiguration
 ```javascript
