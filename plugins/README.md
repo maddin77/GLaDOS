@@ -1,3 +1,4 @@
+## Example
 ```javascript
 module.exports = {
 	/**
