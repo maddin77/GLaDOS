@@ -19,7 +19,7 @@ moar plugins
 ```javascript
 {
     "commandChar": "!", //Char zum erkennen von Befehlen
-    "permissions": [], //Benutzer die von Grund auf rechte haben.
+    "permissions": [], //Benutzer die Spezielle Rechte haben (update, exit, etc.)
     "quitMSG": "bye", //Nachricht die beim Beenden gesendet wird (quit: )
     "version": "1337^drölf", //antwort auf ctcp-version
 
