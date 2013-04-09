@@ -17,7 +17,6 @@ LOG				= require('./lib/logging.js');
 Server			= require('./lib/server.js');
 Channel			= require('./lib/channel.js');
 User			= require('./lib/user.js');
-Mode			= require('./lib/mode.js');
 UTIL			= require('./lib/util.js');
 PLUGINS			= require('./lib/plugins.js');
 

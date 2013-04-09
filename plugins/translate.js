@@ -87,7 +87,6 @@ module.exports = {
 						var language = that.languages[parsed[2]];
 						parsed = parsed[0] && parsed[0][0] && parsed[0][0][0];
 						if (parsed) {
-							console.log("The " + language + " " + term + " translates as " + parsed + " in " + that.languages[target]);
 							client.say(channel.getName(), user.getNick() + ": \"" + term + "\" bedeutet \"" + parsed + "\" in " + that.languages[target]);
 						}
 					}

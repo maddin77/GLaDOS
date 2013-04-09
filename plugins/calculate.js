@@ -8,6 +8,8 @@ module.exports = {
 					try {
 						var result = eval("("+body+")");
 						result.rhs = result.rhs.replace(new RegExp(String.fromCharCode(65533), "g"), " ");
+						result.rhs = result.rhs.replace(/\240/g, "");
+						result.rhs = result.rhs.replace(/\\x26#215; 10\\x3csup\\x3e([0-9-]+)\\x3c\/sup\\x3e/, "*(10^$1)");
 						client.say(channel.getName(), user.getNick() + ": " + (result.rhs || 'Could not compute.'));
 					}
 					catch(e) {}
@@ -23,6 +25,8 @@ module.exports = {
 					try {
 						var result = eval("("+body+")");
 						result.rhs = result.rhs.replace(new RegExp(String.fromCharCode(65533), "g"), " ");
+						result.rhs = result.rhs.replace(/\240/g, "");
+						result.rhs = result.rhs.replace(/\\x26#215; 10\\x3csup\\x3e([0-9-]+)\\x3c\/sup\\x3e/, "*(10^$1)");
 						client.say(channel.getName(), user.getNick() + ": " + (result.rhs || 'Could not compute.'));
 					}
 					catch(e) {}

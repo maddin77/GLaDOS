@@ -1,6 +1,6 @@
 module.exports = {
-	_file: 'storage/intelligenTs.json',
-	_intelligenTs: null,
+	_intDB: STORAGE.database('intelligenTs'),
+	_intelligenTs: {},
 
 	onCommand: function(client, server, channel, commandChar, name, params, user, text, message) {
 		if(name == "intelligenTs") {
@@ -29,29 +29,19 @@ module.exports = {
 		}
 	},
 	save: function() {
-		if(this._intelligenTs !== null) {
-			FS.writeFile(this._file, JSON.stringify(this._intelligenTs, null, '\t'), {encoding: 'utf8'}, function(err) {
-				if (err) throw err;
-			});
-		}
+		this._intelligenTs['id'] = "intelligenTs";
+		this._intDB.postSync(this._intelligenTs);
 	},
 	onLoad: function() {
-		if(!FS.existsSync(this._file)) {
-			FS.writeFileSync(this._file, '{}');
+		if(!this._intDB.existsSync()) {
+			this._intDB.createSync();
+			this.save();
 		}
 		else {
-			var data = FS.readFileSync(this._file, {encoding: 'utf8'});
-			if(data !== "") {
-				this._intelligenTs = JSON.parse(data);
-			}
-			else {
-				this._intelligenTs = {};
-			}
+			this._intelligenTs = this._intDB.getSync('intelligenTs');
 		}
 	},
 	onUnload: function() {
-		if(this._intelligenTs !== null) {
-			FS.writeFileSync(this._file, JSON.stringify(this._intelligenTs, null, '\t'), {encoding: 'utf8'});
-		}
+		this.save();
 	}
 };
