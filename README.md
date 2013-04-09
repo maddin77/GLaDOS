@@ -14,7 +14,7 @@ moar plugins
 6. profit.
 
 ## Konfiguration
-<pre>
+```javascript
 {
     "commandChar": "!", //Char zum erkennen von Befehlen
     "permissions": [], //Benutzer die von Grund auf rechte haben.
@@ -51,4 +51,4 @@ moar plugins
         "messageSplit": 512
     }
 }
-</pre>
+```
