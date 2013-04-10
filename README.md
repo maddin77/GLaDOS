@@ -57,6 +57,9 @@ control plugin/forever n shit
     }
 }
 ```
+## Plugins-Entwicklung
+============
+[Look here.](https://github.com/maddin77/James/tree/master/plugins)
 
 ## Changelog
 ============
