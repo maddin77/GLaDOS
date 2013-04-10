@@ -62,7 +62,7 @@ control plugin/forever n shit
 
 ## Changelog
 ============
-### Version 0.1.1 (*10.04.2013*)
+### Version 0.1.1 *(10.04.2013)*
 * **Neue Plugin**: [domain](https://github.com/maddin77/James/blob/master/plugins/domain.js)
 * `index.js` heisst nun `james.js`. (siehe [Installation Punkt 7](#installation))
 * Plugin [urltitle](https://github.com/maddin77/James/blob/master/plugins/urltitle.js) gefixxt.
