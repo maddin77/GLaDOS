@@ -9,7 +9,6 @@ control plugin/forever n shit
 ============
 
 1. Installiere [node.js](http://nodejs.org/).
-<pre>$ npm install forever -g</pre>
 2. `$ git clone https://github.com/maddin77/James.git`
 3. `$ cd James`
 4. Installiere alle abhängigkeiten mit npm:
