@@ -15,7 +15,7 @@ control plugin/forever n shit
 <pre>$ npm install</pre>
 5. unter `config/` die Datei `default.config.json` in `config.json` umbenennen und den Wünschen nach anpassen (siehe [konfiguration](#konfiguration)).
 6. Den Ordner `data/` erstellen. 
-7. per `node james.js` (*innerhalb des Ordner*) starten.
+7. per `node james.js` *(innerhalb des Ordner)* starten.
 8. ...
 9. profit.
 
@@ -64,7 +64,7 @@ control plugin/forever n shit
 ============
 ### Version 0.1.1 (*10.04.2013*)
 * **Neue Plugin**: [domain](https://github.com/maddin77/James/blob/master/plugins/domain.js)
-* `index.js` heisst nun `james.js`. (siehe [Installation Pink 8](#installation))
+* `index.js` heisst nun `james.js`. (siehe [Installation Punkt 7](#installation))
 * Plugin [urltitle](https://github.com/maddin77/James/blob/master/plugins/urltitle.js) gefixxt.
 * Sonderbehandlung für YouTube-Links beim Posten der URL-Titel.
 * Befehl `!fact` für das Plugin [facts](https://github.com/maddin77/James/blob/master/plugins/facts.js) hinzugefügt.
