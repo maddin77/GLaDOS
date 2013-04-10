@@ -1,22 +1,27 @@
 # James
 
 ## ToDo
+============
 moar plugins
+control plugin/forever n shit
 
 ## Installation
+============
 
 1. Installiere [node.js](http://nodejs.org/).
+<pre>$ npm install forever -g</pre>
 2. `$ git clone https://github.com/maddin77/James.git`
 3. `$ cd James`
 4. Installiere alle abhängigkeiten mit npm:
 <pre>$ npm install</pre>
 5. unter `config/` die Datei `default.config.json` in `config.json` umbenennen und den Wünschen nach anpassen (siehe [konfiguration](#konfiguration)).
 6. Den Ordner `data/` erstellen. 
-7. per `node pfad/zu/james` bzw. `node index.js`(innerhalb des Ordner) starten.
+7. per `node james.js` (*innerhalb des Ordner*) starten.
 8. ...
 9. profit.
 
 ## Konfiguration
+============
 ```javascript
 {
     "commandChar": "!", //Char zum erkennen von Befehlen
@@ -52,3 +57,12 @@ moar plugins
     }
 }
 ```
+
+## Changelog
+============
+### Version 0.1.1 (*10.04.2013*)
+* **Neue Plugin**: [domain](https://github.com/maddin77/James/blob/master/plugins/domain.js)
+* `index.js` heisst nun `james.js`. (siehe [Installation Pink 8](#installation))
+* Plugin [urltitle](https://github.com/maddin77/James/blob/master/plugins/urltitle.js) gefixxt.
+* Sonderbehandlung für YouTube-Links beim Posten der URL-Titel.
+* Befehl `!fact` für das Plugin [facts](https://github.com/maddin77/James/blob/master/plugins/facts.js) hinzugefügt.

@@ -1,30 +1,30 @@
 /* NODE-MODULES
    ============================= */
-FS				= require('fs');
-PATH			= require('path');
-IRC				= require('irc');
-HTTP			= require('http');
-REQUEST			= require('request');
-CRYPTO			= require('crypto');
-CHEERIO			= require('cheerio');
-MOMENT			= require('moment');
-STORAGE			= new(require('nosqlite').Connection)('./data');
+FS              = require('fs');
+PATH            = require('path');
+IRC             = require('irc');
+HTTP            = require('http');
+REQUEST         = require('request');
+CRYPTO          = require('crypto');
+CHEERIO         = require('cheerio');
+MOMENT          = require('moment');
+STORAGE         = new(require('nosqlite').Connection)('./data');
 
 /* LIBS
    ============================= */
-CONFIG			= require('./config/config.json');
-LOG				= require('./lib/logging.js');
-Server			= require('./lib/server.js');
-Channel			= require('./lib/channel.js');
-User			= require('./lib/user.js');
-UTIL			= require('./lib/util.js');
-PLUGINS			= require('./lib/plugins.js');
+CONFIG  = require('./config/config.json');
+LOG     = require('./lib/logging.js');
+Server  = require('./lib/server.js');
+Channel = require('./lib/channel.js');
+User    = require('./lib/user.js');
+UTIL    = require('./lib/util.js');
+PLUGINS = require('./lib/plugins.js');
 
 /* GLOBAL SETTINGS
    ============================= */
 MOMENT.lang("de");
-SERVER			= new Server(CONFIG.irc.server);
-CLIENT			= new IRC.Client(CONFIG.irc.server, CONFIG.irc.nick, CONFIG.irc);
+SERVER          = new Server(CONFIG.irc.server);
+CLIENT          = new IRC.Client(CONFIG.irc.server, CONFIG.irc.nick, CONFIG.irc);
 
 QUIT = function() {
 	CLIENT.disconnect( CONFIG.quitMSG );
@@ -36,8 +36,6 @@ QUIT = function() {
 	}
 	process.exit(0);
 };
-
-
 
 
 CLIENT.addListener('registered', function(message) {

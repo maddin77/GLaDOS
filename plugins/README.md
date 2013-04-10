@@ -1,4 +1,5 @@
 ## Example
+============
 ```javascript
 module.exports = {
 	/**
