@@ -1,6 +1,6 @@
 module.exports = {
 	onCommand: function(client, server, channel, commandChar, name, params, user, text, message) {
-		if(name == "bitcoin") {
+		if(name == "bitcoin" || name == "btc") {
 			REQUEST("http://data.mtgox.com/api/2/BTCEUR/money/ticker", function (error, response, body) {
 				if (!error && response.statusCode == 200) {
 					var bitcoin = JSON.parse(body);
