@@ -68,3 +68,4 @@ control plugin/forever n shit
 * Plugin [urltitle](https://github.com/maddin77/James/blob/master/plugins/urltitle.js) gefixxt.
 * Sonderbehandlung für YouTube-Links beim Posten der URL-Titel.
 * Befehl `!fact` für das Plugin [facts](https://github.com/maddin77/James/blob/master/plugins/facts.js) hinzugefügt.
+* Befehl `!btc` für das Plugin [bitcoin](https://github.com/maddin77/James/blob/master/plugins/bitcoin.js) hinzugefügt.
