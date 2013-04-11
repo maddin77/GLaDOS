@@ -15,7 +15,7 @@ control plugin/forever n shit
 <pre>$ npm install</pre>
 5. unter `config/` die Datei `default.config.json` in `config.json` umbenennen und den Wünschen nach anpassen (siehe [konfiguration](#konfiguration)).
 6. Den Ordner `data/` erstellen. 
-7. per `node james.js` *(innerhalb des Ordner)* starten.
+7. per `node daemon.js` *(innerhalb des Ordner)* starten.
 8. ...
 9. profit.
 
@@ -62,6 +62,10 @@ control plugin/forever n shit
 
 ## Changelog
 ============
+### Version 0.1.2 *(10.04.2013)*
+* daemon eingebaut. (siehe [Installation Punkt 7](#installation)). DUrch den Daemon wird James bei einem Crash/Exit automatisch neugestartet.
+* **Neue Plugin**: [control](https://github.com/maddin77/James/blob/master/plugins/control.js)
+
 ### Version 0.1.1 *(10.04.2013)*
 * **Neue Plugin**: [domain](https://github.com/maddin77/James/blob/master/plugins/domain.js)
 * `index.js` heisst nun `james.js`. (siehe [Installation Punkt 7](#installation))

@@ -36,7 +36,7 @@ module.exports = {
 								}
 							}
 							if(changes) {
-								client.say(channel.getName(), "I have some pending updates, KILL ME PLEASE!");
+								client.say(channel.getName(), "I have some pending updates, KILL ME PLEASE! (!exit, !restart)");
 							}
 							else {
 								client.say(channel.getName(), "I'm up-to-date!");

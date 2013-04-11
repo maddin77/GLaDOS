@@ -26,15 +26,12 @@ MOMENT.lang("de");
 SERVER          = new Server(CONFIG.irc.server);
 CLIENT          = new IRC.Client(CONFIG.irc.server, CONFIG.irc.nick, CONFIG.irc);
 
-QUIT = function() {
+QUIT = function(code) {
+	PLUGINS.unloadAll();
 	CLIENT.disconnect( CONFIG.quitMSG );
-	for(var p in PLUGINS.plugins) {
-		var pl = PLUGINS.plugins[p];
-		if(typeof pl.onUnload !== 'undefined') {
-			pl.onUnload();
-		}
-	}
-	process.exit(0);
+	setTimeout(function() {
+		process.exit(code);
+	}, 1000);
 };
 
 
