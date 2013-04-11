@@ -3,7 +3,6 @@
 ## ToDo
 ============
 moar plugins
-control plugin/forever n shit
 
 ## Installation
 ============
