@@ -1,29 +1,29 @@
 {
-	"name": "James",
-	"preferGlobal": false,
-	"version": "0.1.2",
-	"author": "Martin Rump <admin@maddin.cc>",
-	"description": "James IRC-Bot",
-	"contributors": [ 
-		{
-			"name": "Martin Rump",
-			"email": "admin@maddin.cc"
-		} 
-	],
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/maddin77/James.git"
-	},
-	"dependencies": {
-		"cheerio": "0.10.7",
-		"crypto": "0.0.3",
-		"irc": "0.3.6",
-		"moment": "2.0.0",
-		"request": "2.12.0",
-		"nosqlite": "0.1.1"
-	},
-	"license": "MIT",
-	"engines": {
-		"node": ">=0.10.1"
-	}
+    "name": "James",
+    "preferGlobal": false,
+    "version": "0.1.2",
+    "author": "Martin Rump <admin@maddin.cc>",
+    "description": "James IRC-Bot",
+    "contributors": [ 
+        {
+            "name": "Martin Rump",
+            "email": "admin@maddin.cc"
+        } 
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/maddin77/James.git"
+    },
+    "dependencies": {
+        "cheerio": "0.10.7",
+        "crypto": "0.0.3",
+        "irc": "0.3.6",
+        "moment": "2.0.0",
+        "request": "2.12.0",
+        "nosqlite": "0.1.1"
+    },
+    "license": "MIT",
+    "engines": {
+        "node": ">=0.10.1"
+    }
 }
