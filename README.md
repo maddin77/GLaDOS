@@ -73,8 +73,8 @@ moar plugins
 * Erkennen von Usermodes innerhalb eines Channels gefixxt.
 * [bitcoin](https://github.com/maddin77/James/blob/master/plugins/bitcoin.js) Plugin auf andere API geändert.
 * [intelligenTs](https://github.com/maddin77/James/blob/master/plugins/intelligenTs.js) entfernt.
-* **Neue Plugin**: [karma](https://github.com/maddin77/James/blob/master/plugins/karma.js)
-* **Neue Plugin**: [wikipedia](https://github.com/maddin77/James/blob/master/plugins/wikipedia.js)
+* **Neues Plugin**: [karma](https://github.com/maddin77/James/blob/master/plugins/karma.js)
+* **Neues Plugin**: [wikipedia](https://github.com/maddin77/James/blob/master/plugins/wikipedia.js)
 * Hilfe eingebaut. Per `/msg James HELP` bekommt man nun genaue Hilfe, auch zu den einzelnen Plugins (sofern vorhanden).
 * Neues Event für Plugins: `onHelpRequest: function(client, server, user, message, parts)`. Siehe [Plugin-Entwicklung](#plugin-entwicklung) für mehr Informationen.
 * Die ausgabe der einzelnen commits bei `!update` wurde entfernt.
@@ -82,10 +82,10 @@ moar plugins
 
 ### Version 0.1.2 *(11.04.2013)*
 * daemon eingebaut. (siehe [Installation Punkt 7](#installation)). DUrch den Daemon wird James bei einem Crash/Exit automatisch neugestartet.
-* **Neue Plugin**: [control](https://github.com/maddin77/James/blob/master/plugins/control.js)
+* **Neues Plugin**: [control](https://github.com/maddin77/James/blob/master/plugins/control.js)
 
 ### Version 0.1.1 *(10.04.2013)*
-* **Neue Plugin**: [domain](https://github.com/maddin77/James/blob/master/plugins/domain.js)
+* **Neues Plugin**: [domain](https://github.com/maddin77/James/blob/master/plugins/domain.js)
 * `index.js` heisst nun `james.js`. (siehe [Installation Punkt 7](#installation))
 * Plugin [urltitle](https://github.com/maddin77/James/blob/master/plugins/urltitle.js) gefixxt.
 * Sonderbehandlung für YouTube-Links beim Posten der URL-Titel.
