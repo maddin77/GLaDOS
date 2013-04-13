@@ -66,7 +66,7 @@ moar plugins
 
 ## Changelog
 ============
-### Version 0.1.3 *(12.04.2013)*
+### Version 0.1.3 *(13.04.2013)*
 * Per `!plugin enable/disable` können einzelne Plugins nun nur für bestimmte Channel de-/aktiviert werden. Das entfernen aus dem Speicher (`!plugin load/unload`) sollte nur benutzt werden um defekte Plugins zu entfernen bzw. neue zu laden. Per `!plugin listenabled` werden alle Plugins aufgelistet die im moment im Channel aktiviert sind.
 * Es werden nun automatisch alle Plugins im `/plugins` Ordner geladen. Der Eintrag aus der `config.json` wurde entfernt bzw wird ignoriert sofern noch vorhanden.
 * MySQL anstelle von Files. Weil wegen isso. Tabellen werden automatisch erstellt.
