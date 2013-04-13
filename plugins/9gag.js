@@ -22,5 +22,12 @@ module.exports = {
                 }
             });
         });
+    },
+    onHelpRequest: function(client, server, user, message, parts) {
+        client.say(user.getNick(), "# Beschreibung:");
+        client.say(user.getNick(), "#   Postet den Link eines zufälligen Bildes von www.9gag.com im Channel.");
+        client.say(user.getNick(), "# Verwendung:");
+        client.say(user.getNick(), "#   !9gag");
+        client.say(user.getNick(), "#   " + CONFIG.get('irc:nick') + " 9gag");
     }
 };

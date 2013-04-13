@@ -1,7 +1,7 @@
 module.exports = {
     onCommand: function(client, server, channel, commandChar, name, params, user, text, message) {
         if(name == "duden" || name == "d") {
-            if( params.length === 0 ) return client.notice(user.getNick(), commandChar + name + " <Text>");
+            if( params.length === 0 ) return client.notice(user.getNick(), commandChar + name + " <Begriff>");
             var url = "http://www.duden.de/rechtschreibung/" + encodeURIComponent(text);
             REQUEST(url, function (error, response, body) {
                 if(!error) {
@@ -91,5 +91,13 @@ module.exports = {
                 }
             });
         });
+    },
+    onHelpRequest: function(client, server, user, message, parts) {
+        client.say(user.getNick(), "# Beschreibung:");
+        client.say(user.getNick(), "#   Gibt die Definition eines Begriffes aus dem Duden zurück.");
+        client.say(user.getNick(), "# Verwendung:");
+        client.say(user.getNick(), "#   !duden <Begriff>");
+        client.say(user.getNick(), "#   " + CONFIG.get('irc:nick') + " definiere <Begriff>");
+        client.say(user.getNick(), "#   " + CONFIG.get('irc:nick') + " duden <Begriff>");
     }
 };

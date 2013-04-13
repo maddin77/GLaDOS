@@ -47,5 +47,12 @@ module.exports = {
                 });
             }
         }
+    },
+    onHelpRequest: function(client, server, user, message, parts) {
+        client.say(user.getNick(), "# Beschreibung:");
+        client.say(user.getNick(), "#   Postet den Titel einer Webseite im Channel, wenn ein Link im Channel gepostet wurde.");
+        client.say(user.getNick(), "#   Wird ein YouTube-Link gepostet, so wird der Titel des Videos sowie die Länge gepostet.");
+        client.say(user.getNick(), "# Verwendung:");
+        client.say(user.getNick(), "#   -");
     }
 };

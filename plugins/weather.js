@@ -45,5 +45,15 @@ module.exports = {
                 }
             });
         });
+    },
+    onHelpRequest: function(client, server, user, message, parts) {
+        client.say(user.getNick(), "# Beschreibung:");
+        client.say(user.getNick(), "#   Postet das aktuelle Wetter der angegebene Stadt im Channel.");
+        client.say(user.getNick(), "# Verwendung:");
+        client.say(user.getNick(), "#   !weather <Stadt>");
+        client.say(user.getNick(), "#   !wetter <Stadt>");
+        client.say(user.getNick(), "#   !w <Stadt>");
+        client.say(user.getNick(), "#   " + CONFIG.get('irc:nick') + " wetter <Stadt>");
+        client.say(user.getNick(), "#   " + CONFIG.get('irc:nick') + " wie ist das wetter in <Stadt>");
     }
 };

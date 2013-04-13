@@ -33,5 +33,15 @@ module.exports = {
                 }
             });
         });
+    },
+    onHelpRequest: function(client, server, user, message, parts) {
+        client.say(user.getNick(), "# Beschreibung:");
+        client.say(user.getNick(), "#   Gibt das Ergebniss der angegebenen rechnung aus.");
+        client.say(user.getNick(), "# Verwendung:");
+        client.say(user.getNick(), "#   !calculate <term>");
+        client.say(user.getNick(), "#   !calc <term>");
+        client.say(user.getNick(), "#   !c <term>");
+        client.say(user.getNick(), "#   " + CONFIG.get('irc:nick') + " rechne  <term>");
+        client.say(user.getNick(), "#   " + CONFIG.get('irc:nick') + " wie viel ist  <term>");
     }
 };

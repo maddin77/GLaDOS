@@ -4,5 +4,11 @@ module.exports = {
             var mem = process.memoryUsage();
             client.notice(user.getNick(), UTIL.readableNumber(mem.rss) + " (v8: " + UTIL.readableNumber(mem.heapUsed) + " / " + UTIL.readableNumber(mem.heapTotal) + ")");
         }
+    },
+    onHelpRequest: function(client, server, user, message, parts) {
+        client.say(user.getNick(), "# Beschreibung:");
+        client.say(user.getNick(), "#   Zeigt die aktuelle Speicherausnutzung an.");
+        client.say(user.getNick(), "# Verwendung:");
+        client.say(user.getNick(), "#   !memory");
     }
 };

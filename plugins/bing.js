@@ -22,5 +22,13 @@ module.exports = {
                 }
             });
         });
+    },
+    onHelpRequest: function(client, server, user, message, parts) {
+        client.say(user.getNick(), "# Beschreibung:");
+        client.say(user.getNick(), "#   Sucht nach einem oder mehrteren Suchbegriffen auf www.bing.com und Postet den ersten Link.");
+        client.say(user.getNick(), "# Verwendung:");
+        client.say(user.getNick(), "#   !bing <Suchbegriff(e)>");
+        client.say(user.getNick(), "#   " + CONFIG.get('irc:nick') + " such(e) <Suchbegriff(e)>");
+        client.say(user.getNick(), "#   " + CONFIG.get('irc:nick') + " such(e) nach <Suchbegriff(e)>");
     }
 };

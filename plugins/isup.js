@@ -25,5 +25,13 @@ module.exports = {
                 }
             });
         });
+    },
+    onHelpRequest: function(client, server, user, message, parts) {
+        client.say(user.getNick(), "# Beschreibung:");
+        client.say(user.getNick(), "#   Prüft ob die angegebene Webseite Erreichbar ist.");
+        client.say(user.getNick(), "# Verwendung:");
+        client.say(user.getNick(), "#   !isup <Website, z.b google.de>");
+        client.say(user.getNick(), "#   " + CONFIG.get('irc:nick') + " is <Website, z.b google.de> online?");
+        client.say(user.getNick(), "#   " + CONFIG.get('irc:nick') + " ist <Website, z.b google.de> offline");
     }
 };

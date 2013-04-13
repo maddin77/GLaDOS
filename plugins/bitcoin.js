@@ -1,41 +1,57 @@
 module.exports = {
+    getBitoinData: function(callback) {
+        REQUEST("http://blockchain.info/de/ticker", function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+                body = body.replace(/(\r\n|\n|\r)/gm,"");
+                var data = JSON.parse(body);
+                callback(true, data.EUR.buy, data.EUR.sell);
+            }
+            else {
+                callback(false, error, response.statusCode);
+            }
+        });
+    },
     onCommand: function(client, server, channel, commandChar, name, params, user, text, message) {
         if(name == "bitcoin" || name == "btc") {
-            REQUEST("http://data.mtgox.com/api/2/BTCEUR/money/ticker", function (error, response, body) {
-                if (!error && response.statusCode == 200) {
-                    var bitcoin = JSON.parse(body);
-                    if(bitcoin.result == "success") {
-                        var buy = bitcoin.data.buy.value;
-                        var sell = bitcoin.data.sell.value;
-                        if(params.length === 0) {
-                            client.say(channel.getName(), user.getNick() + ": Kaufen: " + buy + "€/BTC, Verkaufen: " + sell + "€/BTC (data from www.mtgox.com)");
-                        }
-                        else {
-                            client.say(channel.getName(), user.getNick() + ": Kaufen: " + (buy*parseFloat(params[0])) + " €, Verkaufen: " + (sell*parseFloat(params[0])) + " € (data from www.mtgox.com)");
-                        }
+            this.getBitoinData(function(success, buy, sell) {
+                if(success) {
+                    if(params.length === 0) {
+                        client.say(channel.getName(), user.getNick() + ": Kaufen: " + buy + "€/BTC, Verkaufen: " + sell + "€/BTC (data from www.blockchain.info)");
                     }
                     else {
-                        client.notice(user.getNick(), bitcoin.error);
+                        if(!isNaN(params[0])) {
+                            client.say(channel.getName(), user.getNick() + ": Kaufen: " + (buy*parseFloat(params[0])) + "€/" + params[0] + ", Verkaufen: " + (sell*parseFloat(params[0])) + "€/" + params[0] + " (data from www.blockchain.info)");
+                        }
                     }
+                }
+                else {
+                    client.notice(user.getNick(), sell + ": " + buy);
                 }
             });
         }
     },
     onResponseMessage: function(client, server, channel, user, message) {
+        var that = this;
         message.rmatch("^bitcoin(s)?( kurs)?", function(match) {
-            REQUEST("http://data.mtgox.com/api/2/BTCEUR/money/ticker", function (error, response, body) {
-                if (!error && response.statusCode == 200) {
-                    var bitcoin = JSON.parse(body);
-                    if(bitcoin.result == "success") {
-                        var buy = bitcoin.data.buy.value;
-                        var sell = bitcoin.data.sell.value;
-                        client.say(channel.getName(), user.getNick() + ": Kaufen: " + buy + "€/BTC, Verkaufen: " + sell + "€/BTC (data from www.mtgox.com)");
-                    }
-                    else {
-                        client.notice(user.getNick(), bitcoin.error);
-                    }
+            that.getBitoinData(function(success, buy, sell) {
+                if(success) {
+                    client.say(channel.getName(), user.getNick() + ": Kaufen: " + buy + "€/BTC, Verkaufen: " + sell + "€/BTC (data from www.blockchain.info)");
+                }
+                else {
+                    client.notice(user.getNick(), sell + ": " + buy);
                 }
             });
         });
+    },
+    onHelpRequest: function(client, server, user, message, parts) {
+        client.say(user.getNick(), "# Beschreibung:");
+        client.say(user.getNick(), "#   Gibt den aktuellen Kurs für Bitcoins in Euro aus oder Berechnet den An- und Verkaufswert für die angegebene Menge an Bitcoins.");
+        client.say(user.getNick(), "# Verwendung:");
+        client.say(user.getNick(), "#   !bitcoin");
+        client.say(user.getNick(), "#   !btc");
+        client.say(user.getNick(), "#   !bitcoin <Menge>");
+        client.say(user.getNick(), "#   !btc <Menge>");
+        client.say(user.getNick(), "#   " + CONFIG.get('irc:nick') + " bitcoin(s)");
+        client.say(user.getNick(), "#   " + CONFIG.get('irc:nick') + " bitcoin(s) kurs");
     }
 };

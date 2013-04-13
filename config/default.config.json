@@ -4,9 +4,7 @@
     "quitMSG": "bye",
     "version": "1337^drölf",
 
-    "plugins": [],
-
-    "loggin": {
+    "logging": {
         "log": true,
         "debug": true,
         "error": true
@@ -29,5 +27,12 @@
         "certExpired": false,
         "floodProtection": false,
         "floodProtectionDelay": 1000
+    },
+
+    "mysql": {
+        "host": "127.0.0.1",
+        "user": "",
+        "pass": "",
+        "database": "James"
     }
 }

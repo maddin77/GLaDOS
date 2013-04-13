@@ -18,6 +18,17 @@ module.exports = {
     onCommand: function(client, server, channel, commandChar, name, params, user, text, message) {},
 
     /**
+     * Wird aufgerufen, wenn jemand /msg James HELP <Pluginname> benutzt.
+     *
+     * @param {Object.IRC.Client} client Eine instanz der IRC.Client Klasse.
+     * @param {Object.Server} server Eine instanz der Server Klasse.
+     * @param {Object.User} user Eine instanz der User Klasse, repräsentiert den Benutzer der den Befehl gesendet hat.
+     * @param {String} message Der Text des Benutzers, ohne "HELP <Pluginname>".
+     * @param {Array.String} parts Der Text nach dem Befehl, ohne "HELP <Pluginname>" und gesplittet durch Leerzeichen.
+     */
+    onHelpRequest: function(client, server, user, message, parts) {}
+
+    /**
      * Wird aufgerufen, wenn ein Benutzer den Bot im Channel direkt anspricht.
      *
      * @param {Object.IRC.Client} client Eine instanz der IRC.Client Klasse.
@@ -190,12 +201,12 @@ module.exports = {
     onIRCError: function(client, server, message) {},
 
     /**
-     * Wird aufgerufen, wenn ein Plugin geladen wird. 
+     * Wird aufgerufen, wenn das Plugin geladen wird. 
      */
     onLoad: function() {},
 
     /**
-     * Wird aufgerufen, wenn ein Plugin entfernt wird. 
+     * Wird aufgerufen, wenn das Plugin entfernt wird. 
      */
     onUnload: function() {}
 };

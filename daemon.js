@@ -14,8 +14,8 @@ function spawn() {
         if(code === null && signal == "SIGTERM") {
             respawn();
         }
-        else if(code == 65786974) {
-            //process.exit(0);
+        else if(code == 1) {
+            process.exit(1);
         }
         else {
              log('James exited with code ' + (code ? code.toString() : "null") + " and signal " + (signal ? signal.toString() : "null"));

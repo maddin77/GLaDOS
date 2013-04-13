@@ -6,5 +6,12 @@ module.exports = {
                 client.say(channel.getName(), user.getNick() + ": " + img);
             });
         }
+    },
+    onHelpRequest: function(client, server, user, message, parts) {
+        client.say(user.getNick(), "# Beschreibung:");
+        client.say(user.getNick(), "#   Postet den Link eines zufälligen Facepalm-Bildes im Channel.");
+        client.say(user.getNick(), "# Verwendung:");
+        client.say(user.getNick(), "#   !facepalm");
+        client.say(user.getNick(), "#   !fp");
     }
 };

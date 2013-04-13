@@ -17,5 +17,12 @@ module.exports = {
                 }
             });
         }
+    },
+    onHelpRequest: function(client, server, user, message, parts) {
+        client.say(user.getNick(), "# Beschreibung:");
+        client.say(user.getNick(), "#   Postet die Definition des Begriffes von www.urbandictionary.com im Channel.");
+        client.say(user.getNick(), "# Verwendung:");
+        client.say(user.getNick(), "#   !urban <Text>");
+        client.say(user.getNick(), "#   !ud <Text>");
     }
 };

@@ -7,7 +7,7 @@ module.exports = {
     },
     onCommand: function(client, server, channel, commandChar, name, params, user, text, message) {
         if(name == "poll") {
-            if( !user.hasMinMode("%") ) return client.notice(user.getNick(), "Du hast nicht die nötigen rechte dazu.");
+            if( !channel.userHasMinMode(user.getNick(), "%") ) return client.notice(user.getNick(), "Du hast nicht die nötigen rechte dazu.");
             if( params.length === 0 ) return client.notice(user.getNick(), commandChar + name + " <OPEN / CLOSE / RESET / RESULTS>");
             if(params[0].toLowerCase() == "open") {
                 if( this._poll.open ) return client.notice(user.getNick(), "Es läuft z.Z. bereits eine Umfrage.");
@@ -71,5 +71,12 @@ module.exports = {
     },
     onUnload: function() {
         this._poll = null;
+    },
+    onHelpRequest: function(client, server, user, message, parts) {
+        client.say(user.getNick(), "# Beschreibung:");
+        client.say(user.getNick(), "#   Erstellt eine Umfrage im Channel.");
+        client.say(user.getNick(), "# Verwendung:");
+        client.say(user.getNick(), "#   !vote");
+        client.say(user.getNick(), "#   !poll <OPEN / CLOSE / RESET / RESULTS>");
     }
 };

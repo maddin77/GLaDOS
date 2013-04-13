@@ -12,7 +12,8 @@ module.exports = {
                     else {
                         var output = stdout+'';
                         if(!/Already up\-to\-date/.test(output)) {
-                            client.say(channel.getName(), "my source code changed:\n"+output);
+                            //client.say(channel.getName(), "my source code changed:\n"+output);
+                            client.say(channel.getName(), "my source code changed");
                             changes = true;
                         }
                         else {
@@ -28,7 +29,8 @@ module.exports = {
                             else {
                                 var output = stdout+'';
                                 if(/node_modules/.test(output)) {
-                                    client.say(channel.getName(), "some dependencies updated:\n"+output);
+                                    //client.say(channel.getName(), "some dependencies updated:\n"+output);
+                                    client.say(channel.getName(), "some dependencies updated");
                                     changes = true;
                                 }
                                 else {
@@ -52,5 +54,11 @@ module.exports = {
                 client.say(channel.getName(), "git pull failed: " + error);
             }
         }
+    },
+    onHelpRequest: function(client, server, user, message, parts) {
+        client.say(user.getNick(), "# Beschreibung:");
+        client.say(user.getNick(), "#   Updated James auf den neuesten Stand.");
+        client.say(user.getNick(), "# Verwendung:");
+        client.say(user.getNick(), "#   !update");
     }
 };

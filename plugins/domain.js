@@ -1,12 +1,18 @@
 module.exports = {
     onCommand: function(client, server, channel, commandChar, name, params, user, text, message) {
         if(name == "domain") {
-            var url = "http://www.whoissmart.com/whois/" + text;
+            var url = "http://whois.domaintools.com/" + text;
             REQUEST(url, function (error, response, body) {
                 if (!error) {
                     var $ = CHEERIO.load(body);
-                    var pre = $('pre').text();
-                    if(response.statusCode == 404 || pre.length === 0) {
+                    console.log(body, response.statusCode);
+                    if(response.statusCode == 403) {
+                        return client.say(channel.getName(), user.getNick() + ": The domain or IP you have entered seems malformed.");
+                    }
+                    if(new RegExp("<h2>This domain name is not registered</h2>", "gm").test(body)) {
+                        return client.say(channel.getName(), user.getNick() + ": This domain name is not registered.");
+                    }
+                    /*if(response.statusCode == 404 || pre.length === 0) {
                         client.say(channel.getName(), user.getNick() + ": Invalid Domain/Request");
                         return;
                     }
@@ -24,7 +30,7 @@ module.exports = {
                             client.say(channel.getName(), user.getNick() + ": " + text + " ist Frei.");
                             return;
                         }
-                    }
+                    }*/
                 }
             });
         }
