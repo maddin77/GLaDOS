@@ -328,7 +328,9 @@ CLIENT.addListener('+mode', function(channel, by, mode, argument, message) {
     if (typeof argument !== 'undefined') {
         //TODO: pw
         _channel.addUserMode(argument, mode);
-        CLIENT.whois(_user.getNick());
+        if(_channel.userExistInChannel(argument)) {
+            CLIENT.whois(SERVER.getUser(argument).getNick());
+        }
         LOG.log('[{@cyan}%s{@reset}] %s setze den Mode: +%s %s', channel, by, mode, argument);
     } else {
         _channel.setMode(mode);
@@ -346,7 +348,9 @@ CLIENT.addListener('-mode', function(channel, by, mode, argument, message) {
     if (typeof argument !== 'undefined') {
         //TODO: pw
         _channel.remUserMode(argument, mode);
-        CLIENT.whois(_user.getNick());
+        if(_channel.userExistInChannel(argument)) {
+            CLIENT.whois(SERVER.getUser(argument).getNick());
+        }
         LOG.log('[{@cyan}%s{@reset}] %s setze den Mode: -%s %s', channel, by, mode, argument);
     } else {
         _channel.setMode(mode);
