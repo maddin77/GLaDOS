@@ -1,7 +1,7 @@
 {
     "name": "James",
     "preferGlobal": false,
-    "version": "0.1.3",
+    "version": "0.1.4",
     "author": "Martin Rump <admin@maddin.cc>",
     "description": "James IRC-Bot",
     "contributors": [ 

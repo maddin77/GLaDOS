@@ -66,6 +66,10 @@ moar plugins
 
 ## Changelog
 ============
+### Version 0.1.4 *(17.04.2013)*
+* [bitcoin](https://github.com/maddin77/James/blob/master/plugins/bitcoin.js) Plugin wieder auf alte API geändert.
+* Bei Unbehandelten Exceptions wird James nun versuchen "sicher" zu beenden, d.h alle Plugins zu entladen und dann abschalten.
+
 ### Version 0.1.3 *(13.04.2013)*
 * Per `!plugin enable/disable` können einzelne Plugins nun nur für bestimmte Channel de-/aktiviert werden. Das entfernen aus dem Speicher (`!plugin load/unload`) sollte nur benutzt werden um defekte Plugins zu entfernen bzw. neue zu laden. Per `!plugin listenabled` werden alle Plugins aufgelistet die im moment im Channel aktiviert sind.
 * Es werden nun automatisch alle Plugins im `/plugins` Ordner geladen. Der Eintrag aus der `config.json` wurde entfernt bzw wird ignoriert sofern noch vorhanden.
