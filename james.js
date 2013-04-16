@@ -53,6 +53,11 @@ QUIT = function(code) {
         }, 1000);
     });
 };
+process.on('uncaughtException', function(err) {
+    LOG.error("Caught exception: "+ err);
+    LOG.error("Shutting down.");
+    QUIT(1);
+});
 
 CLIENT.addListener('registered', function(message) {
     LOG.log('[{@green}%s{@reset}] %s', CONFIG.get('irc:server'), message.args.join(' '));

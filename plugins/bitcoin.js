@@ -1,10 +1,14 @@
 module.exports = {
     getBitoinData: function(callback) {
-        REQUEST("http://blockchain.info/de/ticker", function (error, response, body) {
+        REQUEST("http://data.mtgox.com/api/2/BTCEUR/money/ticker", function (error, response, body) {
             if (!error && response.statusCode == 200) {
-                body = body.replace(/(\r\n|\n|\r)/gm,"");
-                var data = JSON.parse(body);
-                callback(true, data.EUR.buy, data.EUR.sell);
+                var bitcoin = JSON.parse(body);
+                if(bitcoin.result == "success") {
+                    callback(true, parseFloat(bitcoin.data.buy.value.toString()), parseFloat(bitcoin.data.sell.value.toString()));
+                }
+                else {
+                   callback(false, error, bitcoin.result);
+                }
             }
             else {
                 callback(false, error, response.statusCode);
@@ -16,11 +20,11 @@ module.exports = {
             this.getBitoinData(function(success, buy, sell) {
                 if(success) {
                     if(params.length === 0) {
-                        client.say(channel.getName(), user.getNick() + ": Kaufen: " + buy + "€/BTC, Verkaufen: " + sell + "€/BTC (data from www.blockchain.info)");
+                        client.say(channel.getName(), user.getNick() + ": Kaufen: " + buy + "€/BTC, Verkaufen: " + sell + "€/BTC (data from www.mtgox.com)");
                     }
                     else {
                         if(!isNaN(params[0])) {
-                            client.say(channel.getName(), user.getNick() + ": Kaufen: " + (buy*parseFloat(params[0])) + "€/" + params[0] + ", Verkaufen: " + (sell*parseFloat(params[0])) + "€/" + params[0] + " (data from www.blockchain.info)");
+                            client.say(channel.getName(), user.getNick() + ": Kaufen: " + (buy*parseFloat(params[0])) + "€/" + params[0] + ", Verkaufen: " + (sell*parseFloat(params[0])) + "€/" + params[0] + " (data from www.mtgox.com)");
                         }
                     }
                 }
@@ -35,7 +39,7 @@ module.exports = {
         message.rmatch("^bitcoin(s)?( kurs)?", function(match) {
             that.getBitoinData(function(success, buy, sell) {
                 if(success) {
-                    client.say(channel.getName(), user.getNick() + ": Kaufen: " + buy + "€/BTC, Verkaufen: " + sell + "€/BTC (data from www.blockchain.info)");
+                    client.say(channel.getName(), user.getNick() + ": Kaufen: " + buy + "€/BTC, Verkaufen: " + sell + "€/BTC (data from www.mtgox.com)");
                 }
                 else {
                     client.notice(user.getNick(), sell + ": " + buy);
