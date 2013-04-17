@@ -1,7 +1,7 @@
 {
     "name": "James",
     "preferGlobal": false,
-    "version": "0.1.4",
+    "version": "0.1.5",
     "author": "Martin Rump <admin@maddin.cc>",
     "description": "James IRC-Bot",
     "contributors": [ 
@@ -19,8 +19,9 @@
         "crypto": "*",
         "irc": "*",
         "moment": "*",
-        "request": "*",
-        "mysql": "*"
+        "mysql": "*",
+        "nconf": "*",
+        "request": "*"
     },
     "license": "MIT",
     "engines": {

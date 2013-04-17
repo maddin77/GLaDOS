@@ -9,7 +9,9 @@ MYSQL   = require('mysql');
 
 /* LIBS
    ============================= */
-CONFIG  = require('./lib/config.js').load();
+CONFIG  = require('nconf');
+CONFIG.file('', {json_spacing: 4, file: './config/config.json'});
+
 LOG     = require('./lib/logging.js');
 DATABASE= MYSQL.createConnection(CONFIG.get('mysql'));
 DATABASE.connect(function(err) {

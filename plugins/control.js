@@ -1,9 +1,11 @@
 module.exports = {
     onCommand: function(client, server, channel, commandChar, name, params, user, text, message) {
-        if(name == "exit" && user.hasPermissions()) {
+        if(name == "exit") {
+            if(!user.hasPermissions()) return client.notice(user.getNick(), "Du hast nicht die nötigen Rechte dazu.");
             QUIT(1);
         }
-        if(name == "restart" && user.hasPermissions()) {
+        if(name == "restart") {
+            if(!user.hasPermissions()) return client.notice(user.getNick(), "Du hast nicht die nötigen Rechte dazu.");
             QUIT(0);
         }
     },

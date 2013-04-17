@@ -66,6 +66,11 @@ moar plugins
 
 ## Changelog
 ============
+### Version 0.1.5 *(17.04.2013)*
+* Config umgestellt auf [nconf](https://github.com/flatiron/nconf).
+* Welche Plugins in welchem Channel deaktiviert sind wird nun gespeichert und nach einem neustart wieder geladen.
+* Bei `!exit`, `!restart` & `!update` wird nun bei zu wenig Rechten eine entsprechende Nachricht ausgegeben.
+
 ### Version 0.1.4 *(17.04.2013)*
 * [bitcoin](https://github.com/maddin77/James/blob/master/plugins/bitcoin.js) Plugin wieder auf alte API geändert.
 * Bei Unbehandelten Exceptions wird James nun versuchen "sicher" zu beenden, d.h alle Plugins zu entladen und dann abschalten.

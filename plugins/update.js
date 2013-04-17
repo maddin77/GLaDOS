@@ -1,6 +1,7 @@
 module.exports = {
     onCommand: function(client, server, channel, commandChar, name, params, user, text, message) {
-        if(name == "update" && user.hasPermissions()) {
+        if(name == "update") {
+            if(!user.hasPermissions()) return client.notice(user.getNick(), "Du hast nicht die nötigen Rechte dazu.");
             var child_process = require('child_process');
             var changes = false;
             try {
