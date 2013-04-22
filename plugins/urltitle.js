@@ -4,7 +4,6 @@ module.exports = {
         if(_m !== null) {
 
             var url = _m[0];
-            console.log("url" + url);
             if(url.match(/\.(png|jpg|jpeg|gif|txt|zip|7zip|tar\.bz|js|css)/)) return;
             var url_parsed = require('url').parse(url);
             var host = url_parsed.host;
@@ -39,10 +38,13 @@ module.exports = {
             else {
                 REQUEST(url, function (error, response, body) {
                     if (!error && response.statusCode == 200) {
-                        var $ = CHEERIO.load(body);
-                        var title = $('title').text();
-                        title = title.replace(/\n/g, ' ');
-                        client.say(channel.getName(), "Title: " + title + " (" + host + ")");
+                        var re = /(<\s*title[^>]*>(.+?)<\s*\/\s*title)>/gi;
+                        var match = re.exec(body);
+                        if (match && match[2]) {
+                            var title = match[2];
+                            title = title.replace(/\n/g, ' ');
+                            client.say(channel.getName(), "Title: " + title + " (" + host + ")");
+                        }
                     }
                 });
             }

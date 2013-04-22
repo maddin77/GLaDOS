@@ -1,71 +1,25 @@
 # James
+Installation, Konfiguration und weitere Infos gibts [hier](http://maddin77.github.io/James/).
 
-## ToDo
+## Lizenz
 ============
-moar plugins
+Everyone is permitted to copy and distribute verbatim or modified 
+copies of this software and associated documentation files, and 
+changing it is allowed as long as the name is changed.
 
-## Installation
-============
+You just DO WHAT THE FUCK YOU WANT TO. 
 
-1. Installiere [node.js](http://nodejs.org/).
-2. `$ git clone https://github.com/maddin77/James.git`
-3. `$ cd James`
-4. Installiere alle abhängigkeiten mit npm:
-<pre>$ npm install</pre>
-5. Eine neue MySQL-Datenbank für James erstellen. 
-6. Unter `config/` die Datei `default.config.json` in `config.json` umbenennen und den Wünschen nach anpassen (siehe [konfiguration](#konfiguration)).
-7. per `node daemon.js` *(innerhalb des Ordner)* starten.
-8. ...
-9. profit.
-
-## Konfiguration
-============
-```javascript
-{
-    "commandChar": "!", //Char zum erkennen von Befehlen
-    "permissions": [], //Benutzer die Spezielle Rechte haben (update, exit, etc.)
-    "quitMSG": "bye", //Nachricht die beim Beenden gesendet wird (quit: )
-    "version": "1337^drölf", //antwort auf ctcp-version
-
-    "loggin": {
-        "log": true, //standard ausgabe an/aus
-        "debug": true, //debug ausgabe an/aus
-        "error": true //fehler ausgabe an/aus
-    },
-
-    "irc": {
-        "server": "chat.kerat.net", //host des irc-servers
-        "nick": "", //nick des bots
-        "userName": "", //name des bots
-        "realName": "", //realname des bots
-        "password": "", //passwort des bots (nickserv)
-        "port": 6667, //port des irc-servers
-        "debug": false, //irc debug an/aus
-        "showErrors": false, //selbsterklärend...
-        "autoRejoin": true, //selbsterklärend...
-        "autoConnect": true, //selbsterklärend...
-        "channels": ["#dev"], //selbsterklärend...
-        "secure": false, //ssl ja/nein
-        "selfSigned": false, //selbst signierte zertifikate erlauben ja/nein
-        "certExpired": false, //abgelaufene zertifikate erlauben ja/nein
-        "floodProtection": false, //verhindert, das zu viele nachrichten auf einmal an den server gesendet werden
-        "floodProtectionDelay": 1000 //s.o
-    },
-
-    "mysql": {
-        "host": "127.0.0.1", //host des MySQL-Servers
-        "user": "", //MySQL Benutzer
-        "pass": "", //MySQL Passwort
-        "database": "James" //MySQL Datenbank Name
-    }
-}
-```
-## Plugin-Entwicklung
-============
-[Look here.](https://github.com/maddin77/James/tree/master/plugins)
+This program is free software. It comes without any warranty, to
+the extent permitted by applicable law. You can redistribute it
+and/or modify it under the terms of the Do What The Fuck You Want
+To Public License, Version 2, as published by Sam Hocevar. See
+http://sam.zoy.org/wtfpl/COPYING for more details
 
 ## Changelog
 ============
+### Version 0.1.6 *(17.04.2013)*
+* Plugin [urltitle](https://github.com/maddin77/James/blob/master/plugins/urltitle.js) gefixxt.
+
 ### Version 0.1.5 *(17.04.2013)*
 * Config umgestellt auf [nconf](https://github.com/flatiron/nconf).
 * Welche Plugins in welchem Channel deaktiviert sind wird nun gespeichert und nach einem neustart wieder geladen.
