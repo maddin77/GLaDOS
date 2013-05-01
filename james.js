@@ -1,3 +1,6 @@
+/* TODO */
+//-
+
 /* NODE-MODULES
    ============================= */
 IRC     = require('irc');
@@ -6,6 +9,7 @@ CRYPTO  = require('crypto');
 CHEERIO = require('cheerio');
 MOMENT  = require('moment');
 MYSQL   = require('mysql');
+EXPRESS = require('express');
 
 /* LIBS
    ============================= */
@@ -42,18 +46,12 @@ CLIENT  = new IRC.Client(CONFIG.get('irc:server'), CONFIG.get('irc:nick'), CONFI
 QUIT = function(code) {
     PLUGINS.unloadAll();
     CLIENT.disconnect( CONFIG.get('quitMSG') );
-    DATABASE.end();
-    CONFIG.save(function(err) {
-        if(err) {
-            console.log(err);
-            setTimeout(function() {
-                process.exit(1);
-            }, 1000);
-        }
-        setTimeout(function() {
-            process.exit(code);
-        }, 1000);
-    });
+    try {
+        DATABASE.end();
+    } catch(e) {}
+    setTimeout(function() {
+        process.exit(code);
+    }, 1000);
 };
 process.on('uncaughtException', function(err) {
     LOG.error("Caught exception: "+ err);
@@ -174,22 +172,21 @@ CLIENT.addListener('message', function(nick, to, text, message) {
             var parts = text.split(" ");
             if(parts.length == 1) {
                 CLIENT.say(nick, "***** " + CONFIG.get('irc:nick') + " Help *****");
-                CLIENT.say(nick, "Ich bin ein Bot und reagiere auf bestimmte Befehle bzw.");
-                CLIENT.say(nick, "Interaktionen im Channel.");
+                CLIENT.say(nick, "Ich bin ein Bot und reagiere auf bestimmte Befehle bzw. Interaktionen im Channel.");
                 CLIENT.say(nick, " ");
-                CLIENT.say(nick, "Für mehr Informationen, benutze:");
+                CLIENT.say(nick, "Für mehr Informationen zu meinen Funktionen, benutze:");
                 CLIENT.say(nick, "/msg " + CONFIG.get('irc:nick') + " HELP <plugin>");
                 CLIENT.say(nick, " ");
-                CLIENT.say(nick, "Folgende Plugins sind verfügbar:");
-                CLIENT.say(nick, PLUGINS.getAllAsString(", ", false));
+                CLIENT.say(nick, "Folgende Plugins sind installiert:");
+                CLIENT.say(nick, PLUGINS.getAllAsString(", "));
                 CLIENT.say(nick, "***** " + CONFIG.get('irc:nick') + " Help *****");
             }
             else {
-                if(!PLUGINS.plugins.hasOwnProperty(parts[1]+".js")) {
+                if(!PLUGINS.exist(parts[1])) {
                     CLIENT.say(nick, "Für das Plugin " + parts[1] + " ist keine Hilfe verfügbar.");
                 }
                 else {
-                    var pl_ = PLUGINS.plugins[parts[1]+".js"];
+                    var pl_ = PLUGINS.plugins[parts[1]];
                     if(typeof pl_.onHelpRequest !== 'undefined') {
                         var msg_ = text.substr(parts[0].length + 1 + parts[1].length + 1);
                         parts = msg_.split(" ");
@@ -432,7 +429,7 @@ CLIENT.addListener('error', function(message) {
 require('fs').readdir("./plugins", function(err, files) {
     for(var f in files) {
         var name = files[f];
-        if(name == "README.md") continue;
+        if(name == "README.md" || name[0] == "_") continue;
         PLUGINS.loadPlugin(name);
     }
 });

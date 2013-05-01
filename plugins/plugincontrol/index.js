@@ -5,21 +5,21 @@ module.exports = {
             if(params.length === 0) return client.notice(user.getNick(), commandChar + name + " <ENABLE/DISABLE/LOAD/UNLOAD/RELOAD/LIST/LISTENABLED>");
             if(params[0].toLowerCase() == "load") {
                 if(params.length == 1) return client.notice(user.getNick(), commandChar + name + " LOAD <Pluginname>");
-                var pluginName = params[1]+".js";
+                var pluginName = params[1];
                 var pl = PLUGINS.loadPlugin(pluginName);
                 if(pl) return client.notice(user.getNick(), "Plugin \"" + params[1] + "\" wurde geladen.");
-                else return client.notice(user.getNick(), "Plugin \"" + params[1] + "\" ist bereits geladen.");
+                else return client.notice(user.getNick(), "Plugin \"" + params[1] + "\" ist bereits geladen oder existiert nicht.");
             }
             else if(params[0].toLowerCase() == "unload") {
                 if(params.length == 1) return client.notice(user.getNick(), commandChar + name + " UNLOAD <Pluginname>");
-                var _pluginName = params[1]+".js";
+                var _pluginName = params[1];
                 var _pl = PLUGINS.unloadPlugin(_pluginName);
                 if(_pl) return client.notice(user.getNick(), "Plugin \"" + params[1] + "\" wurde aus dem Speicher entfernt.");
                 else return client.notice(user.getNick(), "Plugin \"" + params[1] + "\" ist nicht geladen.");
             }
             else if(params[0].toLowerCase() == "reload") {
                 if(params.length == 1) return client.notice(user.getNick(), commandChar + name + " RELOAD <Pluginname>");
-                var __pluginName = params[1]+".js";
+                var __pluginName = params[1];
                 var __pl = PLUGINS.unloadPlugin(__pluginName);
                 if(__pl) {
                     __pl = PLUGINS.loadPlugin(__pluginName);
@@ -27,16 +27,11 @@ module.exports = {
                 }
             }
             else if(params[0].toLowerCase() == "list") {
-                var pNames = [];
-                for(var pName in PLUGINS.plugins) {
-                    pName = pName.slice(0,-3);
-                    pNames.push(pName);
-                }
-                return client.notice(user.getNick(), "Geladene Plugins: " + pNames.join(", "));
+                return client.notice(user.getNick(), "Geladene Plugins: " + PLUGINS.getAllAsString(", "));
             }
             else if(params[0].toLowerCase() == "enable") {
                 if(params.length == 1) return client.notice(user.getNick(), commandChar + name + " ENABLE <Pluginname>");
-                var ___pluginName = params[1]+".js";
+                var ___pluginName = params[1];
                 if(!PLUGINS.isDisabled(___pluginName, channel.getName())) {
                     return client.notice(user.getNick(), "Plugin \"" + params[1] + "\" ist in diesem Channel bereits aktiviert.");
                 }
@@ -47,7 +42,7 @@ module.exports = {
             }
             else if(params[0].toLowerCase() == "disable") {
                 if(params.length == 1) return client.notice(user.getNick(), commandChar + name + " DISABLE <Pluginname>");
-                var ____pluginName = params[1]+".js";
+                var ____pluginName = params[1];
                 if(!PLUGINS.isDisabled(____pluginName, channel.getName())) {
                     PLUGINS.disablePLugin(____pluginName, channel.getName());
                     return client.notice(user.getNick(), "Plugin \"" + params[1] + "\" wurde in diesem Channel deaktiviert.");
@@ -60,7 +55,7 @@ module.exports = {
                 var _pNames = [];
                 for(var _pName in PLUGINS.plugins) {
                     if(!PLUGINS.isDisabled(_pName, channel.getName())) {
-                        _pNames.push(_pName.slice(0,-3));
+                        _pNames.push(_pName);
                     }
                 }
                 return client.notice(user.getNick(), "Aktive Plugins in diesem Channel: " + _pNames.join(", "));

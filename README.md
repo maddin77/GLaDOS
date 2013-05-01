@@ -17,8 +17,15 @@ http://sam.zoy.org/wtfpl/COPYING for more details
 
 ## Changelog
 ============
+### Version 0.1.7 *(01.05.2013)*
+* Plugins haben nun einen Eigenen Unterordner.
+* **Neues Plugin**: [google](https://github.com/maddin77/James/blob/master/plugins/google)
+* Plugins die mit einem "_" anfangen werden nicht geladen.
+* HELP gefixxt.
+* **Neues Plugin**: [wolfram](https://github.com/maddin77/James/blob/master/plugins/wolfram)
+
 ### Version 0.1.6 *(17.04.2013)*
-* Plugin [urltitle](https://github.com/maddin77/James/blob/master/plugins/urltitle.js) gefixxt.
+* Plugin [urltitle](https://github.com/maddin77/James/blob/master/plugins/urltitle) gefixxt.
 
 ### Version 0.1.5 *(17.04.2013)*
 * Config umgestellt auf [nconf](https://github.com/flatiron/nconf).
@@ -26,7 +33,7 @@ http://sam.zoy.org/wtfpl/COPYING for more details
 * Bei `!exit`, `!restart` & `!update` wird nun bei zu wenig Rechten eine entsprechende Nachricht ausgegeben.
 
 ### Version 0.1.4 *(17.04.2013)*
-* [bitcoin](https://github.com/maddin77/James/blob/master/plugins/bitcoin.js) Plugin wieder auf alte API geändert.
+* [bitcoin](https://github.com/maddin77/James/blob/master/plugins/bitcoin) Plugin wieder auf alte API geändert.
 * Bei Unbehandelten Exceptions wird James nun versuchen "sicher" zu beenden, d.h alle Plugins zu entladen und dann abschalten.
 
 ### Version 0.1.3 *(13.04.2013)*
@@ -34,10 +41,10 @@ http://sam.zoy.org/wtfpl/COPYING for more details
 * Es werden nun automatisch alle Plugins im `/plugins` Ordner geladen. Der Eintrag aus der `config.json` wurde entfernt bzw wird ignoriert sofern noch vorhanden.
 * MySQL anstelle von Files. Weil wegen isso. Tabellen werden automatisch erstellt.
 * Erkennen von Usermodes innerhalb eines Channels gefixxt.
-* [bitcoin](https://github.com/maddin77/James/blob/master/plugins/bitcoin.js) Plugin auf andere API geändert.
-* [intelligenTs](https://github.com/maddin77/James/blob/master/plugins/intelligenTs.js) entfernt.
-* **Neues Plugin**: [karma](https://github.com/maddin77/James/blob/master/plugins/karma.js)
-* **Neues Plugin**: [wikipedia](https://github.com/maddin77/James/blob/master/plugins/wikipedia.js)
+* [bitcoin](https://github.com/maddin77/James/blob/master/plugins/bitcoin) Plugin auf andere API geändert.
+* [intelligenTs](https://github.com/maddin77/James/blob/master/plugins/intelligenTs) entfernt.
+* **Neues Plugin**: [karma](https://github.com/maddin77/James/blob/master/plugins/karma)
+* **Neues Plugin**: [wikipedia](https://github.com/maddin77/James/blob/master/plugins/wikipedia)
 * Hilfe eingebaut. Per `/msg James HELP` bekommt man nun genaue Hilfe, auch zu den einzelnen Plugins (sofern vorhanden).
 * Neues Event für Plugins: `onHelpRequest: function(client, server, user, message, parts)`. Siehe [Plugin-Entwicklung](#plugin-entwicklung) für mehr Informationen.
 * Die ausgabe der einzelnen commits bei `!update` wurde entfernt.
@@ -45,12 +52,12 @@ http://sam.zoy.org/wtfpl/COPYING for more details
 
 ### Version 0.1.2 *(11.04.2013)*
 * daemon eingebaut. (siehe [Installation Punkt 7](#installation)). DUrch den Daemon wird James bei einem Crash/Exit automatisch neugestartet.
-* **Neues Plugin**: [control](https://github.com/maddin77/James/blob/master/plugins/control.js)
+* **Neues Plugin**: [control](https://github.com/maddin77/James/blob/master/plugins/control)
 
 ### Version 0.1.1 *(10.04.2013)*
-* **Neues Plugin**: [domain](https://github.com/maddin77/James/blob/master/plugins/domain.js)
+* **Neues Plugin**: [domain](https://github.com/maddin77/James/blob/master/plugins/domain)
 * `index.js` heisst nun `james.js`. (siehe [Installation Punkt 7](#installation))
-* Plugin [urltitle](https://github.com/maddin77/James/blob/master/plugins/urltitle.js) gefixxt.
+* Plugin [urltitle](https://github.com/maddin77/James/blob/master/plugins/urltitle) gefixxt.
 * Sonderbehandlung für YouTube-Links beim Posten der URL-Titel.
-* Befehl `!fact` für das Plugin [facts](https://github.com/maddin77/James/blob/master/plugins/facts.js) hinzugefügt.
-* Befehl `!btc` für das Plugin [bitcoin](https://github.com/maddin77/James/blob/master/plugins/bitcoin.js) hinzugefügt.
+* Befehl `!fact` für das Plugin [facts](https://github.com/maddin77/James/blob/master/plugins/facts) hinzugefügt.
+* Befehl `!btc` für das Plugin [bitcoin](https://github.com/maddin77/James/blob/master/plugins/bitcoin) hinzugefügt.
