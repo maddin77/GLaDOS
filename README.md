@@ -15,6 +15,10 @@ and/or modify it under the terms of the Do What The Fuck You Want
 To Public License, Version 2, as published by Sam Hocevar. See
 http://sam.zoy.org/wtfpl/COPYING for more details
 
+## Bekannte Fehler
+============
+* Beim beenden kann es manchmal zu Fehlermeldungen bei Queries kommen. Ist aber nicht weiter tragisch.
+
 ## Changelog
 ============
 ### Version 0.2.0 *(04.05.2013)*
