@@ -54,6 +54,7 @@ module.exports = {
             catch(error) {
                 client.say(channel.getName(), "git pull failed: " + error);
             }
+            return true;
         }
     },
     onHelpRequest: function(client, server, user, message, parts) {

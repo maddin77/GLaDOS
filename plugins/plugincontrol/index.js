@@ -61,6 +61,7 @@ module.exports = {
                 return client.notice(user.getNick(), "Aktive Plugins in diesem Channel: " + _pNames.join(", "));
             }
             else return client.notice(user.getNick(), commandChar + name + " <ENABLE/DISABLE/LOAD/UNLOAD/RELOAD/LIST/LISTENABLED>");
+            return true;
         }
     },
     onHelpRequest: function(client, server, user, message, parts) {

@@ -15,6 +15,7 @@ module.exports = {
                 reason = "-";
             }
             client.send('KICK', channel.getName(), _user.getNick(), "(" + user.getNick() + ") " + reason);
+            return true;
         }
     },
     onHelpRequest: function(client, server, user, message, parts) {

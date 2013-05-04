@@ -57,6 +57,7 @@ module.exports = {
                 _opts4 = _opts4.slice(0, -2);
                 client.say(channel.getName(), "Ergebniss: " + _opts4);
             }
+            return true;
         }
         if(name == "vote") {
             if( params.length === 0 ) return client.notice(user.getNick(), commandChar + name + " <Nummer>");
@@ -67,6 +68,7 @@ module.exports = {
             this._poll.votes[option-1]++;
             this._poll.hasvoted.push(user.getNick());
             client.say(channel.getName(), user.getNick() + ": Deine Stimme für \"" + this._poll.options[option-1] + "\" wurde gezählt.");
+            return true;
         }
     },
     onUnload: function() {

@@ -32,6 +32,7 @@ module.exports = {
                     client.notice(user.getNick(), sell + ": " + buy);
                 }
             });
+            return true;
         }
     },
     onResponseMessage: function(client, server, channel, user, message) {

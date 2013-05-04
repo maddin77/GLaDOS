@@ -15,6 +15,7 @@ module.exports = {
                     catch(e) {}
                 }
             });
+            return true;
         }
     },
     onResponseMessage: function(client, server, channel, user, message) {

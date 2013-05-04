@@ -38,6 +38,7 @@ module.exports = {
             else {
                 client.say(channel.getName(), user.getNick() + ": " + params[0] + " hat " + this.getKarma(params[0]).value + " Karma.");
             }
+            return true;
         }
     },
     onChannelMessage: function(client, server, channel, user, message) {

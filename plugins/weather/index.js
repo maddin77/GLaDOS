@@ -21,6 +21,7 @@ module.exports = {
                     client.say(channel.getName(), city + " wurde nicht gefunden.");
                 }
             });
+            return true;
         }
     },
     onResponseMessage: function(client, server, channel, user, message) {

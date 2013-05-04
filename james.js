@@ -29,6 +29,12 @@ DATABASE.connect(function(err) {
     else {
         DATABASE.query("CREATE TABLE IF NOT EXISTS `channel` (`name` varchar(255) NOT NULL DEFAULT '',`userCount` int(11) DEFAULT NULL,`topic` varchar(255) DEFAULT NULL,`modes` varchar(255) DEFAULT NULL,PRIMARY KEY (`name`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
         DATABASE.query("CREATE TABLE IF NOT EXISTS `user` (`nick` varchar(255) NOT NULL DEFAULT '',`userName` varchar(255) DEFAULT NULL,`host` varchar(255) DEFAULT NULL,`server` varchar(255) DEFAULT NULL,`realName` varchar(255) DEFAULT NULL,`inChannels` varchar(255) DEFAULT NULL,`account` varchar(255) DEFAULT NULL,`idle` int(11) DEFAULT NULL,PRIMARY KEY (`nick`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+        DATABASE.query("CREATE TABLE IF NOT EXISTS `join` (`id` int(11) NOT NULL AUTO_INCREMENT,`channel` varchar(255) DEFAULT NULL,`nick` varchar(255) DEFAULT NULL,`time` varchar(255) DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+        DATABASE.query("CREATE TABLE IF NOT EXISTS `part` (`id` int(11) NOT NULL AUTO_INCREMENT,`channel` varchar(255) DEFAULT NULL,`nick` varchar(255) DEFAULT NULL,`reason` varchar(255) DEFAULT NULL,`time` varchar(255) DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+        DATABASE.query("CREATE TABLE IF NOT EXISTS `quit` (`id` int(11) NOT NULL AUTO_INCREMENT,`nick` varchar(255) DEFAULT NULL,`reason` varchar(255) DEFAULT NULL,`time` varchar(255) DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+        DATABASE.query("CREATE TABLE IF NOT EXISTS `kick` (`id` int(11) NOT NULL AUTO_INCREMENT,`channel` varchar(255) DEFAULT NULL,`nick` varchar(255) DEFAULT NULL,`by` varchar(255) DEFAULT NULL,`reason` varchar(255) DEFAULT NULL,`time` varchar(255) DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+        DATABASE.query("CREATE TABLE IF NOT EXISTS `private_message` (`id` int(11) NOT NULL AUTO_INCREMENT,`nick` varchar(255) DEFAULT NULL,`text` varchar(255) DEFAULT NULL,`time` varchar(255) DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+        DATABASE.query("CREATE TABLE IF NOT EXISTS `channel_message` (`id` int(11) NOT NULL AUTO_INCREMENT,`channel` varchar(255) DEFAULT NULL,`nick` varchar(255) DEFAULT NULL,`text` varchar(255) DEFAULT NULL,`time` varchar(255) DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
     }
 });
 Server  = require('./lib/server.js');
@@ -47,14 +53,18 @@ QUIT = function(code) {
     PLUGINS.unloadAll();
     CLIENT.disconnect( CONFIG.get('quitMSG') );
     try {
-        DATABASE.end();
-    } catch(e) {}
-    setTimeout(function() {
-        process.exit(code);
-    }, 1000);
+        DATABASE.end( function() {
+            setTimeout(function() {
+                process.exit(code);
+            }, 1000);
+        });
+    } catch(e) {
+        throw e;
+    }
 };
 process.on('uncaughtException', function(err) {
     LOG.error("Caught exception: "+ err);
+    LOG.error(err.stack);
     LOG.error("Shutting down.");
     QUIT(1);
 });
@@ -81,7 +91,7 @@ CLIENT.addListener('names', function(channel, nicks) {
         CLIENT.whois(nick);
     }
     nickList = nickList.substr(0, nickList.length-2);
-    LOG.log('[{@cyan}%s{@reset}] User im Channel: %s', channel, nickList);
+    LOG.log('[{@cyan}%s{@reset}] User : %s', channel, nickList);
 });
 
 CLIENT.addListener('topic', function(channel, topic, nick, message) {
@@ -93,7 +103,7 @@ CLIENT.addListener('topic', function(channel, topic, nick, message) {
         "time": date
     });
     LOG.log('[{@cyan}%s{@reset}] Topic: %s', channel, topic);
-    LOG.log('[{@cyan}%s{@reset}] Topic wurde von %s gesetzt. (%s)', channel, nick, date.toString());
+    LOG.log('[{@cyan}%s{@reset}] Topic set by %s. (%s)', channel, nick, date.toString());
     for(var p in PLUGINS.plugins) {
         var pl = PLUGINS.plugins[p];
         if(typeof pl.onTopic !== 'undefined' && !PLUGINS.isDisabled(p, _channel.getName())) {
@@ -103,7 +113,7 @@ CLIENT.addListener('topic', function(channel, topic, nick, message) {
 });
 
 CLIENT.addListener('join', function(channel, nick, message) {
-    LOG.log('[{@cyan}%s{@reset}] %s hat den Channel betreten', channel, nick);
+    LOG.log('[{@cyan}%s{@reset}] %s has joined.', channel, nick);
     var _channel = SERVER.getChannel(channel);
     var user = SERVER.getUser(nick);
     if(nick != CONFIG.get('irc:nick')) {
@@ -115,10 +125,16 @@ CLIENT.addListener('join', function(channel, nick, message) {
             pl.onJoin(CLIENT, SERVER, _channel, user);
         }
     }
+    DATABASE.query("INSERT INTO `join` (`channel`, `nick`, `time`) VALUES (?,?,?)", [channel, nick, new Date().toString()], function(err, results) {
+        if(err) {
+            console.error(err);
+            QUIT(1);
+        }
+    });
 });
 
 CLIENT.addListener('part', function(channel, nick, reason, message) {
-    LOG.log('[{@cyan}%s{@reset}] %s hat den Channel verlassen (%s)', channel, nick, reason);
+    LOG.log('[{@cyan}%s{@reset}] %s has left (%s).', channel, nick, reason);
     var _channel = SERVER.getChannel(channel);
     var user = SERVER.getUser(nick);
 
@@ -128,10 +144,16 @@ CLIENT.addListener('part', function(channel, nick, reason, message) {
             pl.onPart(CLIENT, SERVER, _channel, user, reason);
         }
     }
+    DATABASE.query("INSERT INTO `part` (`channel`, `nick`, `reason`, `time`) VALUES (?,?,?,?)", [channel, nick, reason, new Date().toString()], function(err, results) {
+        if(err) {
+            console.error(err);
+            QUIT(1);
+        }
+    });
 });
 
 CLIENT.addListener('quit', function(nick, reason, channels, message) {
-    LOG.log('%s hat den Server verlassen (%s)', nick, reason);
+    LOG.log('%s has Quit (%s)', nick, reason);
     var user = SERVER.getUser(nick);
     user.setOffline();
     for(var p in PLUGINS.plugins) {
@@ -140,10 +162,16 @@ CLIENT.addListener('quit', function(nick, reason, channels, message) {
             pl.onQuit(CLIENT, SERVER, user, reason);
         }
     }
+    DATABASE.query("INSERT INTO `quit` (`nick`, `reason`, `time`) VALUES (?,?,?)", [nick, reason, new Date().toString()], function(err, results) {
+        if(err) {
+            console.error(err);
+            QUIT(1);
+        }
+    });
 });
 
 CLIENT.addListener('kick', function(channel, nick, by, reason, message) {
-    LOG.log('[{@cyan}%s{@reset}] %s wurde von %s aus dem Channel geworfen. Grund: %s', channel, nick, by, reason);
+    LOG.log('[{@cyan}%s{@reset}] %s has kicked %s (%s).', channel, by, nick, reason);
     if( typeof reason == 'undefined' ) {
         reason = "";
     }
@@ -156,10 +184,16 @@ CLIENT.addListener('kick', function(channel, nick, by, reason, message) {
             pl.onKick(CLIENT, SERVER, _channel, user, byUser, reason);
         }
     }
+    DATABASE.query("INSERT INTO `kick` (`channel`, `nick`, `by`, `reason`, `time`) VALUES (?,?,?,?,?)", [channel, nick, by, reason, new Date().toString()], function(err, results) {
+        if(err) {
+            console.error(err);
+            QUIT(1);
+        }
+    });
 });
 
 CLIENT.addListener('kill', function(nick, reason, channels, message) {
-    LOG.log('[{@cyan}%s{@reset}] %s hat den unfreiwillig Server verlassen (%s)', channel, nick, reason);
+    LOG.log('[{@cyan}%s{@reset}] %s left the server (%s).', channel, nick, reason);
     var user = SERVER.getUser(nick);
     user.setOffline();
 });
@@ -172,12 +206,13 @@ CLIENT.addListener('message', function(nick, to, text, message) {
             var parts = text.split(" ");
             if(parts.length == 1) {
                 CLIENT.say(nick, "***** " + CONFIG.get('irc:nick') + " Help *****");
-                CLIENT.say(nick, "Ich bin ein Bot und reagiere auf bestimmte Befehle bzw. Interaktionen im Channel.");
+                //CLIENT.say(nick, "Ich bin ein Bot und reagiere auf bestimmte Befehle bzw. Interaktionen im Channel.");
+                CLIENT.say(nick, "Hi! I am " + CONFIG.get('irc:nick') + ". I react on defined commands or interactions in Channels.");
                 CLIENT.say(nick, " ");
-                CLIENT.say(nick, "Für mehr Informationen zu meinen Funktionen, benutze:");
+                CLIENT.say(nick, "For more information on a function, type:");
                 CLIENT.say(nick, "/msg " + CONFIG.get('irc:nick') + " HELP <plugin>");
                 CLIENT.say(nick, " ");
-                CLIENT.say(nick, "Folgende Plugins sind installiert:");
+                CLIENT.say(nick, "The following functions are available:");
                 CLIENT.say(nick, PLUGINS.getAllAsString(", "));
                 CLIENT.say(nick, "***** " + CONFIG.get('irc:nick') + " Help *****");
             }
@@ -207,6 +242,12 @@ CLIENT.addListener('message', function(nick, to, text, message) {
                 }
             }
         }
+        DATABASE.query("INSERT INTO `private_message` (`nick`, `text`, `time`) VALUES (?,?,?)", [nick, text, new Date().toString()], function(err, results) {
+            if(err) {
+                console.error(err);
+                QUIT(1);
+            }
+        });
     }
     else {
         LOG.log('[{@cyan}%s{@reset}] %s: %s', to, nick, text);
@@ -222,7 +263,7 @@ CLIENT.addListener('message', function(nick, to, text, message) {
             for(var _p in PLUGINS.plugins) {
                 var _pl = PLUGINS.plugins[_p];
                 if(typeof _pl.onCommand !== 'undefined' && !PLUGINS.isDisabled(_p, channel.getName())) {
-                    _pl.onCommand(CLIENT, SERVER, channel, CONFIG.get('commandChar'), cmdName, params, user, msg, text);
+                    if(_pl.onCommand(CLIENT, SERVER, channel, CONFIG.get('commandChar'), cmdName, params, user, msg, text)) break;
                 }
             }
         }
@@ -249,6 +290,12 @@ CLIENT.addListener('message', function(nick, to, text, message) {
                 }
             }
         }
+        DATABASE.query("INSERT INTO `channel_message` (`channel`, `nick`, `text`, `time`) VALUES (?,?,?,?)", [to, nick, text, new Date().toString()], function(err, results) {
+            if(err) {
+                console.error(err);
+                QUIT(1);
+            }
+        });
     }
 });
 
@@ -306,7 +353,7 @@ CLIENT.addListener('ctcp-version', function(from, to) {
 });
 
 CLIENT.addListener('nick', function(oldnick, newnick, channels, message) {
-    LOG.log('[{@cyan}%s{@reset}] %s heisst nun %s', CONFIG.get('irc:server'), oldnick, newnick);
+    LOG.log('[{@cyan}%s{@reset}] %s is now known as %s.', CONFIG.get('irc:server'), oldnick, newnick);
     var user = SERVER.getUser(oldnick);
     user.setNick(newnick);
     for(var p in PLUGINS.plugins) {
@@ -318,7 +365,7 @@ CLIENT.addListener('nick', function(oldnick, newnick, channels, message) {
 });
 
 CLIENT.addListener('invite', function(channel, from, message) {
-    LOG.log('[{@green}%s{@reset}] %s hat dich in %s eingeladen', CONFIG.get('irc:server'), from, channel);
+    LOG.log('[{@green}%s{@reset}] %s invite you to join %s.', CONFIG.get('irc:server'), from, channel);
     for(var p in PLUGINS.plugins) {
         var pl = PLUGINS.plugins[p];
         if(typeof pl.onInvite !== 'undefined') {
@@ -335,10 +382,10 @@ CLIENT.addListener('+mode', function(channel, by, mode, argument, message) {
         if(_channel.userExistInChannel(argument)) {
             CLIENT.whois(SERVER.getUser(argument).getNick());
         }
-        LOG.log('[{@cyan}%s{@reset}] %s setze den Mode: +%s %s', channel, by, mode, argument);
+        LOG.log('[{@cyan}%s{@reset}] %s sets modes: +%s %s', channel, by, mode, argument);
     } else {
         _channel.setMode(mode);
-        LOG.log('[{@cyan}%s{@reset}] %s setze den Mode: +%s', channel, by, mode);
+        LOG.log('[{@cyan}%s{@reset}] %s sets modes: +%s', channel, by, mode);
     }
     for(var p in PLUGINS.plugins) {
         var pl = PLUGINS.plugins[p];
@@ -355,10 +402,10 @@ CLIENT.addListener('-mode', function(channel, by, mode, argument, message) {
         if(_channel.userExistInChannel(argument)) {
             CLIENT.whois(SERVER.getUser(argument).getNick());
         }
-        LOG.log('[{@cyan}%s{@reset}] %s setze den Mode: -%s %s', channel, by, mode, argument);
+        LOG.log('[{@cyan}%s{@reset}] %s sets modes: -%s %s', channel, by, mode, argument);
     } else {
         _channel.setMode(mode);
-        LOG.log('[{@cyan}%s{@reset}] %s setze den Mode: -%s', channel, by, mode);
+        LOG.log('[{@cyan}%s{@reset}] %s sets modes: -%s', channel, by, mode);
     }
     for(var p in PLUGINS.plugins) {
         var pl = PLUGINS.plugins[p];
@@ -369,29 +416,30 @@ CLIENT.addListener('-mode', function(channel, by, mode, argument, message) {
 });
 
 CLIENT.addListener('whois', function(info) {
-    LOG.debug('[whois] >> %s', info.nick);
-    for(var i in info.channels) {
-        var channame = "#"+info.channels[i].split("#")[1];
-        var _channel = SERVER.getChannel(channame);
-        var mode = info.channels[i].split("#")[0];
-        var user = SERVER.getUser(info.nick);
-        user.setUserName(info.user);
-        user.setHost(info.host);
-        user.setServer(info.server);
-        user.setRealname(info.realname);
-        var _chans = [];
-        for(var j=0; j<info.channels.length; j++) {
-            _chans.push("#"+info.channels[j].split("#")[1]);
-        }
-        user.setInChannels(_chans);
-        user.setAccount(info.account);
+    var start = new Date().getTime();
+    var user = SERVER.getUser(info.nick);
+    user.setUserName(info.user);
+    user.setHost(info.host);
+    user.setServer(info.server);
+    user.setRealname(info.realname);
+    var _chans = [];
+    for(var i=0; i<info.channels.length; i++) {
+        _chans.push("#"+info.channels[i].split("#")[1]);
+    }
+    user.setInChannels(_chans);
+    user.setAccount(info.account);
+    if(info.hasOwnProperty("idle")) {
+        user.setIdleTime(info.idle);
+    }
+
+    for(var j in info.channels) {
+        var mode = info.channels[j].split("#")[0];
         if(mode !== "") {
-            _channel.addUserMode(info.nick, mode);
-        }
-        if(info.hasOwnProperty("idle")) {
-            user.setIdleTime(info.idle);
+            SERVER.getChannel("#"+info.channels[j].split("#")[1]).addUserMode(info.nick, mode);
         }
     }
+    var ms = new Date().getTime() - start;
+    LOG.debug('[whois] >> %s (finished in %sms)', info.nick, ms);
 });
 CLIENT.addListener('raw', function(message) {
     //console.log(message);

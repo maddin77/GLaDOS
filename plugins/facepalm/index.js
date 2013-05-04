@@ -5,6 +5,7 @@ module.exports = {
                 var img = "http://facepalm.org/" + response.req.path;
                 client.say(channel.getName(), user.getNick() + ": " + img);
             });
+            return true;
         }
     },
     onHelpRequest: function(client, server, user, message, parts) {

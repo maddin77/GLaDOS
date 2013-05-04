@@ -8,6 +8,7 @@ module.exports = {
                     client.say(channel.getName(), user.getNick() + ": " + fact);
                 }
             });
+            return true;
         }
     },
     onResponseMessage: function(client, server, channel, user, message) {

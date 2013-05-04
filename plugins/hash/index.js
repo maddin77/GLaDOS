@@ -14,6 +14,7 @@ module.exports = {
                     }
                 }
             });
+            return true;
         }
         else if(name == "hash") {
             if( params.length < 2 ) return client.notice(user.getNick(), commandChar + name + " <md5/sha/sha1/sha256/sha512/rmd160> <Text>");
@@ -27,6 +28,7 @@ module.exports = {
             sum.update(_text);
             var res = sum.digest('hex');
             client.say(channel.getName(), user.getNick() + ": " + method + " von \"" + _text + "\" ist " + res + "");
+            return true;
         }
     },
     onResponseMessage: function(client, server, channel, user, message) {

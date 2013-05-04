@@ -17,6 +17,15 @@ http://sam.zoy.org/wtfpl/COPYING for more details
 
 ## Changelog
 ============
+### Version 0.2.0 *(04.05.2013)*
+* [domain](https://github.com/maddin77/James/blob/master/plugins/domain) entfernt.
+* **Neues Plugin**: [dns](https://github.com/maddin77/James/blob/master/plugins/dns)
+* **Neues Plugin**: [quiz](https://github.com/maddin77/James/blob/master/plugins/quiz)
+* Für zukünftige updates werden nun joins, parts, kick, quits, sowie PN's und Channel-Nachrichten in der Datenbank gespeichert.
+* Befehle in einem Plugin erwarten nun die Rückgabe von ```true``` wenn der Befehl verarbeitet wurde.
+* Verarbeitung von WHOIS-Abfragen deutlich verbessert. Der Verarbeitung dauert nun wesentlich kürzer (5-10ms). Ändert allerdings nichts an den laggs.
+* [control](https://github.com/maddin77/James/blob/master/plugins/control) Hat nun 2 neue Befehle: `part [Channel]` und `join <Channel>`.
+
 ### Version 0.1.7 *(01.05.2013)*
 * Plugins haben nun einen Eigenen Unterordner.
 * **Neues Plugin**: [google](https://github.com/maddin77/James/blob/master/plugins/google)

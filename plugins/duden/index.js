@@ -62,6 +62,7 @@ module.exports = {
             this.duden(text, function(resp) {
                 client.say(channel.getName(), user.getNick() + ": " + resp);
             });
+            return true;
         }
     },
     onResponseMessage: function(client, server, channel, user, message) {

@@ -92,6 +92,7 @@ module.exports = {
                     }
                 }
             });
+            return true;
         }
     },
     onHelpRequest: function(client, server, user, message, parts) {

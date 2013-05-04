@@ -25,6 +25,7 @@ module.exports = {
                      client.say(channel.getName(), user.getNick() + ": Wikipedia weiss nicht was du suchst.");
                 }
             });
+            return true;
         }
     },
     onHelpRequest: function(client, server, user, message, parts) {
