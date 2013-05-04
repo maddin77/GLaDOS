@@ -20,7 +20,7 @@ module.exports = {
         }
         this.userScore[nick]++;
         this.saveScore();
-        client.say(this.channel, "[\u000309\u0002QUIZ\u000f] " + IRC.colors.wrap("yellow", nick) + " hat die richtige Antwort gewusst! Die richtige Antwort war: " + IRC.colors.wrap("yellow", this.activeQuestion.Answer.replace(/\#/g,'')) );
+        client.say(this.channel, "[\u0002QUIZ\u000f] " + nick + " hat die richtige Antwort gewusst! Die richtige Antwort war: " + this.activeQuestion.Answer.replace(/\#/g,'') );
         this.stopTipps();
         this.wait = true;
         var that = this;
@@ -33,7 +33,7 @@ module.exports = {
         this.wait = false;
         var frageNum = Math.round( 1 + ( Math.random() * ( Object.keys(this.questions).length - 1 ) ) );
         this.qString = this.start(frageNum);
-        client.say(this.channel, "[\u000309\u0002QUIZ\u000f] " + this.qString);
+        client.say(this.channel, "[\u0002QUIZ\u000f] " + this.qString);
         this.startTipps(client);
     },
     start: function(frageNum) {
@@ -49,15 +49,15 @@ module.exports = {
         console.log( frageNum );
         console.log( this.questions[ frageNum ] );
 
-        questionString = "[Frage: " + IRC.colors.wrap("light_blue", frageNum) + "]";
+        questionString = "[Frage: " + frageNum + "]";
 
         if ( typeof this.questions[ frageNum ].Category !== 'undefined' ) {
-            questionString += " [Kategorie: " + IRC.colors.wrap("orange", this.questions[ frageNum ].Category) + "]";
+            questionString += " [Kategorie: " + this.questions[ frageNum ].Category + "]";
         }
         if ( typeof this.questions[ frageNum ].Level !== 'undefined' ) {
-            questionString += " [Level: " + IRC.colors.wrap("orange", this.questions[ frageNum ].Level) + "]";
+            questionString += " [Level: " + this.questions[ frageNum ].Level + "]";
         }
-        questionString += " " + IRC.colors.wrap("light_cyan", this.questions[ frageNum ].Question);
+        questionString += " " + this.questions[ frageNum ].Question;
 
         return questionString;
     },
@@ -70,7 +70,7 @@ module.exports = {
             if(this.intervalId == -1) return;
             tippCount++;
             if( tippCount === 1 && typeof that.activeQuestion.Tip !== 'undefined' ) {
-                client.say(that.channel, "[\u000309\u0002QUIZ\u000f] [Tip " + IRC.colors.wrap("yellow", tippCount) + "] " + that.activeQuestion.Tip);
+                client.say(that.channel, "[\u0002QUIZ\u000f] [Tip " + tippCount + "] " + that.activeQuestion.Tip);
             }
             else if( tippCount > that.maxTipps || tippCount > that.activeQuestion.Answer.replace(/\#/g,'').length ) {
                 that.stopTipps();
@@ -99,15 +99,15 @@ module.exports = {
                         tipp += ' ';
                     }
                 }
-                client.say(that.channel, "[\u000309\u0002QUIZ\u000f] [Tip " + IRC.colors.wrap("yellow", tippCount) + "] " + tipp);
+                client.say(that.channel, "[\u0002QUIZ\u000f] [Tip " + tippCount + "] " + tipp);
             }
         }, this.tippDelay*1000);
     },
     noRightAnswer: function(client) {
         if(!this.ative) return;
-        client.say(this.channel, "[\u000309\u0002QUIZ\u000f] Die Zeit ist um. Niemand von euch versagern hat die richtige antwort gewusst!");
-        client.say(this.channel, "[\u000309\u0002QUIZ\u000f] Aber um trotzdem noch etwas für eure Allgemeinbildung zu tun; Die richte Antwort war: " + IRC.colors.wrap("yellow", this.activeQuestion.Answer.replace(/\#/g,'')));
-        client.say(this.channel, "[\u000309\u0002QUIZ\u000f] Die nächste Frage folgt in " + IRC.colors.wrap("orange", this.questionDelay) + " Sekunden.");
+        client.say(this.channel, "[\u0002QUIZ\u000f] Die Zeit ist um. Niemand hat die richtige antwort gewusst!");
+        client.say(this.channel, "[\u0002QUIZ\u000f] Aber um trotzdem noch etwas für eure Allgemeinbildung zu tun; Die richte Antwort war: " + this.activeQuestion.Answer.replace(/\#/g,''));
+        client.say(this.channel, "[\u0002QUIZ\u000f] Die nächste Frage folgt in " + this.questionDelay + " Sekunden.");
         this.stopTipps();
         this.wait = true;
         var that = this;
@@ -175,9 +175,9 @@ module.exports = {
             if(params[0].toLowerCase() == "start") {
                 if(this.active) return client.notice(user.getNick(), "Das Quiz läuft bereits.");
                 if(this.channel !== null && channel.getName() != this.channel) return client.notice(user.getNick(), "Das Quiz läuft bereits in einem anderen Channel.");
-                client.say(channel.getName(), "[\u000309\u0002QUIZ\u000f] " + IRC.colors.wrap("yellow", user.getNick()) + " hat das Quiz gestartet!");
-                client.say(channel.getName(), "[\u000309\u0002QUIZ\u000f] Meine Datenbank umfasst " + IRC.colors.wrap("orange", Object.keys(this.questions).length) + " Fragen.");
-                client.say(channel.getName(), "[\u000309\u0002QUIZ\u000f] Die erste Frage folgt in " + IRC.colors.wrap("orange", this.questionDelay) + " Sekunden.");
+                client.say(channel.getName(), "[\u0002QUIZ\u000f] " + user.getNick() + " hat das Quiz gestartet!");
+                client.say(channel.getName(), "[\u0002QUIZ\u000f] Meine Datenbank umfasst " + Object.keys(this.questions).length + " Fragen.");
+                client.say(channel.getName(), "[\u0002QUIZ\u000f] Die erste Frage folgt in " + this.questionDelay + " Sekunden.");
                 this.active = true;
                 this.stopTipps();
                 this.wait = true;
@@ -193,12 +193,12 @@ module.exports = {
                 this.active = false;
                 this.stop();
                 this.channel = null;
-                client.say(channel.getName(), "[\u000309\u0002QUIZ\u000f] " + IRC.colors.wrap("yellow", user.getNick()) + " hat das Quiz gestoppt!");
+                client.say(channel.getName(), "[\u0002QUIZ\u000f] " + user.getNick() + " hat das Quiz gestoppt!");
             }
             else if(params[0].toLowerCase() == "next") {
                 if(!this.active || this.channel === null) return client.notice(user.getNick(), "Zur Zeit läuft kein Quiz.");
                 if(channel.getName() != this.channel) return client.notice(user.getNick(), "In diesem Channel läuft kein Quiz.");
-                client.say(this.channel, "[\u000309\u0002QUIZ\u000f] Diese Frage wird übersprungen.");
+                client.say(this.channel, "[\u0002QUIZ\u000f] Diese Frage wird übersprungen.");
                 this.stopTipps();
                 this.wait = true;
                 var _that = this;
