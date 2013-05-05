@@ -5,6 +5,11 @@ module.exports = {
             var child_process = require('child_process');
             var changes = false;
             try {
+                child_process.exec("git stash", function(error, stdout, stderr) {
+                    if(error) {
+                        client.say(channel.getName(), "git stash failed: " + stderr);
+                    }
+                });
                 client.say(channel.getName(), "git pull...");
                 child_process.exec("git pull", function(error, stdout, stderr) {
                     if(error) {
