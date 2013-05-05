@@ -24045,7 +24045,6 @@ module.exports = {
         "Category": "Geographie",
         "Question": "Welches Weltmeer bezeichnet man auch als \"Stillen Ozean\"?",
         "Answer": "Pazifik",
-        "Regexp": "pazifischer Ozean",
         "Author": "proll",
         "Level": "easy"
     },

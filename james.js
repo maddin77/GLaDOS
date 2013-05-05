@@ -1,5 +1,5 @@
 /* TODO */
-//-
+// QUiz revolte & toplist nach x fragen
 
 /* NODE-MODULES
    ============================= */
@@ -418,25 +418,41 @@ CLIENT.addListener('-mode', function(channel, by, mode, argument, message) {
 CLIENT.addListener('whois', function(info) {
     var start = new Date().getTime();
     var user = SERVER.getUser(info.nick);
-    user.setUserName(info.user);
-    user.setHost(info.host);
-    user.setServer(info.server);
-    user.setRealname(info.realname);
-    var _chans = [];
-    for(var i=0; i<info.channels.length; i++) {
-        _chans.push("#"+info.channels[i].split("#")[1]);
+
+    if(info.hasOwnProperty('user')) {
+        user.setUserName(info.user);
     }
-    user.setInChannels(_chans);
-    user.setAccount(info.account);
+
+    if(info.hasOwnProperty('host')) {
+        user.setHost(info.host);
+    }
+
+    if(info.hasOwnProperty('server')) {
+        user.setServer(info.server);
+    }
+
+    if(info.hasOwnProperty('realname')) {
+        user.setRealname(info.realname);
+    }
+
+    if(info.hasOwnProperty('account')) {
+        user.setAccount(info.account);
+    }
+
     if(info.hasOwnProperty("idle")) {
         user.setIdleTime(info.idle);
     }
 
-    for(var j in info.channels) {
-        var mode = info.channels[j].split("#")[0];
-        if(mode !== "") {
-            SERVER.getChannel("#"+info.channels[j].split("#")[1]).addUserMode(info.nick, mode);
+    if(info.hasOwnProperty('channels')) {
+        var _chans = [];
+        for(var j in info.channels) {
+            var mode = info.channels[j].split("#")[0];
+            if(mode !== "") {
+                SERVER.getChannel("#"+info.channels[j].split("#")[1]).addUserMode(info.nick, mode);
+            }
+            _chans.push("#"+info.channels[j].split("#")[1]);
         }
+        user.setInChannels(_chans);
     }
     var ms = new Date().getTime() - start;
     LOG.debug('[whois] >> %s (finished in %sms)', info.nick, ms);
