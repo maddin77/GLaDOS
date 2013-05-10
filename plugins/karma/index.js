@@ -1,4 +1,11 @@
 module.exports = {
+    /*==========[ +INFO+ ]==========*/
+    info: {
+        description: "Wenn du mit dem was ein Benutzer sagt einverstanden bist, gib ihm Karma :D",
+        commands: ["{C}karma [Nick]", "<Nick>: ++", "<Nick>: +1"]
+    },
+    /*==========[ -INFO- ]==========*/
+
     _karma: [],
     getKarma: function(nick) {
         for (var i = 0; i < this._karma.length; i++) {
@@ -78,14 +85,5 @@ module.exports = {
     },
     onUnload: function() {
         this.save();
-    },
-    onHelpRequest: function(client, server, user, message, parts) {
-        client.say(user.getNick(), "# Beschreibung:");
-        client.say(user.getNick(), "#   Wenn du mit dem was ein Benutzer sagt einverstanden bist, gib ihm Karma :D");
-        client.say(user.getNick(), "# Verwendung:");
-        client.say(user.getNick(), "#   !karma");
-        client.say(user.getNick(), "#   !karma <Nick>");
-        client.say(user.getNick(), "#   <Nick>: ++");
-        client.say(user.getNick(), "#   <Nick>: +1");
     }
 };

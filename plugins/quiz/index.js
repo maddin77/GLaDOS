@@ -1,4 +1,11 @@
 module.exports = {
+    /*==========[ +INFO+ ]==========*/
+    info: {
+        description: "Bietet Quiz-Funktionen für den Channel.",
+        commands: ["{C}quiz <START/STOP/NEXT>"]
+    },
+    /*==========[ -INFO- ]==========*/
+
     questions: require('./questions-de.js'),
     rules: ["Keine Suchmaschinen(Google/Bing/Yahoo/etc.)", "Raten ist erlaubt, solange es nicht in Spam ausartet"],
     active: false,
@@ -9,8 +16,15 @@ module.exports = {
     qString: "",
     intervalId: null,
     tippDelay: 30,
+    tippCount: 0,
     maxTipps: 5,
+    frageNum: -1,
     channel: null,
+    postTops: 0,
+    revolte: {
+        needed: -1,
+        has: []
+    },
 
     right: function(client, user) {
         if(!this.active) return;
@@ -18,11 +32,14 @@ module.exports = {
         if( !this.userScore.hasOwnProperty( nick ) ) {
             this.userScore[nick] = 0;
         }
+        this.questions[ this.frageNum ].alreadyAsked = true;
+        this.questions[ this.frageNum ].answered = true;
         this.userScore[nick]++;
         this.saveScore();
         client.say(this.channel, "[\u0002QUIZ\u000f] " + nick + " hat die richtige Antwort gewusst! Die richtige Antwort war: " + this.activeQuestion.Answer.replace(/\#/g,'') );
         this.stopTipps();
         this.wait = true;
+        this.postTopList(client);
         var that = this;
         setTimeout(function() {
             that.showQuestion(client);
@@ -32,17 +49,23 @@ module.exports = {
         if(!this.active) return;
         this.wait = false;
         var frageNum = Math.round( 1 + ( Math.random() * ( Object.keys(this.questions).length - 1 ) ) );
+        while(this.questions[ frageNum ].answered === false) {
+            frageNum = Math.round( 1 + ( Math.random() * ( Object.keys(this.questions).length - 1 ) ) );
+        }
         this.qString = this.start(frageNum);
         client.say(this.channel, "[\u0002QUIZ\u000f] " + this.qString);
         this.startTipps(client);
+        this.revolte.needed = -1;
+        this.revolte.has = [];
     },
     start: function(frageNum) {
+        this.frageNum = frageNum;
         var questionString = "";
 
         this.active = true;
 
-        this.questions[ frageNum ].alreadyAsked = true;
-        this.questions[ frageNum ].answered = false;
+        //this.questions[ frageNum ].alreadyAsked = true;
+        //this.questions[ frageNum ].answered = false;
 
         this.activeQuestion = this.questions[ frageNum ];
 
@@ -63,16 +86,15 @@ module.exports = {
     },
     startTipps: function(client) {
         if(!this.active) return;
-        var tippCount = 0;
         var that = this;
 
         this.intervalId = setInterval(function() {
             if(this.intervalId == -1) return;
-            tippCount++;
-            if( tippCount === 1 && typeof that.activeQuestion.Tip !== 'undefined' ) {
-                client.say(that.channel, "[\u0002QUIZ\u000f] [Tip " + tippCount + "] " + that.activeQuestion.Tip);
+            that.tippCount++;
+            if( that.tippCount === 1 && typeof that.activeQuestion.Tip !== 'undefined' ) {
+                client.say(that.channel, "[\u0002QUIZ\u000f] [Tip " + that.tippCount + "] " + that.activeQuestion.Tip);
             }
-            else if( tippCount > that.maxTipps || tippCount > that.activeQuestion.Answer.replace(/\#/g,'').length ) {
+            else if( that.tippCount > that.maxTipps || that.tippCount > that.activeQuestion.Answer.replace(/\#/g,'').length ) {
                 that.stopTipps();
                 that.noRightAnswer(client);
             }
@@ -86,7 +108,7 @@ module.exports = {
                 for(var p=0; p<parts.length; p++) {
                     var part = parts[p];
                     for(var j=0; j<part.length; j++) {
-                        if(j+1 <= tippCount) {
+                        if(j+1 <= that.tippCount) {
                             tipp += part.charAt(j);
                         }
                         else {
@@ -99,7 +121,7 @@ module.exports = {
                         tipp += ' ';
                     }
                 }
-                client.say(that.channel, "[\u0002QUIZ\u000f] [Tip " + tippCount + "] " + tipp);
+                client.say(that.channel, "[\u0002QUIZ\u000f] [Tip " + that.tippCount + "] " + tipp);
             }
         }, this.tippDelay*1000);
     },
@@ -109,11 +131,41 @@ module.exports = {
         client.say(this.channel, "[\u0002QUIZ\u000f] Aber um trotzdem noch etwas für eure Allgemeinbildung zu tun; Die richte Antwort war: " + this.activeQuestion.Answer.replace(/\#/g,''));
         client.say(this.channel, "[\u0002QUIZ\u000f] Die nächste Frage folgt in " + this.questionDelay + " Sekunden.");
         this.stopTipps();
+        this.questions[ this.frageNum ].alreadyAsked = true;
         this.wait = true;
+        this.postTopList(client);
         var that = this;
         setTimeout(function() {
             that.showQuestion(client);
         }, this.questionDelay*1000);
+    },
+    generateTopList: function() {
+        var score = [];
+        for(var nick in this.userScore) {
+            var value = this.userScore[nick];
+            score.push({
+                "nick": nick,
+                "value": value
+            });
+        }
+        score.sort(function(a,b) {
+            if(a.value > b.value) return -1;
+            if(a.value == b.value) return 0;
+            if(a.value < b.value) return 1;
+        });
+        score = score.slice(0,5);
+        var max = [];
+        for(var j = 0; j < score.length; j++) {
+            max.push(score[j].nick + " ("+score[j].value+")");
+        }
+        return max.join(", ");
+    },
+    postTopList: function() {
+        this.postTops++;
+        if(this.postTops >= 5) {
+            this.postTops = 0;
+            client.say(this.channel, "[\u0002QUIZ\u000f] Toplist: " + this.generateTopList());
+        }
     },
     stop: function() {
         this.stopTipps();
@@ -198,7 +250,7 @@ module.exports = {
             else if(params[0].toLowerCase() == "next") {
                 if(!this.active || this.channel === null) return client.notice(user.getNick(), "Zur Zeit läuft kein Quiz.");
                 if(channel.getName() != this.channel) return client.notice(user.getNick(), "In diesem Channel läuft kein Quiz.");
-                client.say(this.channel, "[\u0002QUIZ\u000f] Diese Frage wird übersprungen.");
+                client.say(channel.getName(), "[\u0002QUIZ\u000f] Diese Frage wird übersprungen.");
                 this.stopTipps();
                 this.wait = true;
                 var _that = this;
@@ -233,29 +285,37 @@ module.exports = {
                 this.userScore[_nick] = 0;
             }
             client.notice(user.getNick(), "Du hast " + this.userScore[_nick] + " Fragen richtig beantwortet.");
-            var score = [];
-            for(var nick in this.userScore) {
-                var value = this.userScore[nick];
-                score.push({
-                    "nick": nick,
-                    "value": value
-                });
-            }
-            score.sort(function(a,b) {
-                if(a.value > b.value) return -1;
-                if(a.value == b.value) return 0;
-                if(a.value < b.value) return 1;
-            });
-            score = score.slice(0,5);
-            var max = [];
-            for(var j = 0; j < score.length; j++) {
-                max.push(score[j].nick + " ("+score[j].value+")");
-            }
-            client.notice(user.getNick(), "Toplist: " + max.join(", "));
+            client.notice(user.getNick(), "Toplist: " + this.generateTopList());
             return true;
+        }
+        else if(name == "revolte") {
+            if(!this.active || this.channel === null) return client.notice(user.getNick(), "Zur Zeit läuft kein Quiz.");
+            if(this.tippCount < 1) return client.notice(user.getNick(), "Ich reagiere nicht auf Revolten wenn nicht mindestens ein Tipp gegeben wurde.");
+            if(this.revolte.needed == -1) {
+                this.revolte.needed = Math.round((channel.getUserCount()-1)/3*2);
+            }
+            if(this.revolte.has.indexOf(user.getNick()) == -1) {
+                this.revolte.has.push(user.getNick());
+                if(this.revolte.has.length == this.revolte.needed) {
+                    client.say(channel.getName(), "[\u0002QUIZ\u000f] Diese Frage wird übersprungen.");
+                    this.stopTipps();
+                    this.wait = true;
+                    var _that = this;
+                    setTimeout(function() {
+                        _that.showQuestion(client);
+                    }, this.questionDelay*1000);
+                }
+                else {
+                    client.say(channel.getName(), "[\u0002QUIZ\u000f] " + user.getNick() + " und " + (this.revolte.has.length-1) + " andere mögen diese Frage nicht. Ihr braucht min. " + this.revolte.needed + " Stimmen.");
+                }
+            }
         }
     },
     onLoad: function() {
+        for(var i=0; i<this.questions.length; i++) {
+            this.questions[ i ].alreadyAsked = false;
+            this.questions[ i ].answered = false;
+        }
         DATABASE.query("CREATE TABLE IF NOT EXISTS `quiz` (`nick` varchar(255) NOT NULL DEFAULT '',`value` int(11) DEFAULT NULL,PRIMARY KEY (`nick`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
         var that = this;
         DATABASE.query("SELECT * FROM `quiz`", function(err, results) {

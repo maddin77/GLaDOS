@@ -1,4 +1,11 @@
 module.exports = {
+    /*==========[ +INFO+ ]==========*/
+    info: {
+        description: "Prüft ob die angegebene Webseite Erreichbar ist.",
+        commands: ["{C}isup <Website, z.b google.de>", "{N} is(t) <Website, z.b google.de> <online/offline>(?)"]
+    },
+    /*==========[ -INFO- ]==========*/
+
     onCommand: function(client, server, channel, commandChar, name, params, user, text, message) {
         if(name == "isup") {
             if( params.length === 0 ) return client.notice(user.getNick(), commandChar + name + " <Website, z.b google.de>");
@@ -26,13 +33,5 @@ module.exports = {
                 }
             });
         });
-    },
-    onHelpRequest: function(client, server, user, message, parts) {
-        client.say(user.getNick(), "# Beschreibung:");
-        client.say(user.getNick(), "#   Prüft ob die angegebene Webseite Erreichbar ist.");
-        client.say(user.getNick(), "# Verwendung:");
-        client.say(user.getNick(), "#   !isup <Website, z.b google.de>");
-        client.say(user.getNick(), "#   " + CONFIG.get('irc:nick') + " is <Website, z.b google.de> online?");
-        client.say(user.getNick(), "#   " + CONFIG.get('irc:nick') + " ist <Website, z.b google.de> offline");
     }
 };

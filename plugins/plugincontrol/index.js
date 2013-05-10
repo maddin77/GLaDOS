@@ -1,4 +1,11 @@
 module.exports = {
+    /*==========[ +INFO+ ]==========*/
+    info: {
+        description: "-",
+        commands: ["{C}plugin <ENABLE/DISABLE/LOAD/UNLOAD/RELOAD/LIST/LISTENABLED>"]
+    },
+    /*==========[ -INFO- ]==========*/
+
     onCommand: function(client, server, channel, commandChar, name, params, user, text, message) {
         if(name == "plugin") {
             if(!user.hasPermissions()) return client.notice(user.getNick(), "Du hast nicht die nötigen rechte dazu.");
@@ -63,17 +70,5 @@ module.exports = {
             else return client.notice(user.getNick(), commandChar + name + " <ENABLE/DISABLE/LOAD/UNLOAD/RELOAD/LIST/LISTENABLED>");
             return true;
         }
-    },
-    onHelpRequest: function(client, server, user, message, parts) {
-        client.say(user.getNick(), "# Beschreibung:");
-        client.say(user.getNick(), "#   -");
-        client.say(user.getNick(), "# Verwendung:");
-        client.say(user.getNick(), "#   !plugin ENABLE <Pluginname> - Aktiviert das angegebene Plugin im Channel.");
-        client.say(user.getNick(), "#   !plugin DISABLE <Pluginname> - Deaktiviert das angegebene Plugin im Channel.");
-        client.say(user.getNick(), "#   !plugin LOAD <Pluginname> - Lädt das angegebene Plugin in den Speicher.");
-        client.say(user.getNick(), "#   !plugin UNLOAD <Pluginname> - Entfernt das angegebene Plugin aus dem Speicher.");
-        client.say(user.getNick(), "#   !plugin RELOAD <Pluginname> - Entfernt das angegebene Plugin aus dem Speicher und Lädt es erneut in den Speicher.");
-        client.say(user.getNick(), "#   !plugin LIST - Listet alle geladenen Plugins auf.");
-        client.say(user.getNick(), "#   !plugin LISTENABLED - Listet alle Plugins auf die in diesem Channel aktiviert sind.");
     }
 };

@@ -1,4 +1,11 @@
 module.exports = {
+    /*==========[ +INFO+ ]==========*/
+    info: {
+        description: "Gibt das Ergebniss der angegebenen rechnung aus.",
+        commands: ["{C}calculate <Term>", "{C}calc <Term>", "{C}c <Term>", "{N} rechne  <term>", "{N} wie viel ist  <term>"]
+    },
+    /*==========[ -INFO- ]==========*/
+
     onCommand: function(client, server, channel, commandChar, name, params, user, text, message) {
         if(name == "c" || name == "calc" || name == "calculate") {
             if(params.length < 1) return client.notice(user.getNick(), commandChar + name + " <term>");
@@ -34,15 +41,5 @@ module.exports = {
                 }
             });
         });
-    },
-    onHelpRequest: function(client, server, user, message, parts) {
-        client.say(user.getNick(), "# Beschreibung:");
-        client.say(user.getNick(), "#   Gibt das Ergebniss der angegebenen rechnung aus.");
-        client.say(user.getNick(), "# Verwendung:");
-        client.say(user.getNick(), "#   !calculate <term>");
-        client.say(user.getNick(), "#   !calc <term>");
-        client.say(user.getNick(), "#   !c <term>");
-        client.say(user.getNick(), "#   " + CONFIG.get('irc:nick') + " rechne  <term>");
-        client.say(user.getNick(), "#   " + CONFIG.get('irc:nick') + " wie viel ist  <term>");
     }
 };

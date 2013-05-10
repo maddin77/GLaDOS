@@ -1,4 +1,11 @@
 module.exports = {
+    /*==========[ +INFO+ ]==========*/
+    info: {
+        description: "Gibt die Definition eines Begriffes aus dem Duden zurück.",
+        commands: ["{C}duden <Begriff>", "{N} definiere <Begriff>", "{N} duden <Begriff>"]
+    },
+    /*==========[ -INFO- ]==========*/
+
     duden: function(key , callback) {
         var that = this;
         var url = "http://www.duden.de/rechtschreibung/" + encodeURIComponent(key);
@@ -10,14 +17,14 @@ module.exports = {
                     if(sug.length === 0) {
                         if(key[0] === key[0].toUpperCase()) {
                             var _key = key.charAt(0).toLowerCase() + key.slice(1);
-                            that.duden(_key, callback);
+                            return that.duden(_key, callback);
                         } else {
                             var __key = key.charAt(0).toUpperCase() + key.slice(1);
-                            that.duden(__key, callback);
+                            return that.duden(__key, callback);
                         }
                     }
                     else {
-                        callback("Unter dem Begriff \"" + key + "\" wurde nichts gefunden. Meintest du vielleicht \"" + sug + "\" ?");
+                        return callback("Unter dem Begriff \"" + key + "\" wurde nichts gefunden. Meintest du vielleicht \"" + sug + "\" ?");
                     }
                 }
                 else {
@@ -25,10 +32,10 @@ module.exports = {
                     if(fof.length !== 0) {
                         if(key[0] === key[0].toUpperCase()) {
                             var ___key = key.charAt(0).toLowerCase() + key.slice(1);
-                            that.duden(___key, callback);
+                            return that.duden(___key, callback);
                         } else {
                             var ____key = key.charAt(0).toUpperCase() + key.slice(1);
-                            that.duden(____key, callback);
+                            return that.duden(____key, callback);
                         }
                     }
                     else {
@@ -43,17 +50,18 @@ module.exports = {
                         content = content.replace(/\s+/g," ");
 
                         if(content.length === 1) {
-                            callback(lemma + artikel + ". " + wortart + ". Keine Bedeutung vorhanden.");
+                            return callback(lemma + artikel + ". " + wortart + ". Keine Bedeutung vorhanden.");
                         }
                         else {
                             if(UTIL.endsWith(content, ";")) {
                                 content = content.slice(0, -1) + ".";
                             }
-                            callback(lemma + artikel + ". " + wortart + ". " + content);
+                            return callback(lemma + artikel + ". " + wortart + ". " + content);
                         }
                     }
                 }
             }
+            else return callback(error);
         });
     },
     onCommand: function(client, server, channel, commandChar, name, params, user, text, message) {
@@ -71,13 +79,5 @@ module.exports = {
                 client.say(channel.getName(), user.getNick() + ": " + resp);
             });
         });
-    },
-    onHelpRequest: function(client, server, user, message, parts) {
-        client.say(user.getNick(), "# Beschreibung:");
-        client.say(user.getNick(), "#   Gibt die Definition eines Begriffes aus dem Duden zurück.");
-        client.say(user.getNick(), "# Verwendung:");
-        client.say(user.getNick(), "#   !duden <Begriff>");
-        client.say(user.getNick(), "#   " + CONFIG.get('irc:nick') + " definiere <Begriff>");
-        client.say(user.getNick(), "#   " + CONFIG.get('irc:nick') + " duden <Begriff>");
     }
 };

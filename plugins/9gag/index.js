@@ -1,4 +1,11 @@
 module.exports = {
+    /*==========[ +INFO+ ]==========*/
+    info: {
+        description: "Postet den Link eines zufälligen Bildes von www.9gag.com im Channel.",
+        commands: ["{C}9gag", "{N} 9gag"]
+    },
+    /*==========[ -INFO- ]==========*/
+
     onCommand: function(client, server, channel, commandChar, name, params, user, text, message) {
         if(name == "9gag") {
             REQUEST("http://9gag.com/random", function (error, response, body) {
@@ -23,12 +30,5 @@ module.exports = {
                 }
             });
         });
-    },
-    onHelpRequest: function(client, server, user, message, parts) {
-        client.say(user.getNick(), "# Beschreibung:");
-        client.say(user.getNick(), "#   Postet den Link eines zufälligen Bildes von www.9gag.com im Channel.");
-        client.say(user.getNick(), "# Verwendung:");
-        client.say(user.getNick(), "#   !9gag");
-        client.say(user.getNick(), "#   " + CONFIG.get('irc:nick') + " 9gag");
     }
 };

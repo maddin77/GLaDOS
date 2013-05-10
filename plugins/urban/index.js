@@ -1,4 +1,11 @@
 module.exports = {
+    /*==========[ +INFO+ ]==========*/
+    info: {
+        description: "Postet die Definition des Begriffes von www.urbandictionary.com im Channel.",
+        commands: ["{C}urban <Text>", "{C}ud <Text>"]
+    },
+    /*==========[ -INFO- ]==========*/
+
     onCommand: function(client, server, channel, commandChar, name, params, user, text, message) {
         if(name == "ud" || name == "urban") {
             if( params.length === 0 ) return client.notice(user.getNick(), commandChar + name + " <Text>");

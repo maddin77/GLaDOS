@@ -1,5 +1,4 @@
 /* TODO */
-// QUiz revolte & toplist nach x fragen
 
 /* NODE-MODULES
    ============================= */
@@ -9,7 +8,6 @@ CRYPTO  = require('crypto');
 CHEERIO = require('cheerio');
 MOMENT  = require('moment');
 MYSQL   = require('mysql');
-EXPRESS = require('express');
 
 /* LIBS
    ============================= */
@@ -33,8 +31,8 @@ DATABASE.connect(function(err) {
         DATABASE.query("CREATE TABLE IF NOT EXISTS `part` (`id` int(11) NOT NULL AUTO_INCREMENT,`channel` varchar(255) DEFAULT NULL,`nick` varchar(255) DEFAULT NULL,`reason` varchar(255) DEFAULT NULL,`time` varchar(255) DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
         DATABASE.query("CREATE TABLE IF NOT EXISTS `quit` (`id` int(11) NOT NULL AUTO_INCREMENT,`nick` varchar(255) DEFAULT NULL,`reason` varchar(255) DEFAULT NULL,`time` varchar(255) DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
         DATABASE.query("CREATE TABLE IF NOT EXISTS `kick` (`id` int(11) NOT NULL AUTO_INCREMENT,`channel` varchar(255) DEFAULT NULL,`nick` varchar(255) DEFAULT NULL,`by` varchar(255) DEFAULT NULL,`reason` varchar(255) DEFAULT NULL,`time` varchar(255) DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
-        DATABASE.query("CREATE TABLE IF NOT EXISTS `private_message` (`id` int(11) NOT NULL AUTO_INCREMENT,`nick` varchar(255) DEFAULT NULL,`text` varchar(255) DEFAULT NULL,`time` varchar(255) DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
-        DATABASE.query("CREATE TABLE IF NOT EXISTS `channel_message` (`id` int(11) NOT NULL AUTO_INCREMENT,`channel` varchar(255) DEFAULT NULL,`nick` varchar(255) DEFAULT NULL,`text` varchar(255) DEFAULT NULL,`time` varchar(255) DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+        DATABASE.query("CREATE TABLE IF NOT EXISTS `private_message` (`id` int(11) NOT NULL AUTO_INCREMENT,`nick` varchar(255) DEFAULT NULL,`text` text,`time` varchar(255) DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+        DATABASE.query("CREATE TABLE IF NOT EXISTS `channel_message` (`id` int(11) NOT NULL AUTO_INCREMENT,`channel` varchar(255) DEFAULT NULL,`nick` varchar(255) DEFAULT NULL,`text` text,`time` varchar(255) DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
     }
 });
 Server  = require('./lib/server.js');
@@ -52,15 +50,14 @@ CLIENT  = new IRC.Client(CONFIG.get('irc:server'), CONFIG.get('irc:nick'), CONFI
 QUIT = function(code) {
     PLUGINS.unloadAll();
     CLIENT.disconnect( CONFIG.get('quitMSG') );
-    try {
-        DATABASE.end( function() {
-            setTimeout(function() {
-                process.exit(code);
-            }, 1000);
-        });
-    } catch(e) {
-        throw e;
-    }
+    DATABASE.end( function(err) {
+        if(err) {
+            LOG.error("DATABASE.end", err);
+        }
+        setTimeout(function() {
+            process.exit(code);
+        }, 1000);
+    });
 };
 process.on('uncaughtException', function(err) {
     LOG.error("Caught exception: "+ err);
@@ -115,6 +112,7 @@ CLIENT.addListener('topic', function(channel, topic, nick, message) {
 CLIENT.addListener('join', function(channel, nick, message) {
     LOG.log('[{@cyan}%s{@reset}] %s has joined.', channel, nick);
     var _channel = SERVER.getChannel(channel);
+    _channel.setUserCount("++");
     var user = SERVER.getUser(nick);
     if(nick != CONFIG.get('irc:nick')) {
         CLIENT.whois(nick);
@@ -136,8 +134,8 @@ CLIENT.addListener('join', function(channel, nick, message) {
 CLIENT.addListener('part', function(channel, nick, reason, message) {
     LOG.log('[{@cyan}%s{@reset}] %s has left (%s).', channel, nick, reason);
     var _channel = SERVER.getChannel(channel);
+    _channel.setUserCount("--");
     var user = SERVER.getUser(nick);
-
     for(var p in PLUGINS.plugins) {
         var pl = PLUGINS.plugins[p];
         if(typeof pl.onPart !== 'undefined' && !PLUGINS.isDisabled(p, _channel.getName())) {
@@ -156,6 +154,10 @@ CLIENT.addListener('quit', function(nick, reason, channels, message) {
     LOG.log('%s has Quit (%s)', nick, reason);
     var user = SERVER.getUser(nick);
     user.setOffline();
+    for(var i=0; i<channels.length; i++) {
+        var _channel = SERVER.getChannel(channels[i]);
+        _channel.setUserCount("--");
+    }
     for(var p in PLUGINS.plugins) {
         var pl = PLUGINS.plugins[p];
         if(typeof pl.onQuit !== 'undefined') {
@@ -176,6 +178,7 @@ CLIENT.addListener('kick', function(channel, nick, by, reason, message) {
         reason = "";
     }
     var _channel = SERVER.getChannel(channel);
+    _channel.setUserCount("--");
     var user = SERVER.getUser(nick);
     var byUser = SERVER.getUser(by);
     for(var p in PLUGINS.plugins) {
@@ -196,6 +199,10 @@ CLIENT.addListener('kill', function(nick, reason, channels, message) {
     LOG.log('[{@cyan}%s{@reset}] %s left the server (%s).', channel, nick, reason);
     var user = SERVER.getUser(nick);
     user.setOffline();
+    for(var i=0; i<channels.length; i++) {
+        var _channel = SERVER.getChannel(channels[i]);
+        _channel.setUserCount("--");
+    }
 });
 
 CLIENT.addListener('message', function(nick, to, text, message) {
@@ -206,7 +213,6 @@ CLIENT.addListener('message', function(nick, to, text, message) {
             var parts = text.split(" ");
             if(parts.length == 1) {
                 CLIENT.say(nick, "***** " + CONFIG.get('irc:nick') + " Help *****");
-                //CLIENT.say(nick, "Ich bin ein Bot und reagiere auf bestimmte Befehle bzw. Interaktionen im Channel.");
                 CLIENT.say(nick, "Hi! I am " + CONFIG.get('irc:nick') + ". I react on defined commands or interactions in Channels.");
                 CLIENT.say(nick, " ");
                 CLIENT.say(nick, "For more information on a function, type:");
@@ -222,11 +228,18 @@ CLIENT.addListener('message', function(nick, to, text, message) {
                 }
                 else {
                     var pl_ = PLUGINS.plugins[parts[1]];
-                    if(typeof pl_.onHelpRequest !== 'undefined') {
-                        var msg_ = text.substr(parts[0].length + 1 + parts[1].length + 1);
-                        parts = msg_.split(" ");
-                        if(msg_.length === 0) parts = [];
-                        pl_.onHelpRequest(CLIENT, SERVER, user, msg_, parts);
+                    if(typeof pl_.info !== 'undefined') {
+                        var info = pl_.info;
+                        CLIENT.say(nick, "Beschreibung:");
+                        CLIENT.say(nick, info.description);
+                        CLIENT.say(nick, " ");
+                        CLIENT.say(nick, "Verwendung:");
+                        for(var i = 0; i < info.commands.length; i++) {
+                            var usage = info.commands[i];
+                            usage = usage.replace(new RegExp("{C}", 'g'), CONFIG.get('commandChar') );
+                            usage = usage.replace(new RegExp("{N}", 'g'), CONFIG.get('irc:nick') );
+                            CLIENT.say(nick, "\""+usage+"\"");
+                        }
                     }
                     else {
                         CLIENT.say(nick, "Für das Plugin " + parts[1] + " ist keine Hilfe verfügbar.");
@@ -504,5 +517,5 @@ try {
     });
 }
 catch(e) {
-    LOG.error(e);
+    LOG.error("SIGINT", e);
 }

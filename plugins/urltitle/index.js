@@ -1,4 +1,11 @@
 module.exports = {
+    /*==========[ +INFO+ ]==========*/
+    info: {
+        description: "Postet den Titel einer Webseite im Channel, wenn ein Link im Channel gepostet wurde. Wird ein YouTube-Link gepostet, so wird der Titel des Videos sowie die Länge gepostet.",
+        commands: ["-"]
+    },
+    /*==========[ -INFO- ]==========*/
+
     onChannelMessage: function(client, server, channel, user, message) {
         var _m = message.match(/(((ftp|https?):\/\/)[\-\w@:%_\+.~#?,&\/\/=]+)|((mailto:)?[_.\w-]+@([\w][\w\-]+\.)+[a-zA-Z]{2,3})/g);
         if(_m !== null) {
@@ -49,12 +56,5 @@ module.exports = {
                 });
             }
         }
-    },
-    onHelpRequest: function(client, server, user, message, parts) {
-        client.say(user.getNick(), "# Beschreibung:");
-        client.say(user.getNick(), "#   Postet den Titel einer Webseite im Channel, wenn ein Link im Channel gepostet wurde.");
-        client.say(user.getNick(), "#   Wird ein YouTube-Link gepostet, so wird der Titel des Videos sowie die Länge gepostet.");
-        client.say(user.getNick(), "# Verwendung:");
-        client.say(user.getNick(), "#   -");
     }
 };

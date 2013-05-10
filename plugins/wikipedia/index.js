@@ -1,4 +1,11 @@
 module.exports = {
+    /*==========[ +INFO+ ]==========*/
+    info: {
+        description: "Postet die Wikipedia Definition eines Begriffes im Channel.",
+        commands: ["{C}wikipedia <Text>", "{C}wiki <Text>"]
+    },
+    /*==========[ -INFO- ]==========*/
+
     onCommand: function(client, server, channel, commandChar, name, params, user, text, message) {
         if(name == "wiki" || name == "wikipedia") {
             if( params.length === 0 ) return client.notice(user.getNick(), commandChar + name + " <Text>");
@@ -27,12 +34,5 @@ module.exports = {
             });
             return true;
         }
-    },
-    onHelpRequest: function(client, server, user, message, parts) {
-        client.say(user.getNick(), "# Beschreibung:");
-        client.say(user.getNick(), "#   Postet die Wikipedia Definition eines Begriffes im Channel.");
-        client.say(user.getNick(), "# Verwendung:");
-        client.say(user.getNick(), "#   !wikipedia <Text>");
-        client.say(user.getNick(), "#   !wiki <Text>");
     }
 };

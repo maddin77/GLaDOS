@@ -1,4 +1,11 @@
 module.exports = {
+    /*==========[ +INFO+ ]==========*/
+    info: {
+        description: "Gibt den aktuellen Kurs für Bitcoins in Euro aus oder Berechnet den An- und Verkaufswert für die angegebene Menge an Bitcoins.",
+        commands: ["{C}bitcoin", "{C}btc", "{C}bitcoin <Menge>", "{C}btc <Menge>", "{N} bitcoin(s)", "{N} bitcoin(s) kurs"]
+    },
+    /*==========[ -INFO- ]==========*/
+
     getBitoinData: function(callback) {
         REQUEST("http://data.mtgox.com/api/2/BTCEUR/money/ticker", function (error, response, body) {
             if (!error && response.statusCode == 200) {
@@ -47,16 +54,5 @@ module.exports = {
                 }
             });
         });
-    },
-    onHelpRequest: function(client, server, user, message, parts) {
-        client.say(user.getNick(), "# Beschreibung:");
-        client.say(user.getNick(), "#   Gibt den aktuellen Kurs für Bitcoins in Euro aus oder Berechnet den An- und Verkaufswert für die angegebene Menge an Bitcoins.");
-        client.say(user.getNick(), "# Verwendung:");
-        client.say(user.getNick(), "#   !bitcoin");
-        client.say(user.getNick(), "#   !btc");
-        client.say(user.getNick(), "#   !bitcoin <Menge>");
-        client.say(user.getNick(), "#   !btc <Menge>");
-        client.say(user.getNick(), "#   " + CONFIG.get('irc:nick') + " bitcoin(s)");
-        client.say(user.getNick(), "#   " + CONFIG.get('irc:nick') + " bitcoin(s) kurs");
     }
 };

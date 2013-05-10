@@ -1,4 +1,11 @@
 module.exports = {
+    /*==========[ +INFO+ ]==========*/
+    info: {
+        description: "Updated James auf den neuesten Stand.",
+        commands: ["{C}update"]
+    },
+    /*==========[ -INFO- ]==========*/
+
     onCommand: function(client, server, channel, commandChar, name, params, user, text, message) {
         if(name == "update") {
             if(!user.hasPermissions()) return client.notice(user.getNick(), "Du hast nicht die nötigen Rechte dazu.");
@@ -61,11 +68,5 @@ module.exports = {
             }
             return true;
         }
-    },
-    onHelpRequest: function(client, server, user, message, parts) {
-        client.say(user.getNick(), "# Beschreibung:");
-        client.say(user.getNick(), "#   Updated James auf den neuesten Stand.");
-        client.say(user.getNick(), "# Verwendung:");
-        client.say(user.getNick(), "#   !update");
     }
 };

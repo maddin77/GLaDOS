@@ -1,4 +1,11 @@
 module.exports = {
+    /*==========[ +INFO+ ]==========*/
+    info: {
+        description: "Erstellt eine Umfrage im Channel.",
+        commands: ["{C}vote", "{C}poll <OPEN / CLOSE / RESET / RESULTS>"]
+    },
+    /*==========[ -INFO- ]==========*/
+
     _poll: {
         options: [],
         votes: [],

@@ -1,4 +1,11 @@
 module.exports = {
+    /*==========[ +INFO+ ]==========*/
+    info: {
+        description: "Postet das aktuelle Wetter der angegebene Stadt im Channel.",
+        commands: ["{C}weather <Stadt>", "{C}wetter <Stadt>", "{C}w <Stadt>", "{N} wetter <Stadt>", "{N} wie ist das wetter in <Stadt>"]
+    },
+    /*==========[ -INFO- ]==========*/
+
     onCommand: function(client, server, channel, commandChar, name, params, user, text, message) {
         if(name == "weather" || name == "wetter" || name == "w") {
             if( params.length === 0 ) return client.notice(user.getNick(), commandChar + name + " <Stadt>");
@@ -46,15 +53,5 @@ module.exports = {
                 }
             });
         });
-    },
-    onHelpRequest: function(client, server, user, message, parts) {
-        client.say(user.getNick(), "# Beschreibung:");
-        client.say(user.getNick(), "#   Postet das aktuelle Wetter der angegebene Stadt im Channel.");
-        client.say(user.getNick(), "# Verwendung:");
-        client.say(user.getNick(), "#   !weather <Stadt>");
-        client.say(user.getNick(), "#   !wetter <Stadt>");
-        client.say(user.getNick(), "#   !w <Stadt>");
-        client.say(user.getNick(), "#   " + CONFIG.get('irc:nick') + " wetter <Stadt>");
-        client.say(user.getNick(), "#   " + CONFIG.get('irc:nick') + " wie ist das wetter in <Stadt>");
     }
 };

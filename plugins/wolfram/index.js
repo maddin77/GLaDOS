@@ -1,4 +1,11 @@
 module.exports = {
+    /*==========[ +INFO+ ]==========*/
+    info: {
+        description: "Postet Informationen von Wolfram Alpha im Channel.",
+        commands: ["{C}wolfram <Term>", "{C}wa <Term>"]
+    },
+    /*==========[ -INFO- ]==========*/
+
     qs: require('querystring'),
     wolfram: function(query, callback) {
         var uri = 'http://api.wolframalpha.com/v2/query?' + this.qs.stringify({
@@ -68,7 +75,7 @@ module.exports = {
 
     onCommand: function(client, server, channel, commandChar, name, params, user, text, message) {
         if(name == "wolfram" || name == "wa") {
-            if( params.length === 0 ) return client.notice(user.getNick(), commandChar + name + " <term>");
+            if( params.length === 0 ) return client.notice(user.getNick(), commandChar + name + " <Term>");
             this.wolfram(text, function(err, result) {
                 if(err) {
                     client.say(channel.getName(), "Error: " + err);

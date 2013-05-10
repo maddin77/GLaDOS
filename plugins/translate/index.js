@@ -1,4 +1,11 @@
 module.exports = {
+    /*==========[ +INFO+ ]==========*/
+    info: {
+        description: "Übersetzt einen Text von einer Sprache in die andere.",
+        commands: ["{C}translate <Von> <Nach> <Wort/Text>", "{C}t <Von> <Nach> <Wort/Text>"]
+    },
+    /*==========[ -INFO- ]==========*/
+
     languages: {
         "af": "Afrikanisch",
         "sq": "Albanisch",
@@ -94,18 +101,5 @@ module.exports = {
             });
             return true;
         }
-    },
-    onHelpRequest: function(client, server, user, message, parts) {
-        client.say(user.getNick(), "# Beschreibung:");
-        client.say(user.getNick(), "#   Übersetzt einen Text von einer Sprache in die andere.");
-        client.say(user.getNick(), "#   Folgende Sprachen sind verfügbar:");
-        var langs = [];
-        for(var l in this.languages) {
-            langs.push("["+l+"]"+this.languages[l]);
-        }
-        client.say(user.getNick(), "#   " + langs.join(", "));
-        client.say(user.getNick(), "# Verwendung:");
-        client.say(user.getNick(), "#   !t <Von> <Nach> <Wort/Text>");
-        client.say(user.getNick(), "#   !translate <Von> <Nach> <Wort/Text>");
     }
 };

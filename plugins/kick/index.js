@@ -1,4 +1,11 @@
 module.exports = {
+    /*==========[ +INFO+ ]==========*/
+    info: {
+        description: "Kickt einen Nutzer aus dem Channel. Optional auch mit Grund. Kann nur von Operatoren benutzt werden.",
+        commands: ["{C}kick <Nick> [Grund]", "{C}k <Nick> [Grund]"]
+    },
+    /*==========[ -INFO- ]==========*/
+
     onCommand: function(client, server, channel, commandChar, name, params, user, text, message) {
         if(name == "kick" || name == "k") {
             if( !channel.userHasMinMode(user.getNick(), "%") ) return client.notice(user.getNick(), "Du hast nicht die nötigen rechte dazu.");
@@ -17,13 +24,5 @@ module.exports = {
             client.send('KICK', channel.getName(), _user.getNick(), "(" + user.getNick() + ") " + reason);
             return true;
         }
-    },
-    onHelpRequest: function(client, server, user, message, parts) {
-        client.say(user.getNick(), "# Beschreibung:");
-        client.say(user.getNick(), "#   Kickt einen Nutzer aus dem Channel. Optional auch mit Grund.");
-        client.say(user.getNick(), "#   Kann nur von Operatoren benutzt werden.");
-        client.say(user.getNick(), "# Verwendung:");
-        client.say(user.getNick(), "#   !kick <Nick> [Grund]");
-        client.say(user.getNick(), "#   !k <Nick> [Grund]");
     }
 };
