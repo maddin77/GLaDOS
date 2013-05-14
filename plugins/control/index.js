@@ -2,7 +2,7 @@ module.exports = {
     /*==========[ +INFO+ ]==========*/
     info: {
         description: "-",
-        commands: ["{C}exit", "{C}restart", "{C}join <Channel>", "{C}part [Channel]"]
+        commands: ["{C}exit", "{C}restart", "{C}join <Channel>", "{C}part [Channel]", "{C}memory"]
     },
     /*==========[ -INFO- ]==========*/
 
@@ -27,6 +27,11 @@ module.exports = {
             if(!user.hasPermissions()) return client.notice(user.getNick(), "Du hast nicht die nötigen Rechte dazu.");
             var chan = params.length < 1 ? channel.getName() : params[0];
             client.part(chan);
+            return true;
+        }
+        else if(name == "memory" && user.hasPermissions()) {
+            var mem = process.memoryUsage();
+            client.notice(user.getNick(), UTIL.readableNumber(mem.rss) + " (v8: " + UTIL.readableNumber(mem.heapUsed) + " / " + UTIL.readableNumber(mem.heapTotal) + ")");
             return true;
         }
     }

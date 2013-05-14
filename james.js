@@ -15,7 +15,10 @@ CONFIG  = require('nconf');
 CONFIG.file('', {json_spacing: 4, file: './config/config.json'});
 
 LOG     = require('./lib/logging.js');
-DATABASE= MYSQL.createConnection(CONFIG.get('mysql'));
+var dbcfg = CONFIG.get('mysql');
+dbcfg['multipleStatements'] = true;
+DATABASE= MYSQL.createConnection(dbcfg);
+delete dbcfg;
 DATABASE.connect(function(err) {
     if(err) {
         LOG.error("[MySQL] " + err);
@@ -467,8 +470,7 @@ CLIENT.addListener('whois', function(info) {
         }
         user.setInChannels(_chans);
     }
-    var ms = new Date().getTime() - start;
-    LOG.debug('[whois] >> %s (finished in %sms)', info.nick, ms);
+    LOG.debug('Whois >> %s (finished in %sms)', info.nick, new Date().getTime() - start);
 });
 CLIENT.addListener('raw', function(message) {
     //console.log(message);

@@ -47,6 +47,7 @@ module.exports = {
     },
     showQuestion: function(client) {
         if(!this.active) return;
+        this.tippCount = 0;
         this.wait = false;
         var frageNum = Math.round( 1 + ( Math.random() * ( Object.keys(this.questions).length - 1 ) ) );
         while(this.questions[ frageNum ].answered === false) {
@@ -89,7 +90,7 @@ module.exports = {
         var that = this;
 
         this.intervalId = setInterval(function() {
-            if(this.intervalId == -1) return;
+            if(that.intervalId == -1) return;
             that.tippCount++;
             if( that.tippCount === 1 && typeof that.activeQuestion.Tip !== 'undefined' ) {
                 client.say(that.channel, "[\u0002QUIZ\u000f] [Tip " + that.tippCount + "] " + that.activeQuestion.Tip);
@@ -160,7 +161,7 @@ module.exports = {
         }
         return max.join(", ");
     },
-    postTopList: function() {
+    postTopList: function(client) {
         this.postTops++;
         if(this.postTops >= 5) {
             this.postTops = 0;
@@ -327,7 +328,6 @@ module.exports = {
                 for(var i=0; i<results.length; i++) {
                     that.userScore[ results[i].nick ] = results[i].value;
                 }
-                console.log(that.userScore);
             }
         });
     },
