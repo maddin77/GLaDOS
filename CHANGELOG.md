@@ -1,3 +1,6 @@
+# Version 0.2.3 (15.05.2013)
+* HASH-Plugin gefixxt.
+
 # Version 0.2.2 (14.05.2013)
 * MEMORY-Plugin entfernt und den Befehl im CONTROL-Plugin unter gebracht.
 * Quiz-Tipp gefixxt.

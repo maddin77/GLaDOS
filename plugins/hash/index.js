@@ -27,9 +27,9 @@ module.exports = {
             if( params.length < 2 ) return client.notice(user.getNick(), commandChar + name + " <md5/sha/sha1/sha256/sha512/rmd160> <Text>");
 
             var method = params[0];
-            if(method != "md5" && method != "sha" && method != "sha1" && method != "sha256" && method != "sha512" && method != "rmd160") return client.notice(cmd.user.getNick(), commandChar + name + " <md5/sha/sha1/sha256/sha512/rmd160> <Text>");
-
-            var _text = message.substr(method.length+1);
+            if(method != "md5" && method != "sha" && method != "sha1" && method != "sha256" && method != "sha512" && method != "rmd160") return client.notice(user.getNick(), commandChar + name + " <md5/sha/sha1/sha256/sha512/rmd160> <Text>");
+         
+            var _text = text.substr(method.length+1);
 
             var sum = CRYPTO.createHash(method);
             sum.update(_text);
