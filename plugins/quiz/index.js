@@ -59,6 +59,16 @@ module.exports = {
         this.revolte.needed = -1;
         this.revolte.has = [];
     },
+    showNextQuestion: function(client, frageNum) {
+        if(!this.active) return;
+        this.tippCount = 0;
+        this.wait = false;
+        this.qString = this.start(frageNum);
+        client.say(this.channel, "[\u0002QUIZ\u000f] " + this.qString);
+        this.startTipps(client);
+        this.revolte.needed = -1;
+        this.revolte.has = [];
+    },
     start: function(frageNum) {
         this.frageNum = frageNum;
         var questionString = "";
@@ -70,8 +80,8 @@ module.exports = {
 
         this.activeQuestion = this.questions[ frageNum ];
 
-        console.log( frageNum );
-        console.log( this.questions[ frageNum ] );
+        //console.log( frageNum );
+        //console.log( this.questions[ frageNum ] );
 
         questionString = "[Frage: " + frageNum + "]";
 
@@ -127,7 +137,7 @@ module.exports = {
         }, this.tippDelay*1000);
     },
     noRightAnswer: function(client) {
-        if(!this.ative) return;
+        if(!this.active) return;
         client.say(this.channel, "[\u0002QUIZ\u000f] Die Zeit ist um. Niemand hat die richtige antwort gewusst!");
         client.say(this.channel, "[\u0002QUIZ\u000f] Aber um trotzdem noch etwas für eure Allgemeinbildung zu tun; Die richte Antwort war: " + this.activeQuestion.Answer.replace(/\#/g,''));
         client.say(this.channel, "[\u0002QUIZ\u000f] Die nächste Frage folgt in " + this.questionDelay + " Sekunden.");
@@ -252,12 +262,23 @@ module.exports = {
                 if(!this.active || this.channel === null) return client.notice(user.getNick(), "Zur Zeit läuft kein Quiz.");
                 if(channel.getName() != this.channel) return client.notice(user.getNick(), "In diesem Channel läuft kein Quiz.");
                 client.say(channel.getName(), "[\u0002QUIZ\u000f] Diese Frage wird übersprungen.");
-                this.stopTipps();
-                this.wait = true;
-                var _that = this;
-                setTimeout(function() {
-                    _that.showQuestion(client);
-                }, this.questionDelay*1000);
+                if(params.length == 1) {
+                    this.stopTipps();
+                    this.wait = true;
+                    var _that = this;
+                    setTimeout(function() {
+                        _that.showQuestion(client);
+                    }, this.questionDelay*1000);
+                }
+                else if(params.length > 1) {
+                    var id = parseInt(params[1], 10);
+                    this.stopTipps();
+                    this.wait = true;
+                    var __that = this;
+                    setTimeout(function() {
+                        __that.showNextQuestion(client,id);
+                    }, this.questionDelay*1000);
+                }
             }
             return true;
         }
