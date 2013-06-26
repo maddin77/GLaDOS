@@ -1,3 +1,12 @@
+# Version 0.2.4 (27.06.2013)
+* Neues Plugin: RSS.
+* COMMAND-Plugin: !raw hinzugefügt.
+* MySQL Fehler beim beenden möglicherweise behoben.
+* GOOGLE-Plugin gefixxt.
+* DUDEN-Plugin auf andere API umgeschrieben.
+* 9GAG-Plugin auf das neue Seitenlayout von 9gag.com angepasst.
+* !ping funktioniert jetzt wieder.
+
 # Version 0.2.3 (15.05.2013)
 * HASH-Plugin gefixxt.
 * QUIZ Tip gefixxt.

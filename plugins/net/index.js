@@ -8,6 +8,8 @@ module.exports = {
 
     dns: require('dns'),
     net: require('net'),
+    querystring: require('querystring'),
+    http: require('http'),
     getError: function(ErrCode) {
         switch(ErrCode) {
             case 'ENODATA': return "DNS server returned answer with no data.";
@@ -139,20 +141,26 @@ module.exports = {
         }
         else if(name == "isip") {
             if(params.length === 0) return client.notice(user.getNick(), commandChar + name + " <Input>");
-            var ret = this.net.isIP(params[1]);
-            if(ret == 4) return client.say(channel.getName(), user.getNick() + ": \"" + params[1] + "\" is a IP version 4 address.");
-            else if(ret == 6) return client.say(channel.getName(), user.getNick() + ": \"" + params[1] + "\" is a IP version 6 address.");
-            else return client.say(channel.getName(), user.getNick() + ": \"" + params[1] + "\" is a invalid String.");
+            var ret = this.net.isIP(params[0]);
+            if(ret == 4) return client.say(channel.getName(), user.getNick() + ": \"" + params[0] + "\" is a IP version 4 address.");
+            else if(ret == 6) return client.say(channel.getName(), user.getNick() + ": \"" + params[0] + "\" is a IP version 6 address.");
+            else return client.say(channel.getName(), user.getNick() + ": \"" + params[0] + "\" is a invalid String.");
         }
         else if(name == "isipv4") {
             if(params.length === 0) return client.notice(user.getNick(), commandChar + name + " <Input>");
-            if(this.net.isIPv4(params[1])) return client.say(channel.getName(), user.getNick() + ": \"" + params[1] + "\" is a IP version 4 address.");
-            else return client.say(channel.getName(), user.getNick() + ": \"" + params[1] + "\" is not a IP version 4 address.");
+            if(this.net.isIPv4(params[0])) return client.say(channel.getName(), user.getNick() + ": \"" + params[0] + "\" is a IP version 4 address.");
+            else return client.say(channel.getName(), user.getNick() + ": \"" + params[0] + "\" is not a IP version 4 address.");
         }
         else if(name == "isipv6") {
             if(params.length === 0) return client.notice(user.getNick(), commandChar + name + " <Input>");
-            if(this.net.isIPv6(params[1])) return client.say(channel.getName(), user.getNick() + ": \"" + params[1] + "\" is a IP version 4 address.");
-            else return client.say(channel.getName(), user.getNick() + ": \"" + params[1] + "\" is not a IP version 4 address.");
+            if(this.net.isIPv6(params[0])) return client.say(channel.getName(), user.getNick() + ": \"" + params[0] + "\" is a IP version 4 address.");
+            else return client.say(channel.getName(), user.getNick() + ": \"" + params[0] + "\" is not a IP version 4 address.");
+        }
+        else if(name == "whois") {
+            if(params.length === 0) return client.notice(user.getNick(), commandChar + name + " <Domain. eg: google.com>");
+            GOOGL.shorten("http://whoiz.herokuapp.com/lookup?url="+params[0], function (shortUrl) {
+                client.say(channel.getName(), user.getNick() + ": " + shortUrl.id);
+            });
         }
     }
 };

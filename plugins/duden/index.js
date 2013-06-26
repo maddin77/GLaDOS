@@ -6,7 +6,7 @@ module.exports = {
     },
     /*==========[ -INFO- ]==========*/
 
-    duden: function(key , callback) {
+    /*duden: function(key , callback) {
         var that = this;
         var url = "http://www.duden.de/rechtschreibung/" + encodeURIComponent(key);
         REQUEST(url, function (error, response, body) {
@@ -59,6 +59,60 @@ module.exports = {
                             return callback(lemma + artikel + ". " + wortart + ". " + content);
                         }
                     }
+                }
+            }
+            else return callback(error);
+        });
+    },*/
+    duden: function(key , callback) {
+        var that = this;
+        var url = "http://de.thefreedictionary.com/" + encodeURIComponent(key);
+        console.log(url);
+        REQUEST(url, function (error, response, body) {
+            if(!error) {
+                var $ = CHEERIO.load(body);
+                var MainTxt = $('#MainTxt');
+                MainTxt.remove('script');
+                if( MainTxt.length === 0 ) {
+                    var c = $('#ContentTable').find('tr td:nth-child(2) div');
+                    c.find('form').remove();
+                    var text = c.text();
+                    text = text.replace(/(\r\n|\n|\r)/gm," ");
+                    text = text.replace(/\s+/g," ");
+                    var table = c.find('table').text();
+                    if(table.length === 0) {
+                        console.log(1);
+                        text = text.replace(":", ": ");
+                        return callback(text);
+                    }
+                    else {
+                        var words = [];
+                        c.find('table td').each(function(i,e) {
+                            var w = $(this).text();
+                            if(w.length > 0) {
+                                words.push( w );
+                            }
+                        });
+                        text = text.split(":")[0] + " vielleicht: " + words.join(", ") + "?";
+                        return callback(text);
+                    }
+                    console.log("======================================");
+                }
+                else {
+                    MainTxt.find('script').replaceWith("");
+                    MainTxt.find('br').replaceWith("=======================");
+                    MainTxt.find('hr').replaceWith("=======================");
+                    var text = MainTxt.text().split("=======================")[0];
+                    text = text.replace(/(\r\n|\n|\r)/gm," ");
+                    text = text.replace(/\s+/g," ");
+                    if(text[0] == " ") {
+                        text = text.slice( 1 );
+                    }
+                    if(text[text.length-1] != ".") {
+                        text += ".";
+                    }
+                    console.log( '"'+text+'"' );
+                    return callback(text);
                 }
             }
             else return callback(error);

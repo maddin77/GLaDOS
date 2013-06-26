@@ -1,5 +1,7 @@
 /* TODO */
-
+//[17:49:04] <JJJan> http://rechtschreibpruefung24.de/api/1.0/
+//[17:49:19] * James (James@bow.me) has joined
+//[17:50:05] <JJJan> Gibt XML oder JSON zurück
 /* NODE-MODULES
    ============================= */
 IRC     = require('irc');
@@ -8,6 +10,7 @@ CRYPTO  = require('crypto');
 CHEERIO = require('cheerio');
 MOMENT  = require('moment');
 MYSQL   = require('mysql');
+GOOGL   = require('goo.gl');
 
 /* LIBS
    ============================= */
@@ -18,7 +21,7 @@ LOG     = require('./lib/logging.js');
 var dbcfg = CONFIG.get('mysql');
 dbcfg['multipleStatements'] = true;
 DATABASE= MYSQL.createConnection(dbcfg);
-delete dbcfg;
+dbcfg = undefined; //free space
 DATABASE.connect(function(err) {
     if(err) {
         LOG.error("[MySQL] " + err);
@@ -53,14 +56,18 @@ CLIENT  = new IRC.Client(CONFIG.get('irc:server'), CONFIG.get('irc:nick'), CONFI
 QUIT = function(code) {
     PLUGINS.unloadAll();
     CLIENT.disconnect( CONFIG.get('quitMSG') );
-    DATABASE.end( function(err) {
-        if(err) {
-            LOG.error("DATABASE.end", err);
-        }
-        setTimeout(function() {
-            process.exit(code);
-        }, 1000);
-    });
+    setTimeout(function() {
+        DATABASE.end( function(err) {
+            if(err) {
+                LOG.error("DATABASE.end", err);
+                LOG.error("DATABASE.end", err);
+            }
+            setTimeout(function() {
+                process.exit(code);
+            }, 1000);
+        });
+    }, 1000);
+    
 };
 process.on('uncaughtException', function(err) {
     LOG.error("Caught exception: "+ err);

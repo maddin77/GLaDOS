@@ -17,7 +17,7 @@ module.exports = {
         });
         REQUEST(uri, function (error, response, body) {
             if(!error && response.statusCode >= 200 && response.statusCode < 300) {
-                if(response.request.uri.search === null) {
+                if(response.request.uri.hostname != "www.google.com") {
                     callback(true, response.request.uri.href);
                 }
                 else {

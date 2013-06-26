@@ -29,9 +29,15 @@ module.exports = {
             client.part(chan);
             return true;
         }
-        else if(name == "memory" && user.hasPermissions()) {
+        else if(name == "memory") {
+            if(!user.hasPermissions()) return client.notice(user.getNick(), "Du hast nicht die nötigen Rechte dazu.");
             var mem = process.memoryUsage();
             client.notice(user.getNick(), UTIL.readableNumber(mem.rss) + " (v8: " + UTIL.readableNumber(mem.heapUsed) + " / " + UTIL.readableNumber(mem.heapTotal) + ")");
+            return true;
+        }
+        else if(name == "raw") {
+            if(!user.hasPermissions()) return client.notice(user.getNick(), "Du hast nicht die nötigen Rechte dazu.");
+            client.send(text);
             return true;
         }
     }

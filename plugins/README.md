@@ -2,6 +2,7 @@
 ============
 ```javascript
 module.exports = {
+
     /**
      * Wird aufgerufen, wenn ein Befehl in einem Channel gesendet wird.
      *

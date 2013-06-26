@@ -14,8 +14,14 @@ module.exports = {
             client.say(channel.getName(), "pong");
         }
     },
+    onCommand: function(client, server, channel, commandChar, name, params, user, text, message) {
+        if(name == "ping") {
+            client.say(channel.getName(), "pong");
+            return true;
+        }
+    },
     onChannelMessage: function(client, server, channel, user, message) {
-        message.rmatch("^(!ping|.ping|,ping)", function(match) {
+        message.rmatch("^(.ping|,ping)", function(match) {
             client.say(channel.getName(), "pong");
         });
     }
