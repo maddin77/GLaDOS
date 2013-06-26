@@ -6,6 +6,7 @@
 * DUDEN-Plugin auf andere API umgeschrieben.
 * 9GAG-Plugin auf das neue Seitenlayout von 9gag.com angepasst.
 * !ping funktioniert jetzt wieder.
+* daemon (hoffentlich) gefixxt.
 
 # Version 0.2.3 (15.05.2013)
 * HASH-Plugin gefixxt.

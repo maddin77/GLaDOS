@@ -18,7 +18,7 @@ function spawn() {
             process.exit(1);
         }
         else {
-             log('James exited with code ' + (code ? code.toString() : "null") + " and signal " + (signal ? signal.toString() : "null"));
+             log('James exited with code ' + (code ? code.toString() : 0) + " and signal " + (signal ? signal.toString() : "null"));
              respawn();
         }
     });
