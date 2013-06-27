@@ -19,7 +19,7 @@ module.exports = {
     tippCount: 0,
     maxTipps: 5,
     frageNum: -1,
-    channel: null,
+    channel: "#quiz",
     postTops: 0,
     revolte: {
         needed: -1,
@@ -234,6 +234,7 @@ module.exports = {
     onCommand: function(client, server, channel, commandChar, name, params, user, text, message) {
         if(name == "quiz") {
             if(!user.hasPermissions()) return client.notice(user.getNick(), "Du hast nicht die nötigen rechte dazu.");
+            if(this.channel != channel.getName()) return client.notice(user.getNick(), "Du musst im Channel '" + this.channel + "' sein.");
             if(params.length === 0) return client.notice(user.getNick(), commandChar + name + " <START/STOP/NEXT>");
             if(params[0].toLowerCase() == "start") {
                 if(this.active) return client.notice(user.getNick(), "Das Quiz läuft bereits.");
@@ -244,22 +245,24 @@ module.exports = {
                 this.active = true;
                 this.stopTipps();
                 this.wait = true;
-                this.channel = channel.getName();
                 var that = this;
                 setTimeout(function() {
                     that.showQuestion(client, channel);
                 }, this.questionDelay*1000);
             }
             else if(params[0].toLowerCase() == "stop") {
-                if(!this.active || this.channel === null) return client.notice(user.getNick(), "Zur Zeit läuft kein Quiz.");
+                if(!user.hasPermissions()) return client.notice(user.getNick(), "Du hast nicht die nötigen rechte dazu.");
+                if(this.channel != channel.getName()) return client.notice(user.getNick(), "Du musst im Channel '" + this.channel + "' sein.");
+                if(!this.active) return client.notice(user.getNick(), "Zur Zeit läuft kein Quiz.");
                 if(channel.getName() != this.channel) return client.notice(user.getNick(), "In diesem Channel läuft kein Quiz.");
                 this.active = false;
                 this.stop();
-                this.channel = null;
                 client.say(channel.getName(), "[\u0002QUIZ\u000f] " + user.getNick() + " hat das Quiz gestoppt!");
             }
             else if(params[0].toLowerCase() == "next") {
-                if(!this.active || this.channel === null) return client.notice(user.getNick(), "Zur Zeit läuft kein Quiz.");
+                if(!user.hasPermissions()) return client.notice(user.getNick(), "Du hast nicht die nötigen rechte dazu.");
+                if(this.channel != channel.getName()) return client.notice(user.getNick(), "Du musst im Channel '" + this.channel + "' sein.");
+                if(!this.active) return client.notice(user.getNick(), "Zur Zeit läuft kein Quiz.");
                 if(channel.getName() != this.channel) return client.notice(user.getNick(), "In diesem Channel läuft kein Quiz.");
                 client.say(channel.getName(), "[\u0002QUIZ\u000f] Diese Frage wird übersprungen.");
                 if(params.length == 1) {
@@ -283,15 +286,15 @@ module.exports = {
             return true;
         }
         else if(name == "frage") {
+            if(this.channel != channel.getName()) return client.notice(user.getNick(), "Du musst im Channel '" + this.channel + "' sein.");
             if(!this.active || this.channel === null) return client.notice(user.getNick(), "Zur Zeit läuft kein Quiz.");
-            if(channel.getName() != this.channel) return client.notice(user.getNick(), "In diesem Channel läuft kein Quiz.");
             if(this.wait) return client.notice(user.getNick(), "Es wurde noch keine neue Frage gestellt. Bitte gedulde dich einen Augenblick.");
             client.notice(user.getNick(), "Die aktuelle frage ist: " + this.qString);
             return true;
         }
         else if(name == "quizhelp") {
-            if(!this.active || this.channel === null) return client.notice(user.getNick(), "Zur Zeit läuft kein Quiz.");
-            if(channel.getName() != this.channel) return client.notice(user.getNick(), "In diesem Channel läuft kein Quiz.");
+            if(this.channel != channel.getName()) return client.notice(user.getNick(), "Du musst im Channel '" + this.channel + "' sein.");
+            if(!this.active) return client.notice(user.getNick(), "Zur Zeit läuft kein Quiz.");
             client.notice(user.getNick(), "In diesem Channel wird Quiz gespielt. Es gelten folgende Regeln:");
             for(var i=0; i<this.rules.length; i++) {
                 client.notice(user.getNick(), "    $" + (i+1) + " - " + this.rules[i]);
@@ -302,6 +305,7 @@ module.exports = {
             return true;
         }
         else if(name == "quizscore") {
+            if(this.channel != channel.getName()) return client.notice(user.getNick(), "Du musst im Channel '" + this.channel + "' sein.");
             var _nick = user.getNick();
             if( !this.userScore.hasOwnProperty( _nick ) ) {
                 this.userScore[_nick] = 0;
@@ -311,7 +315,8 @@ module.exports = {
             return true;
         }
         else if(name == "revolte") {
-            if(!this.active || this.channel === null) return client.notice(user.getNick(), "Zur Zeit läuft kein Quiz.");
+            if(this.channel != channel.getName()) return client.notice(user.getNick(), "Du musst im Channel '" + this.channel + "' sein.");
+            if(!this.active) return client.notice(user.getNick(), "Zur Zeit läuft kein Quiz.");
             if(this.tippCount < 1) return client.notice(user.getNick(), "Ich reagiere nicht auf Revolten wenn nicht mindestens ein Tipp gegeben wurde.");
             if(this.revolte.needed == -1) {
                 this.revolte.needed = Math.round((channel.getUserCount()-1)/3*2);
@@ -334,6 +339,7 @@ module.exports = {
         }
     },
     onLoad: function() {
+        CLIENT.join(this.channel);
         for(var i=0; i<this.questions.length; i++) {
             this.questions[ i ].alreadyAsked = false;
             this.questions[ i ].answered = false;
@@ -352,5 +358,7 @@ module.exports = {
             }
         });
     },
-    onUnload: function() {}
+    onUnload: function() {
+        CLIENT.part(this.channel);
+    }
 };

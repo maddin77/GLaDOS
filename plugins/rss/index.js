@@ -2,7 +2,7 @@ module.exports = {
     /*==========[ +INFO+ ]==========*/
     info: {
         description: "",
-        commands: [""]
+        commands: ["{C}rss <LIST/ADD/SUB(SCRIBE)/UNSUB(SCRIBE)> [...]"]
     },
     /*==========[ -INFO- ]==========*/
     feeds: {},
@@ -59,12 +59,12 @@ module.exports = {
         return this.feeds[ fshort ].subs.indexOf( nick ) != -1;
     },
     feedExist: function(fshort) {
-        return this.feeds.hasOwnProperty(params[1]);
+        return this.feeds.hasOwnProperty(fshort);
     },
     onCommand: function(client, server, channel, commandChar, name, params, user, text, message) {
         if(name == "rss") {
             this.save();
-            if(params.length === 0) return client.notice(user.getNick(), commandChar + name + " <ADD/SUB(SCRIBE)/UNSUB(SCRIBE)> [...]");
+            if(params.length === 0) return client.notice(user.getNick(), commandChar + name + " <LIST/ADD/SUB(SCRIBE)/UNSUB(SCRIBE)> [...]");
             if(params[0].toLowerCase() == "add") {
                 if(!user.hasPermissions()) return client.notice(user.getNick(), "Du hast nicht die nötigen Rechte dazu.");
                 if(params.length < 3) return client.notice(user.getNick(), commandChar + name + " ADD <short> <url>");
@@ -97,14 +97,14 @@ module.exports = {
             else if(params[0].toLowerCase() == "unsub" || params[0].toLowerCase() == "unsubscribe") {
                 if(params.length < 2) {
                     client.notice(user.getNick(), "You are subscribed to he following Channels:");
-                    var exx = "";
-                    for(var feedShortx in this.feeds) {
-                        exx = feedShortx;
-                        if( this.feeds[ feedShortx ].subs.indexOf(user.getNick()) != -1 ) {
-                            client.notice(user.getNick(), "[" + feedShortx + "] " + this.feeds[feedShortx].name + " <" + this.feeds[feedShortx].url + ">");
+                    var ex2 = "";
+                    for(var feedShort2 in this.feeds) {
+                        ex2 = feedShort2;
+                        if( this.feeds[ feedShort2 ].subs.indexOf(user.getNick()) != -1 ) {
+                            client.notice(user.getNick(), "[" + feedShort2 + "] " + this.feeds[feedShort2].name + " <" + this.feeds[feedShort2].url + ">");
                         }
                     }
-                    return client.notice(user.getNick(), commandChar + name + " UNSUBSCRIBE <short, eg: " + exx + ">");
+                    return client.notice(user.getNick(), commandChar + name + " UNSUBSCRIBE <short, eg: " + ex2 + ">");
                 }
                 if(!this.feedExist(params[1])) return client.notice(user.getNick(), "No feed with the short '"+params[1]+"' found. Use '"+commandChar + name + " UNSUBSCRIBE' to get a list of available feeds.");
                 if(!this.isSubscribed(params[1], nick)) return client.notice(user.getNick(), "You are not subscribed to that feed. If you want to subscribe, use '"+commandChar + name + " SUBSCRIBE "+params[1]+"' instead.");
@@ -113,7 +113,13 @@ module.exports = {
                 this.save();
                 return true;
             }
-            else return client.notice(user.getNick(), commandChar + name + " <ADD/SUB(SCRIBE)/UNSUB(SCRIBE)> [...]");
+            else if(params[0].toLowerCase() == "list") {
+                client.notice(user.getNick(), "The following Channels are available:");
+                for(var feedShort3 in this.feeds) {
+                    client.notice(user.getNick(), "[" + feedShort3 + "] " + this.feeds[feedShort3].name + " <" + this.feeds[feedShort3].url + ">");
+                }
+            }
+            else return client.notice(user.getNick(), commandChar + name + " <LIST/ADD/SUB(SCRIBE)/UNSUB(SCRIBE)> [...]");
         }
     },
 
@@ -135,11 +141,13 @@ module.exports = {
     },
 
     onUnload: function() {
+        CLIENT.part(this.channel);
         clearInterval(this.intervalID);
         this.save();
     },
 
     onLoad: function() {
+        CLIENT.join(this.channel);
         DATABASE.query("CREATE TABLE IF NOT EXISTS `rss_channel` (`name` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',`short` varchar(255) COLLATE utf8_bin DEFAULT NULL,`url` varchar(255) COLLATE utf8_bin DEFAULT NULL,PRIMARY KEY (`name`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
         DATABASE.query("INSERT IGNORE INTO `rss_channel` VALUES ('IT-News fuer Profis', 'golem', 'http://rss.golem.de/rss.php');");
         DATABASE.query("INSERT IGNORE INTO `rss_channel` VALUES ('Nachrichten nicht nur aus der Welt der Computer', 'heise', 'http://heise.de.feedsportal.com/c/35207/f/653901/index.rss');");

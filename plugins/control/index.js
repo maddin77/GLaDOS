@@ -2,7 +2,7 @@ module.exports = {
     /*==========[ +INFO+ ]==========*/
     info: {
         description: "-",
-        commands: ["{C}exit", "{C}restart", "{C}join <Channel>", "{C}part [Channel]", "{C}memory"]
+        commands: ["{C}exit", "{C}restart", "{C}join <Channel>", "{C}part [Channel]", "{C}memory", "{C}raw", "{C}ping"]
     },
     /*==========[ -INFO- ]==========*/
 
@@ -21,12 +21,21 @@ module.exports = {
             if(!user.hasPermissions()) return client.notice(user.getNick(), "Du hast nicht die nötigen Rechte dazu.");
             if(params.length < 1) return client.notice(user.getNick(), commandChar + name + " <Channel>");
             client.join(params[0]);
+            var _tmp = CONFIG.get('irc:channels');
+            _tmp.push(params[0]);
+            CONFIG.set('irc:channels', _tmp);
             return true;
         }
         else if(name == "part") {
             if(!user.hasPermissions()) return client.notice(user.getNick(), "Du hast nicht die nötigen Rechte dazu.");
             var chan = params.length < 1 ? channel.getName() : params[0];
             client.part(chan);
+            var _tmp = CONFIG.get('irc:channels');
+            var i = _tmp.indexOf( chan );
+            if( i != -1 ) {
+                _tmp.splice(i, 1);
+            }
+            CONFIG.set('irc:channels', _tmp);
             return true;
         }
         else if(name == "memory") {
@@ -38,6 +47,10 @@ module.exports = {
         else if(name == "raw") {
             if(!user.hasPermissions()) return client.notice(user.getNick(), "Du hast nicht die nötigen Rechte dazu.");
             client.send(text);
+            return true;
+        }
+        else if(name == "ping") {
+            client.say(channel.getName(), "pong");
             return true;
         }
     }
