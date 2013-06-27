@@ -339,7 +339,6 @@ module.exports = {
         }
     },
     onLoad: function() {
-        CLIENT.join(this.channel);
         for(var i=0; i<this.questions.length; i++) {
             this.questions[ i ].alreadyAsked = false;
             this.questions[ i ].answered = false;
@@ -358,7 +357,5 @@ module.exports = {
             }
         });
     },
-    onUnload: function() {
-        CLIENT.part(this.channel);
-    }
+    onUnload: function() {}
 };

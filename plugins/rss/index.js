@@ -141,13 +141,11 @@ module.exports = {
     },
 
     onUnload: function() {
-        CLIENT.part(this.channel);
         clearInterval(this.intervalID);
         this.save();
     },
 
     onLoad: function() {
-        CLIENT.join(this.channel);
         DATABASE.query("CREATE TABLE IF NOT EXISTS `rss_channel` (`name` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',`short` varchar(255) COLLATE utf8_bin DEFAULT NULL,`url` varchar(255) COLLATE utf8_bin DEFAULT NULL,PRIMARY KEY (`name`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
         DATABASE.query("INSERT IGNORE INTO `rss_channel` VALUES ('IT-News fuer Profis', 'golem', 'http://rss.golem.de/rss.php');");
         DATABASE.query("INSERT IGNORE INTO `rss_channel` VALUES ('Nachrichten nicht nur aus der Welt der Computer', 'heise', 'http://heise.de.feedsportal.com/c/35207/f/653901/index.rss');");

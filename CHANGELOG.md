@@ -1,7 +1,5 @@
 # Version 0.2.5 (27.06.2013)
 * QUIZ-Plugin: Das Quiz kann nun nur noch im Channel #quiz gespielt werden.
-* QUIZ-Plugin: der Channel #quiz wird nun automatisch betreten/verlassen.
-* RSS-Plugin: der Channel #rss wird nun automatisch betreten/verlassen.
 * PING-Plugin: entfernt. !ping wurde im CONTROL-Plugin untergebracht.
 * CONTROL-Plugin: Channel die Betreten/Verlassen werden, werden nun auch in der Config übernommen.
 
