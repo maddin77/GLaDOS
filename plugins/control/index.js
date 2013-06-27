@@ -24,6 +24,7 @@ module.exports = {
             var _tmp = CONFIG.get('irc:channels');
             _tmp.push(params[0]);
             CONFIG.set('irc:channels', _tmp);
+            CONFIG.save();
             return true;
         }
         else if(name == "part") {
@@ -36,6 +37,7 @@ module.exports = {
                 _tmp.splice(i, 1);
             }
             CONFIG.set('irc:channels', _tmp);
+            CONFIG.save();
             return true;
         }
         else if(name == "memory") {
