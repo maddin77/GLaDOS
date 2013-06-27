@@ -11,7 +11,7 @@ module.exports = {
     channel: "#rss",
 
     checkFeeds: function(first) {
-        LOG.debug("checkFeeds");
+        //LOG.debug("checkFeeds");
         for(var feedShort in this.feeds) {
             this.requestFeed(feedShort, this.feeds[feedShort].url, this.feeds[feedShort].subs, first);
         }
@@ -182,7 +182,7 @@ module.exports = {
                                 }
                             }
                         }
-                        console.log(that.feeds);
+                        //console.log(that.feeds);
                         that.intervalID = setInterval(function() {
                             that.checkFeeds(false);
                         }, that.intervalTime);
