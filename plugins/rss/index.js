@@ -68,7 +68,7 @@ module.exports = {
             if(params[0].toLowerCase() == "add") {
                 if(!user.hasPermissions()) return client.notice(user.getNick(), "Du hast nicht die nötigen Rechte dazu.");
                 if(params.length < 3) return client.notice(user.getNick(), commandChar + name + " ADD <short> <url>");
-                that.feeds[ params[1] ] = {
+                this.feeds[ params[1] ] = {
                     "name": params[1],
                     "url": params[2],
                     "subs": [],
