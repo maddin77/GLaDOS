@@ -1,8 +1,8 @@
 module.exports = {
     /*==========[ +INFO+ ]==========*/
     info: {
-        description: "Postet den Link eines zufälligen Bildes von www.9gag.com im Channel.",
-        commands: ["{C}9gag", "{N} 9gag"]
+        description: "Returns a random image from 9gag.com.",
+        commands: ["{C}9gag"]
     },
     /*==========[ -INFO- ]==========*/
     getRandomImage: function(callback) {
@@ -24,13 +24,5 @@ module.exports = {
             });
             return true;
         }
-    },
-    onResponseMessage: function(client, server, channel, user, message) {
-        var that = this;
-        message.rmatch("^9gag", function(match) {
-            that.getRandomImage(function(title, url) {
-                client.say(channel.getName(), user.getNick() + ": " + title + " (" + url + ")");
-            });
-        });
     }
 };

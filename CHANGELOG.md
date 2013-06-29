@@ -1,8 +1,12 @@
+# Version 0.2.6 (29.06.2013)
+* James teilweise auf englisch umgestellt.
+* kick und kickban in einem Plugin untergebracht.
+* Google Plugin auf API umgestellt.
+
 # Version 0.2.5 (27.06.2013)
 * QUIZ-Plugin: Das Quiz kann nun nur noch im Channel #quiz gespielt werden.
 * PING-Plugin: entfernt. !ping wurde im CONTROL-Plugin untergebracht.
 * CONTROL-Plugin: Channel die Betreten/Verlassen werden, werden nun auch in der Config übernommen.
-
 
 # Version 0.2.4 (27.06.2013)
 * Neues Plugin: RSS.

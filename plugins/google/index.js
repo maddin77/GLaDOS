@@ -5,33 +5,13 @@ module.exports = {
         commands: ["{C}g <Suchbegriff(e)>", "{C}google <Suchbegriff(e)>", "{N} such(e) <Suchbegriff(e)>", "{N} such(e) nach <Suchbegriff(e)>", "{N} google nach <Suchbegriff(e)>"]
     },
     /*==========[ -INFO- ]==========*/
-
-    qs: require('querystring'),
-    google: function(query, callback) {
-        var uri = 'http://google.com/search?' + this.qs.stringify({
-            'q': encodeURIComponent(query),
-            'btnI': 1,
-            'hl': 'de',
-            'lr': 'de',
-            'pws': 0
-        });
-        REQUEST(uri, function (error, response, body) {
-            if(!error && response.statusCode >= 200 && response.statusCode < 300) {
-                if(response.request.uri.hostname != "www.google.com") {
-                    callback(true, response.request.uri.href);
-                }
-                else {
-                    callback(false);
-                }
-            }
-        });
-    },
+    google: require('google'),
     onCommand: function(client, server, channel, commandChar, name, params, user, text, message) {
         if(name == "g" || name == "google") {
             if( params.length === 0 ) return client.notice(user.getNick(), commandChar + name + " <Suchbegriff(e)>");
-            this.google(text, function(success, url) {
-                if(success) {
-                    client.say(channel.getName(), user.getNick() + ": " + url);
+            this.google(text, function(err, next, links) {
+                if(links.length > 0) {
+                    client.say(channel.getName(), user.getNick() + ": " + links[0].title + " (" + links[0].link + ")" );
                 }
                 else {
                     client.say(channel.getName(), user.getNick() + ": Unter \"" + text + "\" wurde nichts gefunden.");
@@ -42,9 +22,10 @@ module.exports = {
     },
     onResponseMessage: function(client, server, channel, user, message) {
         message.rmatch("^(such nach|google nach|suche nach|such|suche) (.*)", function(match) {
-            this.google(match[2], function(success, url) {
-                if(success) {
-                    client.say(channel.getName(), user.getNick() + ": " + url);
+            var text = match[2];
+            this.google(text, function(err, next, links) {
+                if(links.length > 0) {
+                    client.say(channel.getName(), user.getNick() + ": " + links[0].title + " (" + links[0].link + ")" );
                 }
                 else {
                     client.say(channel.getName(), user.getNick() + ": Unter \"" + text + "\" wurde nichts gefunden.");

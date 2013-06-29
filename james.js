@@ -223,7 +223,7 @@ CLIENT.addListener('message', function(nick, to, text, message) {
             var parts = text.split(" ");
             if(parts.length == 1) {
                 CLIENT.say(nick, "***** " + CONFIG.get('irc:nick') + " Help *****");
-                CLIENT.say(nick, "Hi! I am " + CONFIG.get('irc:nick') + ". I react on defined commands or interactions in Channels.");
+                CLIENT.say(nick, "Hi! I am " + CONFIG.get('irc:nick') + ". I react on defined commands or interactions in a Channel.");
                 CLIENT.say(nick, " ");
                 CLIENT.say(nick, "For more information on a function, type:");
                 CLIENT.say(nick, "/msg " + CONFIG.get('irc:nick') + " HELP <plugin>");
@@ -234,16 +234,16 @@ CLIENT.addListener('message', function(nick, to, text, message) {
             }
             else {
                 if(!PLUGINS.exist(parts[1])) {
-                    CLIENT.say(nick, "Für das Plugin " + parts[1] + " ist keine Hilfe verfügbar.");
+                    CLIENT.say(nick, "No Help available for '" + parts[1] + "'.");
                 }
                 else {
                     var pl_ = PLUGINS.plugins[parts[1]];
                     if(typeof pl_.info !== 'undefined') {
                         var info = pl_.info;
-                        CLIENT.say(nick, "Beschreibung:");
+                        CLIENT.say(nick, "Description:");
                         CLIENT.say(nick, info.description);
                         CLIENT.say(nick, " ");
-                        CLIENT.say(nick, "Verwendung:");
+                        CLIENT.say(nick, "Usage:");
                         for(var i = 0; i < info.commands.length; i++) {
                             var usage = info.commands[i];
                             usage = usage.replace(new RegExp("{C}", 'g'), CONFIG.get('commandChar') );
@@ -252,7 +252,7 @@ CLIENT.addListener('message', function(nick, to, text, message) {
                         }
                     }
                     else {
-                        CLIENT.say(nick, "Für das Plugin " + parts[1] + " ist keine Hilfe verfügbar.");
+                        CLIENT.say(nick, "No Help available for '" + parts[1] + "'.");
                     }
                 }
             }

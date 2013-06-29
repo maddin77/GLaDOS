@@ -1,8 +1,8 @@
 module.exports = {
     /*==========[ +INFO+ ]==========*/
     info: {
-        description: "Gibt den aktuellen Kurs für Bitcoins in Euro aus oder Berechnet den An- und Verkaufswert für die angegebene Menge an Bitcoins.",
-        commands: ["{C}bitcoin", "{C}btc", "{C}bitcoin <Menge>", "{C}btc <Menge>", "{N} bitcoin(s)", "{N} bitcoin(s) kurs"]
+        description: "Find the latest Bitcoin price in €.",
+        commands: ["{C}bitcoin [amount]", "{C}btc [amount]"]
     },
     /*==========[ -INFO- ]==========*/
 
@@ -27,11 +27,11 @@ module.exports = {
             this.getBitoinData(function(success, buy, sell) {
                 if(success) {
                     if(params.length === 0) {
-                        client.say(channel.getName(), user.getNick() + ": Kaufen: " + buy + "€/BTC, Verkaufen: " + sell + "€/BTC (data from www.mtgox.com)");
+                        client.say(channel.getName(), user.getNick() + ": Buy: " + buy + "€/BTC, Verkaufen: " + sell + "€/BTC (data from www.mtgox.com)");
                     }
                     else {
                         if(!isNaN(params[0])) {
-                            client.say(channel.getName(), user.getNick() + ": Kaufen: " + (buy*parseFloat(params[0])) + "€/" + params[0] + ", Verkaufen: " + (sell*parseFloat(params[0])) + "€/" + params[0] + " (data from www.mtgox.com)");
+                            client.say(channel.getName(), user.getNick() + ": Buy: " + (buy*parseFloat(params[0])) + "€/" + params[0] + ", Sell: " + (sell*parseFloat(params[0])) + "€/" + params[0] + " (data from www.mtgox.com)");
                         }
                     }
                 }
@@ -47,7 +47,7 @@ module.exports = {
         message.rmatch("^bitcoin(s)?( kurs)?", function(match) {
             that.getBitoinData(function(success, buy, sell) {
                 if(success) {
-                    client.say(channel.getName(), user.getNick() + ": Kaufen: " + buy + "€/BTC, Verkaufen: " + sell + "€/BTC (data from www.mtgox.com)");
+                    client.say(channel.getName(), user.getNick() + ": Buy: " + buy + "€/BTC, Sell: " + sell + "€/BTC (data from www.mtgox.com)");
                 }
                 else {
                     client.notice(user.getNick(), sell + ": " + buy);

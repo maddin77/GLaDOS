@@ -2,7 +2,7 @@ module.exports = {
     /*==========[ +INFO+ ]==========*/
     info: {
         description: "Gibt die Definition eines Begriffes aus dem Duden zurück.",
-        commands: ["{C}duden <Begriff>", "{N} definiere <Begriff>", "{N} duden <Begriff>"]
+        commands: ["{C}d <Begriff>", "{C}duden <Begriff>"]
     },
     /*==========[ -INFO- ]==========*/
 
@@ -126,12 +126,5 @@ module.exports = {
             });
             return true;
         }
-    },
-    onResponseMessage: function(client, server, channel, user, message) {
-        message.rmatch("^(definiere|duden) (.*)", function(match) {
-            this.duden(match[2], function(resp) {
-                client.say(channel.getName(), user.getNick() + ": " + resp);
-            });
-        });
     }
 };
