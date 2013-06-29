@@ -88,7 +88,7 @@ module.exports = {
                     return client.notice(user.getNick(), commandChar + name + " SUBSCRIBE <short, eg: " + ex + ">");
                 }
                 if(!this.feedExist(params[1])) return client.notice(user.getNick(), "No feed with the short '"+params[1]+"' found. Use '"+commandChar + name + " SUBSCRIBE' to get a list of available feeds.");
-                if(!this.isSubscribed(params[1], user.getNick())) return client.notice(user.getNick(), "You already subscribed to that feed. If you want to unsubscribe, use '"+commandChar + name + " UNSUBSCRIBE "+params[1]+"' instead.");
+                if(this.isSubscribed(params[1], user.getNick())) return client.notice(user.getNick(), "You already subscribed to that feed. If you want to unsubscribe, use '"+commandChar + name + " UNSUBSCRIBE "+params[1]+"' instead.");
                 this.addSubscription(params[1], user.getNick());
                 client.notice(user.getNick(), "You successfully subscribed to the feed '"+params[1]+"'.");
                 this.save();
