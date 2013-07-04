@@ -4,6 +4,14 @@
 //[17:50:05] <JJJan> Gibt XML oder JSON zurück
 /* NODE-MODULES
    ============================= */
+/*
+"mysql": {
+        "host": "10.0.38.32",
+        "user": "uRJ1ApNWC7CVP",
+        "password": "peRPWnBEz0pLx",
+        "database": "d46ffbe75e9504bc4990ef391702dacef",
+    }
+    */
 IRC     = require('irc');
 REQUEST = require('request');
 CRYPTO  = require('crypto');

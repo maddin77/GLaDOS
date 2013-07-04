@@ -1,6 +1,6 @@
 function log() {console.log.apply(null, arguments);}
 function spawn() {
-    var CHILD_PROCESS = require('child_process').spawn("node", ["james.js"] );
+    var CHILD_PROCESS = require('child_process').spawn("node", ["index.js"] );
     log('James started. PID = ' + CHILD_PROCESS.pid);
     CHILD_PROCESS.stdout.on('data', function(data) {
         data = data.toString().replace(/\n$/,"");

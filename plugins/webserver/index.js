@@ -1,6 +1,6 @@
 module.exports = {
     /*==========[ +CONFIG+ ]==========*/
-    PORT: 13357,
+    PORT: process.env.VMC_APP_PORT || 1337,
     CACHE_UPDATE_INTERVAL: 60, //Seconds
     /*==========[ -CONFIG- ]==========*/
     /*==========[ +INFO+ ]==========*/
@@ -125,44 +125,23 @@ module.exports = {
                         body = body.replace(new RegExp("{%jquery%}", 'g'), that.CACHE.files.jquery );
                         body = body.replace(new RegExp("{%TIME%}", 'g'), that.CACHE.time );
                         body = body.replace(new RegExp("{%CACHEDFOR%}", 'g'), that.CACHE_UPDATE_INTERVAL );
-                        DATABASE.query("SELECT * FROM `user` WHERE `nick` = ?", [user], function(err, userResults) {
-                            body = body.replace(new RegExp("{%INFO%}", 'g'), JSON.stringify(userResults[0]) );
 
-                            DATABASE.query("SELECT * FROM `channel_message` WHERE `nick` = ?", [user], function(err, chanmsgResults) {
-                                body = body.replace(new RegExp("{%CHANMSG%}", 'g'), JSON.stringify(chanmsgResults) );
 
-                                DATABASE.query("SELECT * FROM `join` WHERE `nick` = ?", [user], function(err, joinResults) {
-                                    body = body.replace(new RegExp("{%JOINS%}", 'g'), JSON.stringify(joinResults) );
-
-                                    DATABASE.query("SELECT * FROM `kick` WHERE `nick` = ? OR `by` = ?", [user,user], function(err, kickResults) {
-                                        body = body.replace(new RegExp("{%KICKS%}", 'g'), JSON.stringify(kickResults) );
-
-                                        DATABASE.query("SELECT * FROM `part` WHERE `nick` = ?", [user], function(err, partResults) {
-                                            body = body.replace(new RegExp("{%PARTS%}", 'g'), JSON.stringify(partResults) );
-
-                                            DATABASE.query("SELECT * FROM `quit` WHERE `nick` = ?", [user], function(err, quitResults) {
-                                                body = body.replace(new RegExp("{%QUITS%}", 'g'), JSON.stringify(quitResults) );
-
-                                                DATABASE.query("SELECT `value` FROM `quiz` WHERE `nick` = ?", [user], function(err, quizvalue) {
-                                                body = body.replace(new RegExp("{%QUIZVALUE%}", 'g'), JSON.stringify(quizvalue.length === 0 ? 0 : quizvalue[0].value) );
-
-                                                    DATABASE.query("SELECT `value` FROM `karma` WHERE `nick` = ?", [user], function(err, karmavalue) {
-                                                        body = body.replace(new RegExp("{%KARMAVALUE%}", 'g'), JSON.stringify(karmavalue.length === 0 ? 0 : karmavalue[0].value) );
-
-                                                        buffer = new Buffer(body, 'utf8');
-                                                        that.zlib.gzip(buffer, function(err, buf) {
-                                                            if(err) LOG.error("user gzip", err);
-                                                            res.writeHead(200, {'content-encoding': 'gzip','Content-Type': 'text/html'});
-                                                            res.write(buf);
-                                                            res.end();
-                                                        });
-
-                                                    });
-                                                });
-                                            });
-                                        });
-                                    });
-                                });
+                        DATABASE.query("SELECT * FROM `user` WHERE `nick` = ?;SELECT * FROM `channel_message` WHERE `nick` = ?;SELECT * FROM `join` WHERE `nick` = ?;SELECT * FROM `kick` WHERE `nick` = ? OR `by` = ?;SELECT * FROM `part` WHERE `nick` = ?;SELECT * FROM `quit` WHERE `nick` = ?;SELECT `value` FROM `quiz` WHERE `nick` = ?;SELECT `value` FROM `karma` WHERE `nick` = ?",[user,user,user,user,user,user,user,user,user], function(err, results) {
+                            body = body.replace(new RegExp("{%INFO%}", 'g'), JSON.stringify(results[0][0]) );
+                            body = body.replace(new RegExp("{%CHANMSG%}", 'g'), JSON.stringify(results[1]) );
+                            body = body.replace(new RegExp("{%JOINS%}", 'g'), JSON.stringify(results[2]) );
+                            body = body.replace(new RegExp("{%KICKS%}", 'g'), JSON.stringify(results[3]) );
+                            body = body.replace(new RegExp("{%PARTS%}", 'g'), JSON.stringify(results[4]) );
+                            body = body.replace(new RegExp("{%QUITS%}", 'g'), JSON.stringify(results[5]) );
+                            body = body.replace(new RegExp("{%QUIZVALUE%}", 'g'), JSON.stringify(results[6].length === 0 ? 0 : results[6][0].value) );
+                            body = body.replace(new RegExp("{%KARMAVALUE%}", 'g'), JSON.stringify(results[7].length === 0 ? 0 : results[7][0].value) );
+                            buffer = new Buffer(body, 'utf8');
+                            that.zlib.gzip(buffer, function(err, buf) {
+                                if(err) LOG.error("channel gzip", err);
+                                res.writeHead(200, {'content-encoding': 'gzip','Content-Type': 'text/html'});
+                                res.write(buf);
+                                res.end();
                             });
                         });
                     }
@@ -196,32 +175,18 @@ module.exports = {
                         body = body.replace(new RegExp("{%jquery%}", 'g'), that.CACHE.files.jquery );
                         body = body.replace(new RegExp("{%TIME%}", 'g'), that.CACHE.time );
                         body = body.replace(new RegExp("{%CACHEDFOR%}", 'g'), that.CACHE_UPDATE_INTERVAL );
-                        DATABASE.query("SELECT * FROM `channel` WHERE `name` = ?", [channel], function(err, channelResults) {
-                            body = body.replace(new RegExp("{%INFO%}", 'g'), JSON.stringify(channelResults[0]) );
-
-                            DATABASE.query("SELECT * FROM `channel_message` WHERE `channel` = ?", [channel], function(err, chanmsgResults) {
-                                body = body.replace(new RegExp("{%CHANMSG%}", 'g'), JSON.stringify(chanmsgResults) );
-
-                                DATABASE.query("SELECT * FROM `join` WHERE `channel` = ?", [channel], function(err, joinResults) {
-                                    body = body.replace(new RegExp("{%JOINS%}", 'g'), JSON.stringify(joinResults) );
-
-                                    DATABASE.query("SELECT * FROM `kick` WHERE `channel` = ?", [channel], function(err, kickResults) {
-                                        body = body.replace(new RegExp("{%KICKS%}", 'g'), JSON.stringify(kickResults) );
-
-                                        DATABASE.query("SELECT * FROM `part` WHERE `channel` = ?", [channel], function(err, partResults) {
-                                            body = body.replace(new RegExp("{%PARTS%}", 'g'), JSON.stringify(partResults) );
-
-                                            buffer = new Buffer(body, 'utf8');
-                                            that.zlib.gzip(buffer, function(err, buf) {
-                                                if(err) LOG.error("channel gzip", err);
-                                                res.writeHead(200, {'content-encoding': 'gzip','Content-Type': 'text/html'});
-                                                res.write(buf);
-                                                res.end();
-                                            });
-
-                                        });
-                                    });
-                                });
+                        DATABASE.query("SELECT * FROM `channel` WHERE `name` = ?;SELECT * FROM `channel_message` WHERE `channel` = ?;SELECT * FROM `join` WHERE `channel` = ?;SELECT * FROM `kick` WHERE `channel` = ?;SELECT * FROM `part` WHERE `channel` = ?",[channel,channel,channel,channel,channel], function(err, results) {
+                            body = body.replace(new RegExp("{%INFO%}", 'g'), JSON.stringify(results[0][0]) );
+                            body = body.replace(new RegExp("{%CHANMSG%}", 'g'), JSON.stringify(results[1]) );
+                            body = body.replace(new RegExp("{%JOINS%}", 'g'), JSON.stringify(results[2]) );
+                            body = body.replace(new RegExp("{%KICKS%}", 'g'), JSON.stringify(results[3]) );
+                            body = body.replace(new RegExp("{%PARTS%}", 'g'), JSON.stringify(results[4]) );
+                            buffer = new Buffer(body, 'utf8');
+                            that.zlib.gzip(buffer, function(err, buf) {
+                                if(err) LOG.error("channel gzip", err);
+                                res.writeHead(200, {'content-encoding': 'gzip','Content-Type': 'text/html'});
+                                res.write(buf);
+                                res.end();
                             });
                         });
                     }

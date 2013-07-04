@@ -55,5 +55,31 @@ module.exports = {
             client.say(channel.getName(), "pong");
             return true;
         }
+        else if(name == "set") {
+            if(!user.hasPermissions()) return client.notice(user.getNick(), "You don't have the permissions to use this command.");
+            if(params.length === 0) return client.notice(user.getNick(), commandChar + name + " <NICK/COMMAND/QUIT>");
+            if(params[0].toLowerCase() == "nick") {
+                if(params.length == 1) return client.notice(user.getNick(), commandChar + name + " NICK <Nickname>");
+                client.send("NICK", params[1]);
+            }
+            else if(params[0].toLowerCase() == "command") {
+                if(params.length == 1) return client.notice(user.getNick(), commandChar + name + " COMMAND <Char, e.g. !>");
+                CONFIG.set('commandChar', params[1]);
+                client.notice(user.getNick(), "Command identifier changed to '" + params[1] + "'.");
+            }
+            else if(params[0].toLowerCase() == "quit") {
+                if(params.length == 1) return client.notice(user.getNick(), commandChar + name + " QUIT <Message>");
+                CONFIG.set('quitMSG', params[1]);
+                client.notice(user.getNick(), "Quit message changed to '" + params[1] + "'.");
+            }
+            else return client.notice(user.getNick(), commandChar + name + " <NICK/COMMAND/QUIT>");
+        }
+    },
+    onNick: function(client, server, channels, user, oldNick, newNick) {
+        if(oldNick == CONFIG.get('irc:nick')) {
+            console.log("change nick to " + newNick);
+            CONFIG.set('irc:nick', newNick);
+            CONFIG.save();
+        }
     }
 };
