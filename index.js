@@ -4,28 +4,27 @@
 //[17:50:05] <JJJan> Gibt XML oder JSON zurück
 /* NODE-MODULES
    ============================= */
-/*
-"mysql": {
-        "host": "10.0.38.32",
-        "user": "uRJ1ApNWC7CVP",
-        "password": "peRPWnBEz0pLx",
-        "database": "d46ffbe75e9504bc4990ef391702dacef",
-    }
-    */
 IRC     = require('irc');
+/* ============================= */
 REQUEST = require('request');
+/* ============================= */
 CRYPTO  = require('crypto');
+/* ============================= */
 CHEERIO = require('cheerio');
+/* ============================= */
 MOMENT  = require('moment');
+/* ============================= */
 MYSQL   = require('mysql');
+/* ============================= */
 GOOGL   = require('goo.gl');
-
-/* LIBS
-   ============================= */
+/* ============================= */
 CONFIG  = require('nconf');
 CONFIG.file('', {json_spacing: 4, file: './config/config.json'});
-
+/* ============================= */
 LOG     = require('./lib/logging.js');
+/* ============================= */
+//REDIS = require('./lib/database.js');
+/* ============================= */
 var dbcfg = CONFIG.get('mysql');
 dbcfg['multipleStatements'] = true;
 DATABASE= MYSQL.createConnection(dbcfg);
@@ -39,16 +38,17 @@ DATABASE.connect(function(err) {
         }
     }
     else {
-        DATABASE.query("CREATE TABLE IF NOT EXISTS `channel` (`name` varchar(255) NOT NULL DEFAULT '',`userCount` int(11) DEFAULT NULL,`topic` varchar(255) DEFAULT NULL,`modes` varchar(255) DEFAULT NULL,PRIMARY KEY (`name`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
-        DATABASE.query("CREATE TABLE IF NOT EXISTS `user` (`nick` varchar(255) NOT NULL DEFAULT '',`userName` varchar(255) DEFAULT NULL,`host` varchar(255) DEFAULT NULL,`server` varchar(255) DEFAULT NULL,`realName` varchar(255) DEFAULT NULL,`inChannels` varchar(255) DEFAULT NULL,`account` varchar(255) DEFAULT NULL,`idle` int(11) DEFAULT NULL,PRIMARY KEY (`nick`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
-        DATABASE.query("CREATE TABLE IF NOT EXISTS `join` (`id` int(11) NOT NULL AUTO_INCREMENT,`channel` varchar(255) DEFAULT NULL,`nick` varchar(255) DEFAULT NULL,`time` varchar(255) DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
-        DATABASE.query("CREATE TABLE IF NOT EXISTS `part` (`id` int(11) NOT NULL AUTO_INCREMENT,`channel` varchar(255) DEFAULT NULL,`nick` varchar(255) DEFAULT NULL,`reason` varchar(255) DEFAULT NULL,`time` varchar(255) DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
-        DATABASE.query("CREATE TABLE IF NOT EXISTS `quit` (`id` int(11) NOT NULL AUTO_INCREMENT,`nick` varchar(255) DEFAULT NULL,`reason` varchar(255) DEFAULT NULL,`time` varchar(255) DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
-        DATABASE.query("CREATE TABLE IF NOT EXISTS `kick` (`id` int(11) NOT NULL AUTO_INCREMENT,`channel` varchar(255) DEFAULT NULL,`nick` varchar(255) DEFAULT NULL,`by` varchar(255) DEFAULT NULL,`reason` varchar(255) DEFAULT NULL,`time` varchar(255) DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
-        DATABASE.query("CREATE TABLE IF NOT EXISTS `private_message` (`id` int(11) NOT NULL AUTO_INCREMENT,`nick` varchar(255) DEFAULT NULL,`text` text,`time` varchar(255) DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
-        DATABASE.query("CREATE TABLE IF NOT EXISTS `channel_message` (`id` int(11) NOT NULL AUTO_INCREMENT,`channel` varchar(255) DEFAULT NULL,`nick` varchar(255) DEFAULT NULL,`text` text,`time` varchar(255) DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+        DATABASE.query("CREATE TABLE IF NOT EXISTS `channel` (`name` varchar(255) NOT NULL DEFAULT '',`userCount` int(11) DEFAULT NULL,`topic` varchar(255) DEFAULT NULL,`modes` varchar(255) DEFAULT NULL,`join` tinyint(1) NOT NULL DEFAULT '0',`disabledPlugins` varchar(255) DEFAULT NULL,PRIMARY KEY (`name`)) ENGINE=InnoDB DEFAULT CHARSET=utf8 DEFAULT COLLATE utf8_bin;");
+        DATABASE.query("CREATE TABLE IF NOT EXISTS `user` (`nick` varchar(255) NOT NULL DEFAULT '',`userName` varchar(255) DEFAULT NULL,`host` varchar(255) DEFAULT NULL,`server` varchar(255) DEFAULT NULL,`realName` varchar(255) DEFAULT NULL,`inChannels` varchar(255) DEFAULT NULL,`account` varchar(255) DEFAULT NULL,`idle` int(11) DEFAULT NULL,PRIMARY KEY (`nick`)) ENGINE=InnoDB DEFAULT CHARSET=utf8 DEFAULT COLLATE utf8_bin;");
+        DATABASE.query("CREATE TABLE IF NOT EXISTS `join` (`id` int(11) NOT NULL AUTO_INCREMENT,`channel` varchar(255) DEFAULT NULL,`nick` varchar(255) DEFAULT NULL,`time` varchar(255) DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8 DEFAULT COLLATE utf8_bin;");
+        DATABASE.query("CREATE TABLE IF NOT EXISTS `part` (`id` int(11) NOT NULL AUTO_INCREMENT,`channel` varchar(255) DEFAULT NULL,`nick` varchar(255) DEFAULT NULL,`reason` varchar(255) DEFAULT NULL,`time` varchar(255) DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8 DEFAULT COLLATE utf8_bin;");
+        DATABASE.query("CREATE TABLE IF NOT EXISTS `quit` (`id` int(11) NOT NULL AUTO_INCREMENT,`nick` varchar(255) DEFAULT NULL,`reason` varchar(255) DEFAULT NULL,`time` varchar(255) DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8 DEFAULT COLLATE utf8_bin;");
+        DATABASE.query("CREATE TABLE IF NOT EXISTS `kick` (`id` int(11) NOT NULL AUTO_INCREMENT,`channel` varchar(255) DEFAULT NULL,`nick` varchar(255) DEFAULT NULL,`by` varchar(255) DEFAULT NULL,`reason` varchar(255) DEFAULT NULL,`time` varchar(255) DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8 DEFAULT COLLATE utf8_bin;");
+        DATABASE.query("CREATE TABLE IF NOT EXISTS `private_message` (`id` int(11) NOT NULL AUTO_INCREMENT,`nick` varchar(255) DEFAULT NULL,`text` text,`time` varchar(255) DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8 DEFAULT COLLATE utf8_bin;");
+        DATABASE.query("CREATE TABLE IF NOT EXISTS `channel_message` (`id` int(11) NOT NULL AUTO_INCREMENT,`channel` varchar(255) DEFAULT NULL,`nick` varchar(255) DEFAULT NULL,`text` text,`time` varchar(255) DEFAULT NULL,PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8 DEFAULT COLLATE utf8_bin;");
     }
 });
+/* ============================= */
 Server  = require('./lib/server.js');
 Channel = require('./lib/channel.js');
 User    = require('./lib/user.js');
@@ -61,21 +61,33 @@ MOMENT.lang("de");
 SERVER  = new Server(CONFIG.get('irc:server'));
 CLIENT  = new IRC.Client(CONFIG.get('irc:server'), CONFIG.get('irc:nick'), CONFIG.get('irc'));
 
-QUIT = function(code) {
+QUIT = function(code, msg) {
+    if(code == 0) {
+        LOG.debug("forced restart");
+    }
+    else {
+        if(typeof msg != undefined) LOG.error(msg);
+    }
+
+    LOG.debug("unloading plugins...");
     PLUGINS.unloadAll();
+
+    LOG.debug("disconnecting from irc server...");
     CLIENT.disconnect( CONFIG.get('quitMSG') );
+
     setTimeout(function() {
+        LOG.debug("disconnecting from database...");
         DATABASE.end( function(err) {
             if(err) {
                 LOG.error("DATABASE.end", err);
-                LOG.error("DATABASE.end", err);
+                console.log(err);
             }
             setTimeout(function() {
-                process.exit(code);
+                LOG.debug("database connection closed");
+                process.exit(0);
             }, 1000);
         });
-    }, 1000);
-    
+    }, 0);
 };
 process.on('uncaughtException', function(err) {
     LOG.error("Caught exception: "+ err);
@@ -93,6 +105,22 @@ CLIENT.addListener('motd', function(motd) {
     SERVER.setMotd(motd);
     CLIENT.notice("NickServ", "identify " + CONFIG.get('irc:password'));
     CLIENT.list();
+    DATABASE.query("SELECT * FROM `channel`", function(err, results) {
+        if(err) QUIT(1, err);
+        else {
+            for(var i=0; i<results.length; i++) {
+                if(results[i].join == 1) {
+                    CLIENT.join(results[i].name);
+                }
+                if(results[i].disabledPlugins != null) {
+                    var disabled = results[i].disabledPlugins.split(",");
+                    for(var j=0; j<disabled.length; j++) {
+                        PLUGINS.disablePLugin(disabled[j], results[i].name);
+                    }
+                }
+            }
+        }
+    });
 });
 
 CLIENT.addListener('names', function(channel, nicks) {
@@ -142,10 +170,7 @@ CLIENT.addListener('join', function(channel, nick, message) {
         }
     }
     DATABASE.query("INSERT INTO `join` (`channel`, `nick`, `time`) VALUES (?,?,?)", [channel, nick, new Date().toString()], function(err, results) {
-        if(err) {
-            console.error(err);
-            QUIT(1);
-        }
+        if(err) QUIT(1,err);
     });
 });
 
@@ -161,10 +186,7 @@ CLIENT.addListener('part', function(channel, nick, reason, message) {
         }
     }
     DATABASE.query("INSERT INTO `part` (`channel`, `nick`, `reason`, `time`) VALUES (?,?,?,?)", [channel, nick, reason, new Date().toString()], function(err, results) {
-        if(err) {
-            console.error(err);
-            QUIT(1);
-        }
+        if(err) QUIT(1,err);
     });
 });
 
@@ -183,10 +205,7 @@ CLIENT.addListener('quit', function(nick, reason, channels, message) {
         }
     }
     DATABASE.query("INSERT INTO `quit` (`nick`, `reason`, `time`) VALUES (?,?,?)", [nick, reason, new Date().toString()], function(err, results) {
-        if(err) {
-            console.error(err);
-            QUIT(1);
-        }
+        if(err) QUIT(1,err);
     });
 });
 
@@ -206,10 +225,7 @@ CLIENT.addListener('kick', function(channel, nick, by, reason, message) {
         }
     }
     DATABASE.query("INSERT INTO `kick` (`channel`, `nick`, `by`, `reason`, `time`) VALUES (?,?,?,?,?)", [channel, nick, by, reason, new Date().toString()], function(err, results) {
-        if(err) {
-            console.error(err);
-            QUIT(1);
-        }
+        if(err) QUIT(1,err);
     });
 });
 
@@ -274,10 +290,7 @@ CLIENT.addListener('message', function(nick, to, text, message) {
             }
         }
         DATABASE.query("INSERT INTO `private_message` (`nick`, `text`, `time`) VALUES (?,?,?)", [nick, text, new Date().toString()], function(err, results) {
-            if(err) {
-                console.error(err);
-                QUIT(1);
-            }
+            if(err) QUIT(1,err);
         });
     }
     else {
@@ -322,10 +335,7 @@ CLIENT.addListener('message', function(nick, to, text, message) {
             }
         }
         DATABASE.query("INSERT INTO `channel_message` (`channel`, `nick`, `text`, `time`) VALUES (?,?,?,?)", [to, nick, text, new Date().toString()], function(err, results) {
-            if(err) {
-                console.error(err);
-                QUIT(1);
-            }
+            if(err) QUIT(1,err);
         });
     }
 });

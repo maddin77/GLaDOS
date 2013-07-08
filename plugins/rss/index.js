@@ -146,7 +146,7 @@ module.exports = {
     },
 
     onLoad: function() {
-        DATABASE.query("CREATE TABLE IF NOT EXISTS `rss_channel` (`name` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',`short` varchar(255) COLLATE utf8_bin DEFAULT NULL,`url` varchar(255) COLLATE utf8_bin DEFAULT NULL,PRIMARY KEY (`name`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+        DATABASE.query("CREATE TABLE IF NOT EXISTS `rss_channel` (`name` varchar(255) NOT NULL DEFAULT '',`short` varchar(255) DEFAULT NULL,`url` varchar(255) DEFAULT NULL,PRIMARY KEY (`name`)) ENGINE=InnoDB DEFAULT CHARSET=utf8 DEFAULT COLLATE utf8_bin;");
         DATABASE.query("INSERT IGNORE INTO `rss_channel` VALUES ('IT-News fuer Profis', 'golem', 'http://rss.golem.de/rss.php');");
         DATABASE.query("INSERT IGNORE INTO `rss_channel` VALUES ('Nachrichten nicht nur aus der Welt der Computer', 'heise', 'http://heise.de.feedsportal.com/c/35207/f/653901/index.rss');");
         DATABASE.query("INSERT IGNORE INTO `rss_channel` VALUES ('San Andreas Multiplayer - Deutsches Forum', 'samp.de', 'http://forum.sa-mp.de/?page=ThreadsFeed&format=rss2');");
@@ -154,10 +154,7 @@ module.exports = {
         DATABASE.query("CREATE TABLE IF NOT EXISTS `rss_subscription` (`nick` varchar(255) NOT NULL DEFAULT '',`feeds` varchar(255) DEFAULT NULL,PRIMARY KEY (`nick`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
         var that = this;
         DATABASE.query("SELECT * FROM `rss_channel`", function(err, results) {
-            if(err) {
-                console.error(err);
-                QUIT(1);
-            }
+            if(err) QUIT(1,err);
             else {
                 for(var i=0; i<results.length; i++) {
                     that.feeds[ results[i].short ] = {
@@ -169,10 +166,7 @@ module.exports = {
                 }
 
                 DATABASE.query("SELECT * FROM `rss_subscription`", function(err2, results2) {
-                    if(err2) {
-                        console.error(err2);
-                        QUIT(1);
-                    }
+                    if(err) QUIT(1,err);
                     else {
                         for(var i=0; i<results2.length; i++) {
                             var feeds = results2[i].feeds.split(",");

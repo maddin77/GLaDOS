@@ -20,24 +20,40 @@ module.exports = {
         else if(name == "join") {
             if(!user.hasPermissions()) return client.notice(user.getNick(), "You don't have the permissions to use this command.");
             if(params.length < 1) return client.notice(user.getNick(), commandChar + name + " <Channel>");
+            
+            var chans = CONFIG.get('irc:channels');
+            if( chans.indexOf(params[0]) > -1 ) {
+                return client.notice(user.getNick(), "I'm already in this channel.");
+            }
+
             client.join(params[0]);
-            var _tmp = CONFIG.get('irc:channels');
-            _tmp.push(params[0]);
-            CONFIG.set('irc:channels', _tmp);
+            chans.push(params[0]);
+            CONFIG.set('irc:channels', chans);
             CONFIG.save();
+            
+            DATABASE.query("UPDATE `channel` SET `join` = '1' WHERE `name` = ?", [params[0]], function(err, results) {
+                if(err) QUIT(1,err);
+            });
             return true;
         }
         else if(name == "part") {
             if(!user.hasPermissions()) return client.notice(user.getNick(), "You don't have the permissions to use this command.");
             var chan = params.length < 1 ? channel.getName() : params[0];
-            client.part(chan);
-            var _tmp = CONFIG.get('irc:channels');
-            var i = _tmp.indexOf( chan );
-            if( i != -1 ) {
-                _tmp.splice(i, 1);
+            
+            var chans = CONFIG.get('irc:channels');
+            var index = chans.indexOf(chan);
+            if( index == -1 ) {
+                return client.notice(user.getNick(), "I'm not in this channel.");
             }
-            CONFIG.set('irc:channels', _tmp);
+
+            client.part(chan);
+            chans.splice(index, 1);
+            CONFIG.set('irc:channels', chans);
             CONFIG.save();
+            
+            DATABASE.query("UPDATE `channel` SET `join` = '0' WHERE `name` = ?", [chan], function(err, results) {
+                if(err) QUIT(1,err);
+            });
             return true;
         }
         else if(name == "memory") {

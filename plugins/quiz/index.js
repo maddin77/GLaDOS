@@ -191,10 +191,7 @@ module.exports = {
         for(var nick in this.userScore) {
             var value = this.userScore[nick];
             DATABASE.query("INSERT INTO `quiz` (`nick`,`value`) VALUES (?,?) ON DUPLICATE KEY UPDATE `value` = ?", [nick, value, value], function(err, results) {
-                if(err) {
-                    console.error(err);
-                    QUIT(1);
-                }
+                if(err) QUIT(1,err);
             });
         }
     },
@@ -343,13 +340,10 @@ module.exports = {
             this.questions[ i ].alreadyAsked = false;
             this.questions[ i ].answered = false;
         }
-        DATABASE.query("CREATE TABLE IF NOT EXISTS `quiz` (`nick` varchar(255) NOT NULL DEFAULT '',`value` int(11) DEFAULT NULL,PRIMARY KEY (`nick`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+        DATABASE.query("CREATE TABLE IF NOT EXISTS `quiz` (`nick` varchar(255) NOT NULL DEFAULT '',`value` int(11) DEFAULT NULL,PRIMARY KEY (`nick`)) ENGINE=InnoDB DEFAULT CHARSET=utf8 DEFAULT COLLATE utf8_bin;");
         var that = this;
         DATABASE.query("SELECT * FROM `quiz`", function(err, results) {
-            if(err) {
-                console.error(err);
-                QUIT(1);
-            }
+            if(err) QUIT(1,err);
             else {
                 for(var i=0; i<results.length; i++) {
                     that.userScore[ results[i].nick ] = results[i].value;

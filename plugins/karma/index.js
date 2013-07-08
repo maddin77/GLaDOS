@@ -59,13 +59,10 @@ module.exports = {
         });
     },
     onLoad: function() {
-        DATABASE.query("CREATE TABLE IF NOT EXISTS `karma` (`nick` varchar(255) NOT NULL DEFAULT '',`value` int(11) DEFAULT NULL,`lastBy` varchar(255) DEFAULT NULL,`lastTime` varchar(255) DEFAULT NULL,PRIMARY KEY (`nick`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+        DATABASE.query("CREATE TABLE IF NOT EXISTS `karma` (`nick` varchar(255) NOT NULL DEFAULT '',`value` int(11) DEFAULT NULL,`lastBy` varchar(255) DEFAULT NULL,`lastTime` varchar(255) DEFAULT NULL,PRIMARY KEY (`nick`)) ENGINE=InnoDB DEFAULT CHARSET=utf8 DEFAULT COLLATE utf8_bin;");
         var that = this;
         DATABASE.query("SELECT * FROM `karma`", function(err, results) {
-            if(err) {
-                console.error(err);
-                QUIT(1);
-            }
+            if(err) QUIT(1,err);
             else {
                 that._karma = results;
             }
@@ -76,10 +73,7 @@ module.exports = {
             DATABASE.query("INSERT INTO `karma` VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE `value` = ?, `lastBy` = ?, `lastTime` = ?", [
                 this._karma[i].nick, this._karma[i].value, this._karma[i].lastBy, this._karma[i].lastTime, this._karma[i].value, this._karma[i].lastBy, this._karma[i].lastTime
             ], function(err) {
-                if(err) {
-                    console.error(err);
-                    QUIT(1);
-                }
+                if(err) QUIT(1,err);
             });
         }
     },
