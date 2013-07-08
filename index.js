@@ -23,8 +23,6 @@ CONFIG.file('', {json_spacing: 4, file: './config/config.json'});
 /* ============================= */
 LOG     = require('./lib/logging.js');
 /* ============================= */
-//REDIS = require('./lib/database.js');
-/* ============================= */
 var dbcfg = CONFIG.get('mysql');
 dbcfg['multipleStatements'] = true;
 DATABASE= MYSQL.createConnection(dbcfg);
