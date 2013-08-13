@@ -64,7 +64,7 @@ module.exports = {
                         else if(data.message == "reserved range") {
                             return client.say(channel.getName(), user.getNick() + ": the IP address is part of a reserved range (" + data.query + ")");
                         }
-                        else if(data.message == "private range") {
+                        else if(data.message == "invalid query") {
                             return client.say(channel.getName(), user.getNick() + ": invalid IP address or domain name (" + data.query + ")");
                         }
                         else return client.say(channel.getName(), user.getNick() + ": " + data.message + " (" + data.query + ")");

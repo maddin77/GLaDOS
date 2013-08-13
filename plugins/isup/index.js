@@ -13,7 +13,7 @@ module.exports = {
             REQUEST(url, function (error, response, body) {
                 if (!error && response.statusCode == 200) {
                     var $ = CHEERIO.load(body);
-                    $('#container p, #container br, #container center').remove();
+                    $('#container p, #container br, #container center, .ad-container').remove();
                     var result = $('#container').text().replace(/(?:(?:^|\n)\s+|\s+(?:$|\n))/g,'').replace(/\s+/g,' ');
                     client.say(channel.getName(), user.getNick() + ": " + result);
                 }
@@ -27,7 +27,7 @@ module.exports = {
             REQUEST(url, function (error, response, body) {
                 if (!error && response.statusCode == 200) {
                     var $ = CHEERIO.load(body);
-                    $('#container p, #container br, #container center').remove();
+                    $('#container p, #container br, #container center, .ad-container').remove();
                     var result = $('#container').text().replace(/(?:(?:^|\n)\s+|\s+(?:$|\n))/g,'').replace(/\s+/g,' ');
                     client.say(channel.getName(), user.getNick() + ": " + result);
                 }
