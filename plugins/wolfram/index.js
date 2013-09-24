@@ -21,7 +21,7 @@ WolframPlugin.prototype.wolfram = function(query, callback) {
     var uri = 'http://api.wolframalpha.com/v2/query?' + querystring.stringify({
         'input': query,
         'primary': "true",
-        'appid': 'WW6R5P-6QEKU3E6UX'
+        'appid': this.cfg.get('wolframAlpha')
     });
     request(uri, function (error, response, body) {
         if(!error && response.statusCode == 200) {
