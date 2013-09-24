@@ -25,7 +25,6 @@
         "mathjs": "~0.13.0",
         "morse": "~0.1.0",
         "nconf": "~0.6.7",
-        "node-logentries": "~0.1.2",
         "redis": "~0.8.4",
         "request": "~2.27.0",
         "winston": "~0.7.2"
