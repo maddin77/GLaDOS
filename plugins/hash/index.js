@@ -1,64 +1,38 @@
-module.exports = {
-    /*==========[ +INFO+ ]==========*/
-    info: {
-        description: "Berechnet den md5, sha, sha1, sha256, sha512 oder rmd160 Hashwert des angegebenen Textes oder versucht den Originaltext eines md5-Hashwertes zu ermitteln.",
-        commands: ["{C}md5lookup <Hash>", "{C}hash <md5/sha/sha1/sha256/sha512/rmd160> <Text>", "{N} md5lookup( von) <Hash>", "{N} md5( von) <Text>", "{N} sha( von) <Text>", "usw.."]
-    },
-    /*==========[ -INFO- ]==========*/
-
-    onCommand: function(client, server, channel, commandChar, name, params, user, text, message) {
-        if(name == "md5lookup") {
-            if( params.length === 0 ) return client.notice(user.getNick(), commandChar + name + " <Hash>");
-            var url = "http://md5.noisette.ch/md5.php?hash=" + encodeURIComponent(text);
-            REQUEST(url, function (error, response, body) {
-                if (!error && response.statusCode == 200) {
-                    var $ = CHEERIO.load(body);
-                    if($('md5lookup').find('error').length > 0) {
-                        client.say(channel.getName(), user.getNick() + ": md5lookup von " + text + " ist nicht vorhanden.");
-                    }
-                    else {
-                        client.say(channel.getName(), user.getNick() + ": md5lookup von " + $('hash').text() + " ist \"" + $('string').text() + "\"");
-                    }
+var request = require('request');
+var cheerio = require('cheerio');
+var crypto = require('crypto');
+var HashPlugin = function() {};
+HashPlugin.prototype.onCommand = function(server, channel, cmdName, params, user, msg, text) {
+    if(cmdName == "md5lookup") {
+        if( params.length === 0 ) return user.notice("!md5lookup <hash>");
+        var url = "http://md5.noisette.ch/md5.php?hash=" + encodeURIComponent(msg);
+        request(url, function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+                var $ = cheerio.load(body, {xmlMode: true});
+                if($('error').text().length > 0) {
+                    channel.say(user.getNick() + ": " + $('error').text());
                 }
-            });
-            return true;
-        }
-        else if(name == "hash") {
-            if( params.length < 2 ) return client.notice(user.getNick(), commandChar + name + " <md5/sha/sha1/sha256/sha512/rmd160> <Text>");
-
-            var method = params[0];
-            if(method != "md5" && method != "sha" && method != "sha1" && method != "sha256" && method != "sha512" && method != "rmd160") return client.notice(user.getNick(), commandChar + name + " <md5/sha/sha1/sha256/sha512/rmd160> <Text>");
-         
-            var _text = text.substr(method.length+1);
-
-            var sum = CRYPTO.createHash(method);
-            sum.update(_text);
-            var res = sum.digest('hex');
-            client.say(channel.getName(), user.getNick() + ": " + method + " von \"" + _text + "\" ist " + res + "");
-            return true;
-        }
-    },
-    onResponseMessage: function(client, server, channel, user, message) {
-        message.rmatch("^(md5lookup von|md5lookup) (.*)", function(match) {
-            var url = "http://md5.noisette.ch/md5.php?hash=" + encodeURIComponent(match[2]);
-            REQUEST(url, function (error, response, body) {
-                if (!error && response.statusCode == 200) {
-                    var $ = CHEERIO.load(body);
-                    if($('md5lookup').find('error').length > 0) {
-                        client.say(channel.getName(), user.getNick() + ": md5lookup von " + match[2] + " ist nicht vorhanden.");
-                    }
-                    else {
-                        client.say(channel.getName(), user.getNick() + ": md5lookup von " + $('hash').text() + " ist \"" + $('string').text() + "\"");
-                    }
+                else {
+                    channel.say(user.getNick() + ": " + $('string').text());
                 }
-            });
-        });
-        message.rmatch("^(md5 von|sha von|sha1 von|sha256 von|sha512 von|rmd160 von|md5|sha|sha1|sha256|sha512|rmd160) (.*)", function(match) {
-            var method = match[1].split(" ")[0];
-            var sum = CRYPTO.createHash(method);
-            sum.update(match[2]);
-            var res = sum.digest('hex');
-            client.say(channel.getName(), user.getNick() + ": " + method + " von \"" + match[2] + "\" ist " + res + "");
+            }
         });
     }
+    else if(cmdName == "hash") {
+        if( params.length < 2 ) return user.notice("!hash <md5|sha|sha1|sha256|sha512|rmd160> <string>");
+
+        var method = params[0];
+        if(method != "md5" && method != "sha" && method != "sha1" && method != "sha256" && method != "sha512" && method != "rmd160") return user.notice("!hash <md5|sha|sha1|sha256|sha512|rmd160> <string>");
+
+        var sum = crypto.createHash(method);
+        sum.update( msg.substr(method.length+1) );
+        var res = sum.digest('hex');
+        channel.say(user.getNick() + ": " + res );
+        return true;
+    }
 };
+HashPlugin.prototype.onHelp = function(server, user, text) {
+    user.say("Various hashing algorithms.");
+    user.say("Commands: !md5lookup <hash>, !hash <md5|sha|sha1|sha256|sha512|rmd160> <string>");
+};
+module.exports = new HashPlugin();

@@ -1,58 +1,44 @@
-module.exports = {
-    /*==========[ +INFO+ ]==========*/
-    info: {
-        description: "Find the latest Bitcoin price in €.",
-        commands: ["{C}bitcoin [amount]", "{C}btc [amount]"]
-    },
-    /*==========[ -INFO- ]==========*/
-
-    getBitoinData: function(callback) {
-        REQUEST("http://data.mtgox.com/api/2/BTCEUR/money/ticker", function (error, response, body) {
-            if (!error && response.statusCode == 200) {
-                var bitcoin = JSON.parse(body);
-                if(bitcoin.result == "success") {
-                    callback(true, parseFloat(bitcoin.data.buy.value.toString()), parseFloat(bitcoin.data.sell.value.toString()));
-                }
-                else {
-                   callback(false, error, bitcoin.result);
-                }
+var request = require('request');
+var BitcoinPlugin = function() {};
+BitcoinPlugin.prototype.getBitoinData = function(callback) {
+    request("http://data.mtgox.com/api/2/BTCEUR/money/ticker", function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            var bitcoin = JSON.parse(body);
+            if(bitcoin.result == "success") {
+                callback(true, parseFloat(bitcoin.data.buy.value.toString()), parseFloat(bitcoin.data.sell.value.toString()));
             }
             else {
-                callback(false, error, response.statusCode);
+               callback(false, bitcoin.error, bitcoin.error);
+            }
+        }
+        else {
+            callback(false, error, response.statusCode);
+        }
+    });
+};
+BitcoinPlugin.prototype.onCommand = function(server, channel, cmdName, params, user, msg, text) {
+    if(cmdName == "bitcoin" || cmdName == "btc") {
+        this.getBitoinData(function(success, buy, sell) {
+            if(success) {
+                var val = 1.0;
+                if(params.length > 0) {
+                    val = params[0].toString().replace(/\,/g, '.');
+                    if(!isNaN(val)) {
+                        val = parseFloat(val);
+                    }
+                    else val = 1.0;
+                }
+                channel.say(user.getNick() + ": Buy: " + (buy*val) + "€/" + val + "BTC, Sell: " + (sell*val) + "€/" + val + "BTC (data from www.mtgox.com)");
+            }
+            else {
+                user.sendNotice(sell + ": " + buy);
             }
         });
-    },
-    onCommand: function(client, server, channel, commandChar, name, params, user, text, message) {
-        if(name == "bitcoin" || name == "btc") {
-            this.getBitoinData(function(success, buy, sell) {
-                if(success) {
-                    if(params.length === 0) {
-                        client.say(channel.getName(), user.getNick() + ": Buy: " + buy + "€/BTC, Verkaufen: " + sell + "€/BTC (data from www.mtgox.com)");
-                    }
-                    else {
-                        if(!isNaN(params[0])) {
-                            client.say(channel.getName(), user.getNick() + ": Buy: " + (buy*parseFloat(params[0])) + "€/" + params[0] + ", Sell: " + (sell*parseFloat(params[0])) + "€/" + params[0] + " (data from www.mtgox.com)");
-                        }
-                    }
-                }
-                else {
-                    client.notice(user.getNick(), sell + ": " + buy);
-                }
-            });
-            return true;
-        }
-    },
-    onResponseMessage: function(client, server, channel, user, message) {
-        var that = this;
-        message.rmatch("^bitcoin(s)?( kurs)?", function(match) {
-            that.getBitoinData(function(success, buy, sell) {
-                if(success) {
-                    client.say(channel.getName(), user.getNick() + ": Buy: " + buy + "€/BTC, Sell: " + sell + "€/BTC (data from www.mtgox.com)");
-                }
-                else {
-                    client.notice(user.getNick(), sell + ": " + buy);
-                }
-            });
-        });
+        return true;
     }
 };
+BitcoinPlugin.prototype.onHelp = function(server, user, text) {
+    user.say("Find the latest Bitcoin price in €.");
+    user.say("Commands: !bitcoin [amount], !btc [amount]");
+};
+module.exports = new BitcoinPlugin();

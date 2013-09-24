@@ -11,7 +11,6 @@ module.exports = {
     active: false,
     wait: false,
     activeQuestion: null,
-    userScore: {},
     questionDelay: 5,
     qString: "",
     intervalId: null,
@@ -26,16 +25,43 @@ module.exports = {
         has: []
     },
 
+    getScore: function(nick, fn) {
+        REDISDB.hget("quiz", nick, function (err, obj) {
+            fn(obj || 0);
+        });
+    },
+    addScore: function(nick) {
+        this.getScore(nick, function(score) {
+            REDISDB.hset("quiz", nick, score+1);
+        });
+    },
+    getTopList: function(fn) {
+        REDISDB.hgetall("quiz", function (err, obj) {
+            var _scores = obj || {};
+            var scores = [];
+            Object.keys(_scores).forEach(function(nick) {
+                var score = _scores[nick];
+                scores.push({
+                    "nick": nick,
+                    "score": score
+                });
+            });
+            scores.sort(function(a,b) {
+                return b.score - a.score;
+            });
+            var max = [];
+            scores.forEach(function(val) {
+                max.push(val.nick + " ("+val.score+")");
+            });
+            fn(max.join(", "));
+        });
+    },
     right: function(client, user) {
         if(!this.active) return;
         var nick = user.getNick();
-        if( !this.userScore.hasOwnProperty( nick ) ) {
-            this.userScore[nick] = 0;
-        }
+        this.addScore(nick);
         this.questions[ this.frageNum ].alreadyAsked = true;
         this.questions[ this.frageNum ].answered = true;
-        this.userScore[nick]++;
-        this.saveScore();
         client.say(this.channel, "[\u0002QUIZ\u000f] " + nick + " hat die richtige Antwort gewusst! Die richtige Antwort war: " + this.activeQuestion.Answer.replace(/\#/g,'') );
         this.stopTipps();
         this.wait = true;
@@ -150,32 +176,13 @@ module.exports = {
             that.showQuestion(client);
         }, this.questionDelay*1000);
     },
-    generateTopList: function() {
-        var score = [];
-        for(var nick in this.userScore) {
-            var value = this.userScore[nick];
-            score.push({
-                "nick": nick,
-                "value": value
-            });
-        }
-        score.sort(function(a,b) {
-            if(a.value > b.value) return -1;
-            if(a.value == b.value) return 0;
-            if(a.value < b.value) return 1;
-        });
-        score = score.slice(0,5);
-        var max = [];
-        for(var j = 0; j < score.length; j++) {
-            max.push(score[j].nick + " ("+score[j].value+")");
-        }
-        return max.join(", ");
-    },
     postTopList: function(client) {
         this.postTops++;
         if(this.postTops >= 5) {
             this.postTops = 0;
-            client.say(this.channel, "[\u0002QUIZ\u000f] Toplist: " + this.generateTopList());
+            this.getTopList(function(list) {
+                client.say(this.channel, "[\u0002QUIZ\u000f] Toplist: " + list);
+            });
         }
     },
     stop: function() {
@@ -185,15 +192,6 @@ module.exports = {
     stopTipps: function() {
         clearInterval(this.intervalId);
         this.intervalId = -1;
-    },
-    saveScore: function() {
-        //ToDo: save score
-        for(var nick in this.userScore) {
-            var value = this.userScore[nick];
-            DATABASE.query("INSERT INTO `quiz` (`nick`,`value`) VALUES (?,?) ON DUPLICATE KEY UPDATE `value` = ?", [nick, value, value], function(err, results) {
-                if(err) QUIT(1,err);
-            });
-        }
     },
     checkAnswer: function(message) {
         var answer = this.activeQuestion.Answer;
@@ -304,11 +302,12 @@ module.exports = {
         else if(name == "quizscore") {
             if(this.channel != channel.getName()) return client.notice(user.getNick(), "Du musst im Channel '" + this.channel + "' sein.");
             var _nick = user.getNick();
-            if( !this.userScore.hasOwnProperty( _nick ) ) {
-                this.userScore[_nick] = 0;
-            }
-            client.notice(user.getNick(), "Du hast " + this.userScore[_nick] + " Fragen richtig beantwortet.");
-            client.notice(user.getNick(), "Toplist: " + this.generateTopList());
+            this.getScore(_nick, function(score) {
+                client.notice(user.getNick(), "Du hast " + score + " Fragen richtig beantwortet.");
+            });
+            this.getTopList(function(toplist) {
+                client.notice(user.getNick(), "Toplist: " + toplist);
+            });
             return true;
         }
         else if(name == "revolte") {
@@ -324,9 +323,9 @@ module.exports = {
                     client.say(channel.getName(), "[\u0002QUIZ\u000f] Diese Frage wird übersprungen.");
                     this.stopTipps();
                     this.wait = true;
-                    var _that = this;
+                    var ___that = this;
                     setTimeout(function() {
-                        _that.showQuestion(client);
+                        ___that.showQuestion(client);
                     }, this.questionDelay*1000);
                 }
                 else {
@@ -340,16 +339,6 @@ module.exports = {
             this.questions[ i ].alreadyAsked = false;
             this.questions[ i ].answered = false;
         }
-        DATABASE.query("CREATE TABLE IF NOT EXISTS `quiz` (`nick` varchar(255) NOT NULL DEFAULT '',`value` int(11) DEFAULT NULL,PRIMARY KEY (`nick`)) ENGINE=InnoDB DEFAULT CHARSET=utf8 DEFAULT COLLATE utf8_bin;");
-        var that = this;
-        DATABASE.query("SELECT * FROM `quiz`", function(err, results) {
-            if(err) QUIT(1,err);
-            else {
-                for(var i=0; i<results.length; i++) {
-                    that.userScore[ results[i].nick ] = results[i].value;
-                }
-            }
-        });
     },
     onUnload: function() {}
 };

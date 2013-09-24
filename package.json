@@ -1,32 +1,36 @@
 {
-    "name": "James",
-    "preferGlobal": false,
-    "version": "0.2.7",
+    "name": "GLaDOS",
+    "version": "0.3.0",
     "author": "Martin Rump <admin@maddin.cc>",
-    "description": "James IRC-Bot",
+    "description": "GLaDOS IRC-Bot",
     "contributors": [ 
         {
             "name": "Martin Rump",
             "email": "admin@maddin.cc"
         } 
     ],
+    "main": "index.js",
     "repository": {
         "type": "git",
-        "url": "https://github.com/maddin77/James.git"
+        "url": "https://github.com/maddin77/GLaDOS.git"
+    },
+    "bugs": {
+        "url": "https://github.com/maddin77/GLaDOS/issues"
     },
     "dependencies": {
-        "cheerio": "*",
-        "crypto": "*",
-        "goo.gl": "*",
-        "google": "*",
-        "irc": "*",
-        "moment": "*",
-        "mysql": "*",
-        "nconf": "*",
-        "request": "*"
+        "cheerio": "~0.12.2",
+        "crypto": "~0.0.3",
+        "irc": "~0.3.6",
+        "google": "~0.3.2",
+        "mathjs": "~0.13.0",
+        "nconf": "~0.6.7",
+        "node-logentries": "~0.1.2",
+        "redis": "~0.8.4",
+        "request": "~2.27.0",
+        "winston": "~0.7.2"
     },
     "license": "MIT",
     "engines": {
-        "node": ">=0.10.1"
+        "node": "0.10.17"
     }
 }

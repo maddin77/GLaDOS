@@ -1,74 +1,67 @@
-module.exports = {
-    /*==========[ +INFO+ ]==========*/
-    info: {
-        description: "-",
-        commands: ["{C}plugin <ENABLE/DISABLE/LOAD/UNLOAD/RELOAD/LIST/LISTENABLED>"]
-    },
-    /*==========[ -INFO- ]==========*/
-
-    onCommand: function(client, server, channel, commandChar, name, params, user, text, message) {
-        if(name == "plugin") {
-            if(!user.hasPermissions()) return client.notice(user.getNick(), "Du hast nicht die nötigen rechte dazu.");
-            if(params.length === 0) return client.notice(user.getNick(), commandChar + name + " <ENABLE/DISABLE/LOAD/UNLOAD/RELOAD/LIST/LISTENABLED>");
-            if(params[0].toLowerCase() == "load") {
-                if(params.length == 1) return client.notice(user.getNick(), commandChar + name + " LOAD <Pluginname>");
-                var pluginName = params[1];
-                var pl = PLUGINS.loadPlugin(pluginName);
-                if(pl) return client.notice(user.getNick(), "Plugin \"" + params[1] + "\" wurde geladen.");
-                else return client.notice(user.getNick(), "Plugin \"" + params[1] + "\" ist bereits geladen oder existiert nicht.");
-            }
-            else if(params[0].toLowerCase() == "unload") {
-                if(params.length == 1) return client.notice(user.getNick(), commandChar + name + " UNLOAD <Pluginname>");
-                var _pluginName = params[1];
-                var _pl = PLUGINS.unloadPlugin(_pluginName);
-                if(_pl) return client.notice(user.getNick(), "Plugin \"" + params[1] + "\" wurde aus dem Speicher entfernt.");
-                else return client.notice(user.getNick(), "Plugin \"" + params[1] + "\" ist nicht geladen.");
-            }
-            else if(params[0].toLowerCase() == "reload") {
-                if(params.length == 1) return client.notice(user.getNick(), commandChar + name + " RELOAD <Pluginname>");
-                var __pluginName = params[1];
-                var __pl = PLUGINS.unloadPlugin(__pluginName);
-                if(__pl) {
-                    __pl = PLUGINS.loadPlugin(__pluginName);
-                    if(__pl) return client.notice(user.getNick(), "Plugin \"" + params[1] + "\" wurde aktualisiert.");
-                }
-            }
-            else if(params[0].toLowerCase() == "list") {
-                return client.notice(user.getNick(), "Geladene Plugins: " + PLUGINS.getAllAsString(", "));
-            }
-            else if(params[0].toLowerCase() == "enable") {
-                if(params.length == 1) return client.notice(user.getNick(), commandChar + name + " ENABLE <Pluginname>");
-                var ___pluginName = params[1];
-                if(!PLUGINS.isDisabled(___pluginName, channel.getName())) {
-                    return client.notice(user.getNick(), "Plugin \"" + params[1] + "\" ist in diesem Channel bereits aktiviert.");
-                }
-                else {
-                    PLUGINS.enablePlugin(___pluginName, channel.getName());
-                    return client.notice(user.getNick(), "Plugin \"" + params[1] + "\" wurde in diesem Channel aktiviert.");
-                }
-            }
-            else if(params[0].toLowerCase() == "disable") {
-                if(params.length == 1) return client.notice(user.getNick(), commandChar + name + " DISABLE <Pluginname>");
-                var ____pluginName = params[1];
-                if(!PLUGINS.isDisabled(____pluginName, channel.getName())) {
-                    PLUGINS.disablePLugin(____pluginName, channel.getName());
-                    return client.notice(user.getNick(), "Plugin \"" + params[1] + "\" wurde in diesem Channel deaktiviert.");
-                }
-                else {
-                    return client.notice(user.getNick(), "Plugin \"" + params[1] + "\" ist in diesem Channel bereits deaktiviert.");
-                }
-            }
-            else if(params[0].toLowerCase() == "listenabled") {
-                var _pNames = [];
-                for(var _pName in PLUGINS.plugins) {
-                    if(!PLUGINS.isDisabled(_pName, channel.getName())) {
-                        _pNames.push(_pName);
-                    }
-                }
-                return client.notice(user.getNick(), "Aktive Plugins in diesem Channel: " + _pNames.join(", "));
-            }
-            else return client.notice(user.getNick(), commandChar + name + " <ENABLE/DISABLE/LOAD/UNLOAD/RELOAD/LIST/LISTENABLED>");
-            return true;
+var PluginControlPlugin = function() {};
+PluginControlPlugin.prototype.onCommand = function(server, channel, cmdName, params, user, msg, text) {
+    if(cmdName == "plugin") {
+        if(!user.hasPermissions()) return user.notice("You don't have the permissions to use this command.");
+        if(params.length === 0) return user.notice("!plugin <enable/disable/load/unload/reload/list/listenabled>");
+        if(params[0].toLowerCase() == "load") {
+            if(params.length == 1) return user.notice("!plugin LOAD <Pluginname>");
+            var pl = this.pluginManager.loadPlugin(params[1]);
+            if(pl) return user.notice("Plugin \"" + params[1] + "\" has been loaded.");
+            else return user.notice("Could not load plugin \"" + params[1] + "\".");
         }
+        else if(params[0].toLowerCase() == "unload") {
+            if(params.length == 1) return user.notice("!plugin UNLOAD <Pluginname>");
+            var _pl = this.pluginManager.unloadPlugin(params[1]);
+            if(_pl) return user.notice("Plugin \"" + params[1] + "\" has been unloaded.");
+            else return user.notice("Could not unload plugin \"" + params[1] + "\".");
+        }
+        else if(params[0].toLowerCase() == "reload") {
+            if(params.length == 1) return user.notice("!plugin RELOAD <Pluginname>");
+            var __pl = this.pluginManager.unloadPlugin(params[1]);
+            if(__pl) {
+                __pl = this.pluginManager.loadPlugin(params[1]);
+                if(__pl) return user.notice("Plugin \"" + params[1] + "\" has been reloaded.");
+                else return user.notice("Could not reload plugin \"" + params[1] + "\".");
+            }
+            else return user.notice("Could not reload Plugin \"" + params[1] + "\".");
+        }
+        else if(params[0].toLowerCase() == "list") {
+            return user.notice("Loaded plugins: " + this.pluginManager.getAllAsString(", "));
+        }
+        else if(params[0].toLowerCase() == "enable") {
+            if(params.length == 1) return user.notice("!plugin ENABLE <Pluginname>");
+            if(!this.pluginManager.isDisabled(params[1], channel.getName())) {
+                return user.notice("Plugin \"" + params[1] + "\" is already enabled in this channel.");
+            }
+            else {
+                this.pluginManager.enablePlugin(params[1], channel.getName());
+                return user.notice("Plugin \"" + params[1] + "\" has been enabled in this channel.");
+            }
+        }
+        else if(params[0].toLowerCase() == "disable") {
+            if(params.length == 1) return user.notice("!plugin DISABLE <Pluginname>");
+            if(!this.pluginManager.isDisabled(params[1], channel.getName())) {
+                this.pluginManager.disablePLugin(params[1], channel.getName());
+                return user.notice("Plugin \"" + params[1] + "\" has been disabled in this channel.");
+            }
+            else {
+                return user.notice("Plugin \"" + params[1] + "\" is already disbled in this channel.");
+            }
+        }
+        else if(params[0].toLowerCase() == "listenabled") {
+            var pNames = [];
+            for(var pName in this.pluginManager.plugins) {
+                if(!this.pluginManager.isDisabled(pName, channel.getName())) {
+                    pNames.push(pName);
+                }
+            }
+            return user.notice("Aktive Plugins in diesem Channel: " + pNames.join(", "));
+        }
+        else return user.notice("!plugin <enable/disable/load/unload/reload/list/listenabled>");
     }
 };
+PluginControlPlugin.prototype.onHelp = function(server, user, text) {
+    user.say("Control Plugins.");
+    user.say("Commands: !plugin <enable/disable/load/unload/reload/list/listenabled>");
+};
+module.exports = new PluginControlPlugin();

@@ -1,3 +1,7 @@
+# Version 0.3.0 (24.09.2013)
+* **James heisst nun GLaDOS!** 
+* zu viel.
+
 # Version 0.2.6 (29.06.2013)
 * James teilweise auf englisch umgestellt.
 * kick und kickban in einem Plugin untergebracht.
