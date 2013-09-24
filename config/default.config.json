@@ -1,37 +1,33 @@
 {
     "permissions": [],
-    "quitMSG": "bye",
-    "version": "1337^drölf",
-
+    "quitMSG": "-",
+    "version": "-",
     "logging": {
         "log": true,
         "debug": true,
         "error": true
     },
-
     "irc": {
-        "server": "chat.kerat.net",
-        "nick": "",
-        "userName": "",
-        "realName": "",
-        "password": "",
+        "server": "-",
+        "nick": "-",
+        "userName": "-",
+        "realName": "-",
+        "password": "-",
         "port": 6667,
-        "debug": false,
-        "showErrors": false,
+        "showErrors": true,
         "autoRejoin": true,
-        "autoConnect": true,
-        "channels": ["#dev"],
+        "channels": [],
         "secure": false,
         "selfSigned": false,
         "certExpired": false,
         "floodProtection": false,
-        "floodProtectionDelay": 1000
+        "floodProtectionDelay": 500
     },
-
-    "mysql": {
-        "host": "127.0.0.1",
-        "user": "",
-        "password": "",
-        "database": "James"
-    }
+    "redis": {
+        "host": "-",
+        "port": 0,
+        "pass": "-"
+    },
+    "logentries": "-",
+    "wolframAlpha": "-"
 }

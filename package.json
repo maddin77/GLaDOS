@@ -23,6 +23,7 @@
         "irc": "~0.3.6",
         "google": "~0.3.2",
         "mathjs": "~0.13.0",
+        "morse": "~0.1.0",
         "nconf": "~0.6.7",
         "node-logentries": "~0.1.2",
         "redis": "~0.8.4",
