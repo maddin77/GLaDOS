@@ -40,7 +40,7 @@ KarmaPlugin.prototype.onChannelMessage = function(server, channel, user, text) {
         if(subject == user.getNick()) return;
         var resp = this.incrementResponses[Math.floor(Math.random() * this.incrementResponses.length)];
         this.incKarma(subject, function(karma) {
-            channel.say(subject + " " + resp + " (Karma: " + karma + ")");
+            channel.say(match[1] + " " + resp + " (Karma: " + karma + ")");
         });
     }
     else if( (match = /(\S+[^-:\s])[: ]*--(\s|$)/ig.exec(text)) !== null) {
@@ -48,7 +48,7 @@ KarmaPlugin.prototype.onChannelMessage = function(server, channel, user, text) {
         if(_subject == user.getNick()) return;
         var _resp = this.decrementResponses[Math.floor(Math.random() * this.decrementResponses.length)];
         this.decKarma(_subject, function(karma) {
-            channel.say(_subject + " " + _resp + " (Karma: " + karma + ")");
+            channel.say(match[1] + " " + _resp + " (Karma: " + karma + ")");
         });
     }
 };
