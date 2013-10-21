@@ -1,6 +1,6 @@
 {
     "name": "GLaDOS",
-    "version": "0.3.0",
+    "version": "0.3.5",
     "author": "Martin Rump <admin@maddin.cc>",
     "description": "GLaDOS IRC-Bot",
     "contributors": [ 

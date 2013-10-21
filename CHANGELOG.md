@@ -1,3 +1,7 @@
+# Version 0.3.50 (21.10.2013)
+* Quiz Plugin hinzugeüfgt.
+* Whois abgeändert, blockt aber immer noch alles. Scheiss teil.
+
 # Version 0.3.0 (24.09.2013)
 * **James heisst nun GLaDOS!** 
 * zu viel.
