@@ -1,0 +1,24 @@
+{
+    "version": "1.0.0-beta",
+    "permissions": [
+        "maggin"
+    ],
+    "irc": {
+        "server": "chat.kerat.net",
+        "nick": "GLaDOS",
+        "userName": "GLaDOS",
+        "realName": "GLaDOS",
+        "password": "",
+        "port": 6667,
+        "showErrors": true,
+        "autoRejoin": true,
+        "channels": [
+            "#glados"
+        ],
+        "secure": false,
+        "selfSigned": false,
+        "certExpired": false,
+        "floodProtection": false,
+        "floodProtectionDelay": 500
+    }
+}
