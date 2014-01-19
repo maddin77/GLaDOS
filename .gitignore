@@ -1,5 +1,7 @@
 *.log
 node_modules
 v1
-data/*
+data
 .afignore
+*.sublime-workspace
+*.sublime-project
