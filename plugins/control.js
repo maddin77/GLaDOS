@@ -49,6 +49,14 @@ GLaDOS.register({
         if(!user.hasPermissions()) return user.notice('You don\'t have the permissions to use this command.');
         GLaDOS.sendRaw(text);
     });
+    ircEvent('pm', function(user, text) {
+        var params = text.split(' ');
+        if(params.length === 2 && params[0] === 'identify') {
+            GLaDOS.sendMessage('NickServ', 'IDENTIFY ' + params[1]);
+            GLaDOS.config.set('irc:password', params[1]);
+            GLaDOS.config.save();
+        }
+    });
 });
 function readableNumber(bytes) {
     var s = ['bytes', 'kB', 'MB', 'GB', 'TB', 'PB'];
