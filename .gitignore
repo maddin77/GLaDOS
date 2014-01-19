@@ -1,6 +1,5 @@
 *.log
-Thumbs.db
 node_modules
-config/config.json
+v1
+data/*
 .afignore
-TODO.md
