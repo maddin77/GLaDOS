@@ -1,6 +1,6 @@
 GLaDOS.register({
-    'name': 'Control',
-    'desc': 'Provides functions to control the Bot.',
+    'name': 'control',
+    'desc': 'provides functions to control glados.',
     'commands': [
         '!exit',
         '!join <channel>',
@@ -11,15 +11,15 @@ GLaDOS.register({
     ]
 }, function(ircEvent, command) {
     command('exit', function(channel, user, name, text, params) {
-        if(!user.hasPermissions()) return user.notice('You don\'t have the permissions to use this command.');
+        if(!user.hasPermissions()) return user.notice('you don\'t have the permissions to use this command.');
         GLaDOS.shutdown();
     });
     command('join', function(channel, user, name, text, params) {
-        if(!user.hasPermissions()) return user.notice('You don\'t have the permissions to use this command.');
+        if(!user.hasPermissions()) return user.notice('you don\'t have the permissions to use this command.');
         if(params.length < 1) return user.notice('!join <Channel>');
         var chans = GLaDOS.config.get('irc:channels');
         if( chans.indexOf(params[0]) > -1 ) {
-            return user.notice('I\'m already in this channel.');
+            return user.notice('i\'m already in this channel.');
         }
         GLaDOS.getChannel(params[0]).join();
         chans.push(params[0]);
@@ -27,12 +27,12 @@ GLaDOS.register({
         GLaDOS.config.save();
     });
     command('part', function(channel, user, name, text, params) {
-        if(!user.hasPermissions()) return user.notice('You don\'t have the permissions to use this command.');
+        if(!user.hasPermissions()) return user.notice('you don\'t have the permissions to use this command.');
         var chan = params.length < 1 ? channel.getName() : params[0];
         var chans = GLaDOS.config.get('irc:channels');
         var index = chans.indexOf(chan);
         if( index == -1 ) {
-            return user.notice('I\'m not in this channel.');
+            return user.notice('i\'m not in this channel.');
         }
         GLaDOS.getChannel(chan).part();
         chans.splice(index, 1);
@@ -40,13 +40,13 @@ GLaDOS.register({
         GLaDOS.config.save();
     });
     command(['mem','memory'], function(channel, user, name, text, params) {
-        if(!user.hasPermissions()) return user.notice('You don\'t have the permissions to use this command.');
+        if(!user.hasPermissions()) return user.notice('you don\'t have the permissions to use this command.');
         var mem = process.memoryUsage();
         user.notice(readableNumber(mem.rss) + " (v8: " + readableNumber(mem.heapUsed) + " / " + readableNumber(mem.heapTotal) + ")");
         return true;
     });
     command('raw', function(channel, user, name, text, params) {
-        if(!user.hasPermissions()) return user.notice('You don\'t have the permissions to use this command.');
+        if(!user.hasPermissions()) return user.notice('you don\'t have the permissions to use this command.');
         GLaDOS.sendRaw(text);
     });
     ircEvent('pm', function(user, text) {

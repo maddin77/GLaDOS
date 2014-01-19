@@ -7,7 +7,7 @@ GLaDOS.register({
         '!example - nothing',
         '!secondexample - still nothing'
     ]
-},function(glados, ircEvent, command) {
+},function(ircEvent, command) {
     //events.on('registered', function() {});
     //events.on('motd', function(motd) {});
     //events.on('names', function(channel, nicks) {});

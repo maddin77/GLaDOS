@@ -1,32 +1,34 @@
 {
-    "name": "GLaDOS",
-    "version": "1.0.0-beta",
-    "author": "Martin Rump <admin@maddin.cc>",
-    "description": "GLaDOS IRC-Bot",
-    "contributors": [ 
-        {
-            "name": "Martin Rump",
-            "email": "admin@maddin.cc"
-        } 
-    ],
-    "private": true,
-    "main": "index.js",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/maddin77/GLaDOS.git"
-    },
-    "bugs": {
-        "url": "https://github.com/maddin77/GLaDOS/issues"
-    },
-    "dependencies": {
-        "cheerio": "0.13.1",
-        "irc": "0.3.6",
-        "nconf": "0.6.9",
-        "request": "2.33.0",
-        "winston": "0.7.2"
-    },
-    "license": "MIT",
-    "engines": {
-        "node": "0.10.17"
+  "name": "GLaDOS",
+  "version": "1.0.1-beta",
+  "author": "Martin Rump <admin@maddin.cc>",
+  "description": "GLaDOS IRC-Bot",
+  "contributors": [
+    {
+      "name": "Martin Rump",
+      "email": "admin@maddin.cc"
     }
+  ],
+  "private": true,
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maddin77/GLaDOS.git"
+  },
+  "bugs": {
+    "url": "https://github.com/maddin77/GLaDOS/issues"
+  },
+  "dependencies": {
+    "irc": "~0.3.6",
+    "google": "~0.3.2",
+    "winston": "~0.7.2",
+    "nconf": "~0.6.9",
+    "cheerio": "~0.13.1",
+    "request": "~2.33.0",
+    "whois-available": "~0.2.0"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": "0.10.17"
+  }
 }

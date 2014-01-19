@@ -1,13 +1,13 @@
 var request = require('request');
 GLaDOS.register({
-    'name': 'Bitcoin',
-    'desc': 'Find the latest Bitcoin price in specified currency',
+    'name': 'bitcoin',
+    'desc': 'find the latest bitcoin price in specified currency.',
     'commands': [
-        '!bitcoin - Get the latest Bitcoin price in €/1 BTC.',
-        '!bitcoin <volume> - Get the latest Bitcoin price in €/<volume> BTC.',
-        '!bitcoin <currency> - Get the latest Bitcoin price in <currency>/1 BTC.',
-        '!bitcoin <volume> <currency> - Get the latest Bitcoin price in <currency>/<volume> BTC.',
-        '!bitcoin <currency> <volume> - Get the latest Bitcoin price in <currency>/<volume> BTC.'
+        '!bitcoin - get the latest bitcoin price in €/1 BTC.',
+        '!bitcoin <volume> - get the latest bitcoin price in €/<volume> BTC.',
+        '!bitcoin <currency> - get the latest bitcoin price in <currency>/1 BTC.',
+        '!bitcoin <volume> <currency> - get the latest bitcoin price in <currency>/<volume> BTC.',
+        '!bitcoin <currency> <volume> - get the latest bitcoin price in <currency>/<volume> BTC.'
     ]
 }, function(ircEvent, command) {
     command(['bitcoin', 'btc'], function(channel, user, name, text, params) {
@@ -30,10 +30,10 @@ GLaDOS.register({
         getBitoinData(currency, volume, function(error, buy, sell) {
             if(!error) {
                 if(volume == 1.0) {
-                    channel.say(user.getNick() + ': Buy: ' + buy.str + '/BTC, Sell: ' + sell.str + '/BTC');
+                    channel.say(user.getNick() + ': buy: ' + buy.str + '/BTC, sell: ' + sell.str + '/BTC');
                 }
                 else {
-                    channel.say(user.getNick() + ': Buy: ' + buy.str + ' (' + buy.val + '/BTC), Sell: ' + sell.str + ' (' + sell.val + '/BTC)');
+                    channel.say(user.getNick() + ': buy: ' + buy.str + ' (' + buy.val + '/BTC), sell: ' + sell.str + ' (' + sell.val + '/BTC)');
                 }
             }
             else {
