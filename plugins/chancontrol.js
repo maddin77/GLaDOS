@@ -1,11 +1,14 @@
 GLaDOS.register({
     'name': 'chancontrol',
-    'desc': 'provides some useful function to control the channel.',
+    'description': [
+        'Provides some useful functions to control a channel.',
+        'These commands are only available if GLaDOS and the user who uses the command have both at least Half-Op in the channel.'
+    ],
     'commands': [
-        '!kick <nick> [reason] - kick <nick> from the channel.',
-        '!ban <nick or hostmask> - ban <nick or hostmask> from the channel.',
-        '!unban <hostmask> - unban <hostmask> from the channel.',
-        '!kickban <nick> [reason] - ban <nick>\'s hostmask and kick him from the channel.'
+        '!kick <nick> [reason] - Kick <nick> from the channel.',
+        '!ban <nick or hostmask> - Ban <nick or hostmask> from the channel.',
+        '!unban <hostmask> - Unban <hostmask> from the channel.',
+        '!kickban <nick> [reason] - Ban <nick>\'s hostmask and kick him from the channel.'
     ]
 }, function(ircEvent, command) {
     command(['kick', 'k'], function(channel, user, name, text, params) {

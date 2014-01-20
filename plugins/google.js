@@ -1,7 +1,7 @@
 var google = require('google');
 GLaDOS.register({
     'name': 'google',
-    'desc': 'returns the url of the first google hit for a query.',
+    'description': 'Returns the url and title of the first google hit for a query.',
     'commands': '!google <query>'
 },function(ircEvent, command) {
     command(['google','g'], function(channel, user, name, text, params) {

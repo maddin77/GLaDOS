@@ -1,13 +1,18 @@
+var __ = require('underscore')._;
+var phrases = ["Yes, master?", "At your service", "Unleash my strength", "I'm here. As always", "By your command", "Ready to work!", "Yes, milord?", "More work?", "Ready for action", "Orders?", "What do you need?", "Say the word", "Aye, my lord", "Locked and loaded", "Aye, sir?", "I await your command", "Your honor?", "Command me!", "At once", "What ails you?", "Yes, my firend?", "Is my aid required?", "Do you require my aid?", "My powers are ready", "It's hammer time!", "I'm your robot", "I'm on the job", "You're interrupting my calculations!", "What is your wish?", "How may I serve?", "At your call", "You require my assistance?", "What is it now?", "Hmm?", "I'm coming through!", "I'm here, mortal", "I'm ready and waiting", "Ah, at last", "I'm here", "Something need doing?"];
 GLaDOS.register({
     'name': 'control',
-    'desc': 'provides functions to control glados.',
+    'desc': [
+        'Provides functions to control GLaDOS.',
+        'Most of the commands can only be used by user with special permissions.'
+    ],
     'commands': [
-        '!exit',
-        '!join <channel>',
-        '!part [channel]',
-        '!memory',
-        '!raw <raw line>',
-        '!ping'
+        '!exit - Let GLaDOS disconnect.',
+        '!join <channel> - Let GLaDOS join <channel>.',
+        '!part [channel] - Let GLaDOS part [channel] or the current channel.',
+        '!memory - Displays current memory usage.',
+        '!raw <raw line> -  Send a raw line to the server.',
+        '!ping - Test if GLaDOS is attentive.'
     ]
 }, function(ircEvent, command) {
     command('exit', function(channel, user, name, text, params) {
@@ -56,6 +61,9 @@ GLaDOS.register({
             GLaDOS.config.set('irc:password', params[1]);
             GLaDOS.config.save();
         }
+    });
+    command('ping', function(channel, user, name, text, params) {
+        channel.say(user.getNick() + ': ' + __.sample(phrases));
     });
 });
 function readableNumber(bytes) {

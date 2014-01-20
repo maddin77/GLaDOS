@@ -4,15 +4,15 @@ var dns = require('dns');
 var whoisAvailable = require('whois-available');
 GLaDOS.register({
     'name': 'net',
-    'desc': 'various networking utilities.',
+    'description': 'Various networking utilities.',
     'commands': [
-        '!isup <url> - check the availability of a website.',
-        '!geo <ip,domain,etc> - returns geo information about the given ip or domain.',
-        '!isip <string> - checks whether or not the given string is an ip, and if so which version.',
-        '!dnslookup <domain> - looks up and returns the ip of the given domain.',
-        '!dnsreverse <ip> - reverse resolves an ip address to domain names.',
-        '!dnsresolve <domain> [A/AAAA/MX/TXT/SRV/PTR/NS/CNAME] - resolves the given domain into a list of the record types specified by rrtyp.',
-        '!avail <domain> - check if the given domain is available to buy.'
+        '!isup <url> - Check the availability of a website.',
+        '!geo <ip,domain,etc> - Returns geo information about the given ip or domain.',
+        '!isip <string> - Checks whether or not the given string is an ip, and if so which version.',
+        '!dnslookup <domain> - Looks up and returns the ip of the given domain.',
+        '!dnsreverse <ip> - Reverse resolves an ip address to domain names.',
+        '!dnsresolve <domain> [A/AAAA/MX/TXT/SRV/PTR/NS/CNAME] - Resolves the given domain into a list of the record types specified by rrtyp.',
+        '!avail <domain> - Check if the given domain is available to buy.'
     ]
 },function(ircEvent, command) {
     command('isup', function(channel, user, name, text, params) {

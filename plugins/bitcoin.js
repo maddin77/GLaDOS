@@ -1,13 +1,16 @@
 var request = require('request');
 GLaDOS.register({
     'name': 'bitcoin',
-    'desc': 'find the latest bitcoin price in specified currency.',
+    'description': [
+        'Find the latest Bitcoin price in specified currency.',
+        'Data from mtgox.com.'
+    ],
     'commands': [
-        '!bitcoin - get the latest bitcoin price in €/1 BTC.',
-        '!bitcoin <volume> - get the latest bitcoin price in €/<volume> BTC.',
-        '!bitcoin <currency> - get the latest bitcoin price in <currency>/1 BTC.',
-        '!bitcoin <volume> <currency> - get the latest bitcoin price in <currency>/<volume> BTC.',
-        '!bitcoin <currency> <volume> - get the latest bitcoin price in <currency>/<volume> BTC.'
+        '!bitcoin - Get the latest Bitcoin price in €/1 BTC.',
+        '!bitcoin <volume> - Get the latest Bitcoin price in €/<volume> BTC.',
+        '!bitcoin <currency> - Get the latest Bitcoin price in <currency>/1 BTC.',
+        '!bitcoin <volume> <currency> - Get the latest Bitcoin price in <currency>/<volume> BTC.',
+        '!bitcoin <currency> <volume> - Get the latest Bitcoin price in <currency>/<volume> BTC.'
     ]
 }, function(ircEvent, command) {
     command(['bitcoin', 'btc'], function(channel, user, name, text, params) {

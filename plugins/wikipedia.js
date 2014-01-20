@@ -2,7 +2,7 @@ var dns = require('dns');
 var request = require('request');
 GLaDOS.register({
     'name': 'wikipedia',
-    'desc': 'query wikipedia for an article summary or synonyms.',
+    'description': 'Query Wikipedia for an article summary or synonyms.',
     'commands': [
         '!wikipedia <term> - serach for wikiepdia Summary for the given term.',
         '!synonym <term or phrase> - search for synonyms via wikipedia by the given term or a phrase.'

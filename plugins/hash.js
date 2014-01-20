@@ -3,14 +3,14 @@ var cheerio = require('cheerio');
 var crypto = require('crypto');
 GLaDOS.register({
     'name': 'hash',
-    'desc': 'various hashing algorithms.',
+    'description': 'various hashing algorithms.',
     'commands': [
-        '!md5 <string>',
-        '!sha <string>',
-        '!sha1 <string>',
-        '!sha256 <string>',
-        '!sha512 <string>',
-        '!rmd160 <string>',
+        '!md5 <string> - Calculates the MD5 digest of <string>.',
+        '!sha <string> - Calculates the SHA digest of <string>.',
+        '!sha1 <string> - Calculates the SHA-1 digest of <string>.',
+        '!sha256 <string> - Calculates the SHA-256 digest of <string>.',
+        '!sha512 <string> - Calculates the SHA-512 digest of <string>.',
+        '!rmd160 <string> - Calculates the RMD-160 digest of <string>.',
         '!md5lookup <md5 hash> - reverse MD5 lookup in multiple databases.'
     ]
 },function(ircEvent, command) {
