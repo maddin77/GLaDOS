@@ -6,3 +6,4 @@ data/config.json
 *.sublime-workspace
 *.sublime-project
 *.bat
+test.js
