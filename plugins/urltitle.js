@@ -13,6 +13,7 @@ GLaDOS.register({
     ]
 },function(ircEvent, command) {
     ircEvent('message', function(channel, user, text) {
+        if( channel.getNickList().indexOf('Ares') !== -1 ) return; //Fuck you Ares
         var match = text.match(/(((ftp|https?):\/\/)[\-\w@:%_\+.~#?,&\/\/=]+)|((mailto:)?[_.\w-]+@([\w][\w\-]+\.)+[a-zA-Z]{2,3})/g);
         if(match !== null) { //found URL
             var url_string = match[0];
