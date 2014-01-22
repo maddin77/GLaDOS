@@ -1,6 +1,6 @@
 {
   "name": "GLaDOS",
-  "version": "1.0.3-beta",
+  "version": "1.0.4-beta",
   "author": "Martin Rump <admin@maddin.cc>",
   "description": "GLaDOS IRC-Bot",
   "contributors": [
@@ -28,7 +28,9 @@
     "whois-available": "~0.2.0",
     "underscore": "~1.5.2",
     "mathjs": "~0.18.0",
-    "morse": "~0.1.0"
+    "morse": "~0.1.0",
+    "cleverbot-node": "~0.1.2",
+    "html-entities": "~1.0.10"
   },
   "license": "MIT",
   "engines": {
