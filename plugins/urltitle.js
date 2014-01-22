@@ -1,6 +1,8 @@
 var url = require('url');
 var request = require('request');
 var __ = require('underscore')._;
+var Entities = require('html-entities').AllHtmlEntities;
+var entities = new Entities();
 GLaDOS.register({
     'name': 'urltitle',
     'description': [
@@ -92,7 +94,8 @@ GLaDOS.register({
                         if (match && match[2]) {
                             var title = match[2];
                             title = title.replace(/\n/g, ' ');
-                            channel.say('Title: ' + title + ' (at ' + URL.host + ')');
+                            
+                            channel.say('Title: ' + entities.decode(title) + ' (at ' + URL.host + ')');
                         }
                     }
                 });
