@@ -55,11 +55,13 @@ GLaDOS.register({
         GLaDOS.sendRaw(text);
     });
     ircEvent('pm', function(user, text) {
-        var params = text.split(' ');
-        if(params.length === 2 && params[0] === 'identify') {
-            GLaDOS.sendMessage('NickServ', 'IDENTIFY ' + params[1]);
-            GLaDOS.config.set('irc:password', params[1]);
-            GLaDOS.config.save();
+        if(user.hasPermissions()) {
+            var params = text.split(' ');
+            if(params.length === 2 && params[0] === 'identify') {
+                GLaDOS.sendMessage('NickServ', 'IDENTIFY ' + params[1]);
+                GLaDOS.config.set('irc:password', params[1]);
+                GLaDOS.config.save();
+            }
         }
     });
     command('ping', function(channel, user, name, text, params) {
