@@ -14,30 +14,36 @@ GLaDOS.register({
             if (!error) {
                 channel.say(txt[0]);
             } else {
-                GLaDOS.logger.error(error);
+                GLaDOS.logger.error('[wikipedia] %s', error.getMessage(), err);
             }
         });
     });
     command(['synonym','syno'], function(channel, user, name, text, params) {
         if( params.length === 0 ) return user.notice('!synonym <term or phrase>');
         request({uri: 'http://wikisynonyms.ipeirotis.com/api/'+text, json: true}, function (error, response, body) {
-            if(body.http === 200) {
-                var terms = [];
-                for(var i=0; i<10&&i<body.terms.length; i++) {
-                    terms.push(body.terms[i].term);
-                }
-                channel.say(user.getNick() + ': ' + terms.join(', '));
-            }
-            else {
-                if(body.message === 'Multiple matches found because of ambiguous capitalization of the query. Please query again with one of the returned terms') {
-                    channel.say(user.getNick() + ': ' + body.message + ': ' + body.terms.slice(0, 10).join(', '));
-                }
-                else if(body.message === 'The entry is a disambiguation page in Wikipedia. Please query again with one of the returned terms') {
-                    channel.say(user.getNick() + ': ' + body.message + ': ' + body.terms.slice(0, 10).join(', '));
+            if(!error) {
+                if(body.http === 200) {
+                    var terms = [];
+                    for(var i=0; i<10&&i<body.terms.length; i++) {
+                        terms.push(body.terms[i].term);
+                    }
+                    channel.say(user.getNick() + ': ' + terms.join(', '));
                 }
                 else {
-                    channel.say(user.getNick() + ': ' + body.message);
+                    if(body.message === 'Multiple matches found because of ambiguous capitalization of the query. Please query again with one of the returned terms') {
+                        channel.say(user.getNick() + ': ' + body.message + ': ' + body.terms.slice(0, 10).join(', '));
+                    }
+                    else if(body.message === 'The entry is a disambiguation page in Wikipedia. Please query again with one of the returned terms') {
+                        channel.say(user.getNick() + ': ' + body.message + ': ' + body.terms.slice(0, 10).join(', '));
+                    }
+                    else {
+                        channel.say(user.getNick() + ': ' + body.message);
+                    }
                 }
+            }
+            else {
+                channel.say(user.getNick() + ': ' + error.getMessage());
+                GLaDOS.logger.error('[wikipedia] %s', error.getMessage(), error);
             }
         });
     });

@@ -62,6 +62,10 @@ GLaDOS.register({
                 else {
                     channel.say(user.getNick() + ": " + $('string').text());
                 }
+            } else {
+                var eMsg = (error.getMessage()||'Unknown Error');
+                channel.say(user.getNick() + ': ' + eMsg);
+                GLaDOS.logger.error('[hash] %s', eMsg, error);
             }
         });
     });

@@ -21,6 +21,11 @@ GLaDOS.register({
                     channel.say(user.getNick() + ': ' + body.responseDetails);
                 }
             }
+            else {
+                var eMsg = (error.getMessage()||'Unknown Error');
+                channel.say(user.getNick() + ': ' + eMsg);
+                GLaDOS.logger.error('[translate] %s', eMsg, error);
+            }
         });
     });
 });

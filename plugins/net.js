@@ -24,6 +24,11 @@ GLaDOS.register({
                 var result = $('#container').text().replace(/(?:(?:^|\n)\s+|\s+(?:$|\n))/g,'').replace(/\s+/g,' ');
                 channel.say(user.getNick() + ': ' + result);
             }
+            else {
+                var eMsg = (error.getMessage()||'Unknown Error');
+                channel.say(user.getNick() + ': ' + eMsg);
+                GLaDOS.logger.error('[net] %s', eMsg, error);
+            }
         });
     });
     command('geo', function(channel, user, name, text, params) {
@@ -56,6 +61,11 @@ GLaDOS.register({
                         channel.say(user.getNick() + ": " + data.message + " (" + data.query + ")");
                     }
                 }
+            }
+            else {
+                var eMsg = (error.getMessage()||'Unknown Error');
+                channel.say(user.getNick() + ': ' + eMsg);
+                GLaDOS.logger.error('[net] %s', eMsg, error);
             }
         });
     });
@@ -130,7 +140,14 @@ GLaDOS.register({
         if(params.length === 0) return user.notice("!avail <domain>");
         
         whoisAvailable(text, function(err, whoisResponse, isAvailable) {
-            channel.say(user.getNick() + ': "' + text + '" is ' + (isAvailable?'':'not ') + 'available.');
+            if(!err) {
+                channel.say(user.getNick() + ': "' + text + '" is ' + (isAvailable?'':'not ') + 'available.');
+            }
+            else {
+                var eMsg = (err.getMessage()||'Unknown Error');
+                channel.say(user.getNick() + ': ' + eMsg);
+                GLaDOS.logger.error('[net] %s', eMsg, err);
+            }
         });
     });
 });

@@ -70,6 +70,7 @@ function getBitoinData(currency, volume, callback) {
             }
         }
         else {
+            GLaDOS.logger.error('[bitcoin] %s', error.getMessage(), error);
             return callback(error||'Unknown Error');
         }
     });

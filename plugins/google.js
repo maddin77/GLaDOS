@@ -7,11 +7,17 @@ GLaDOS.register({
     command(['google','g'], function(channel, user, name, text, params) {
         if( params.length === 0 ) return user.notice('!google <query>');
         google(text, function(err, next, links) {
-            if(links.length > 0) {
-                channel.say(user.getNick() + ': ' + links[0].title + ' (' + links[0].link + ')' );
+            if(!err) {
+                if(links.length > 0) {
+                    channel.say(user.getNick() + ': ' + links[0].title + ' (' + links[0].link + ')' );
+                }
+                else {
+                    channel.say(user.getNick() + ': your search - ' + text + ' - did not match any documents.');
+                }
             }
             else {
-                channel.say(user.getNick() + ': your search - ' + text + ' - did not match any documents.');
+                channel.say(user.getNick() + ': ' + err.getMessage());
+                GLaDOS.logger.error('[google] %s', err.getMessage(), err);
             }
         });
     });

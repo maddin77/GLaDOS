@@ -43,6 +43,9 @@ GLaDOS.register({
                             var time = formatTime(entry.media$group.yt$duration.seconds);
                             channel.say('YouTube: ' + title + ' [' + time + ']');
                         }
+                        else {
+                            GLaDOS.logger.error('[urltitle] %s', error.getMessage(), error);
+                        }
                     });
                 }
             }
@@ -68,6 +71,9 @@ GLaDOS.register({
                         var nsfw = body.data.nsfw ? ', NSFW' : '';
                         channel.say('Imgur: ' + title + ' [' + width + 'x' + height + ', ' + readableNumber(size) + '' + nsfw + ']');
                     }
+                    else {
+                        GLaDOS.logger.error('[urltitle] %s', error.getMessage(), error);
+                    }
                 });
             }
             /* Vimeo URL */
@@ -81,6 +87,9 @@ GLaDOS.register({
                         var title = body[0].title;
                         var time = formatTime(body[0].duration);
                         channel.say('Vimeo: ' + title + ' [' + time + ']');
+                    }
+                    else {
+                        GLaDOS.logger.error('[urltitle] %s', error.getMessage(), error);
                     }
                 });
             }
@@ -97,6 +106,9 @@ GLaDOS.register({
                             
                             channel.say('Title: ' + entities.decode(title) + ' (at ' + URL.host + ')');
                         }
+                    }
+                    else {
+                        GLaDOS.logger.error('[urltitle] %s', error.getMessage(), error);
                     }
                 });
             }
