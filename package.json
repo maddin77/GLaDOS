@@ -31,7 +31,6 @@
     "morse": "~0.1.0",
     "cleverbot-node": "~0.1.2",
     "html-entities": "~1.0.10",
-    "express": "~3.4.8",
     "socket.io": "~0.9.16"
   },
   "license": "MIT",

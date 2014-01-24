@@ -27,10 +27,10 @@
         <table class="table table-striped" id="messages"></table>
         <script type="text/javascript" src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
         <script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
-        <script src="/socket.io/socket.io.js"></script>
+        <script src="http://glados-maddin.rhcloud.com:80/socket.io/socket.io.js"></script>
         <script type="text/javascript">
         $(function() {
-            var socket = io.connect('http://localhost');
+            var socket = io.connect('http://glados-maddin.rhcloud.com:80');
             var $messages = $('#messages');
             socket.on('logging', function(level, message, meta, date) {
                 date = new Date(date);
