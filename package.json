@@ -30,8 +30,7 @@
     "mathjs": "~0.18.0",
     "morse": "~0.1.0",
     "cleverbot-node": "~0.1.2",
-    "html-entities": "~1.0.10",
-    "socket.io": "~0.9.16"
+    "html-entities": "~1.0.10"
   },
   "license": "MIT",
   "engines": {
