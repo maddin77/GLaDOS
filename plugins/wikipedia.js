@@ -43,7 +43,7 @@ GLaDOS.register({
             }
             else {
                 channel.say(user.getNick() + ': ' + error.getMessage());
-                GLaDOS.logger.error('[wikipedia] %s', error.getMessage(), error);
+                GLaDOS.logger.error('[wikipedia]', error);
             }
         });
     });
