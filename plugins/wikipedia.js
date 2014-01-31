@@ -15,13 +15,7 @@ GLaDOS.register({
             if (!error) {
                 channel.say(txt[0]);
             } else {
-                if (util.isError(error)) {
-                    GLaDOS.logger.error('[wikipedia]', error);
-                    channel.say(user.getNick() + ': ' + (error.getMessage()||'Unknown Error'));
-                }
-                else {
-                    channel.say(user.getNick() + ': ' + (error||'Unknown Error'));
-                }
+                channel.say(user.getNick() + ': There were no results matching the query.');
             }
         });
     });
