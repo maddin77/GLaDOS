@@ -1,4 +1,5 @@
 var request = require('request');
+var util = require('util');
 GLaDOS.register({
     'name': 'bitcoin',
     'description': [
@@ -70,8 +71,13 @@ function getBitoinData(currency, volume, callback) {
             }
         }
         else {
-            GLaDOS.logger.error('[bitcoin] %s', error.getMessage(), error);
-            return callback(error||'Unknown Error');
+            if (util.isError(error)) {
+                GLaDOS.logger.error('[bitcoin]', error);
+                return callback(error.getMessage()||'Unknown Error');
+            }
+            else {
+                return callback(error||'Unknown Error');
+            }
         }
     });
 };

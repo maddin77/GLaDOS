@@ -2,6 +2,7 @@ var request = require('request');
 var cheerio = require('cheerio');
 var dns = require('dns');
 var whoisAvailable = require('whois-available');
+var util = require('util');
 GLaDOS.register({
     'name': 'net',
     'description': 'Various networking utilities.',
@@ -25,9 +26,13 @@ GLaDOS.register({
                 channel.say(user.getNick() + ': ' + result);
             }
             else {
-                var eMsg = (error.getMessage()||'Unknown Error');
-                channel.say(user.getNick() + ': ' + eMsg);
-                GLaDOS.logger.error('[net] %s', eMsg, error);
+                if (util.isError(error)) {
+                    GLaDOS.logger.error('[net]', error);
+                    channel.say(user.getNick() + ': ' + (error.getMessage()||'Unknown Error'));
+                }
+                else {
+                    channel.say(user.getNick() + ': ' + (error||'Unknown Error'));
+                }
             }
         });
     });
@@ -63,50 +68,54 @@ GLaDOS.register({
                 }
             }
             else {
-                var eMsg = (error.getMessage()||'Unknown Error');
-                channel.say(user.getNick() + ': ' + eMsg);
-                GLaDOS.logger.error('[net] %s', eMsg, error);
+                if (util.isError(error)) {
+                    GLaDOS.logger.error('[net]', error);
+                    channel.say(user.getNick() + ': ' + (error.getMessage()||'Unknown Error'));
+                }
+                else {
+                    channel.say(user.getNick() + ': ' + (error||'Unknown Error'));
+                }
             }
         });
     });
     command('dnslookup', function(channel, user, name, text, params) {
         if(params.length == 0) return user.notice('!dnslookup <domain>');
         try {
-            dns.lookup(text, function(err, address, family) {
-                if(err) {
-                    channel.say(user.getNick() + ": " + getError(err.code));
+            dns.lookup(text, function(error, address, family) {
+                if(error) {
+                    channel.say(user.getNick() + ": " + getError(error.code));
                 } else {
                     channel.say(user.getNick() + ": " + address);
                 }
                 
             });
         }
-        catch(e) {
-            channel.say(user.getNick() + ': ' + getError(e.code));
+        catch(error) {
+            channel.say(user.getNick() + ': ' + getError(error.code));
         }
     });
     command('dnsreverse', function(channel, user, name, text, params) {
         if(params.length == 0) return user.notice('!dnsreverse <ip>');
         try {
-            dns.reverse(text, function(err, domains) {
-                if(err) {
-                    channel.say(user.getNick() + ": " + getError(err.code));
+            dns.reverse(text, function(error, domains) {
+                if(error) {
+                    channel.say(user.getNick() + ": " + getError(error.code));
                 } else {
                     channel.say(user.getNick() + ": " + domains.join(", "));
                 }
             });
         }
-        catch(e) {
-            channel.say(user.getNick() + ': ' + getError(e.code));
+        catch(error) {
+            channel.say(user.getNick() + ': ' + getError(error.code));
         }
     });
     command('dnsresolve', function(channel, user, name, text, params) {
         if(params.length == 0) return user.notice('!dnsresolve <domain> [A/AAAA/MX/TXT/SRV/PTR/NS/CNAME]');
         var rrtype = params.length == 2 ? params[1].toUpperCase() : 'A';
         try {
-            dns.resolve(params[0], rrtype, function(err, addresses) {
-                if(err) {
-                    channel.say(user.getNick() + ': ' + getError(err.code));
+            dns.resolve(params[0], rrtype, function(error, addresses) {
+                if(error) {
+                    channel.say(user.getNick() + ': ' + getError(error.code));
                 } else {
                     if(rrtype == 'MX') {
                         var exchanges = [];
@@ -139,14 +148,18 @@ GLaDOS.register({
     command('avail', function(channel, user, name, text, params) {
         if(params.length === 0) return user.notice("!avail <domain>");
         
-        whoisAvailable(text, function(err, whoisResponse, isAvailable) {
-            if(!err) {
+        whoisAvailable(text, function(error, whoisResponse, isAvailable) {
+            if(!error) {
                 channel.say(user.getNick() + ': "' + text + '" is ' + (isAvailable?'':'not ') + 'available.');
             }
             else {
-                var eMsg = (err.getMessage()||'Unknown Error');
-                channel.say(user.getNick() + ': ' + eMsg);
-                GLaDOS.logger.error('[net] %s', eMsg, err);
+                if (util.isError(error)) {
+                    GLaDOS.logger.error('[net]', error);
+                    channel.say(user.getNick() + ': ' + (error.getMessage()||'Unknown Error'));
+                }
+                else {
+                    channel.say(user.getNick() + ': ' + (error||'Unknown Error'));
+                }
             }
         });
     });

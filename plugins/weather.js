@@ -1,4 +1,5 @@
 var request = require('request');
+var util = require('util');
 GLaDOS.register({
     'name': 'weather',
     'description': 'Get information about the current weather in a specific location.',
@@ -33,8 +34,13 @@ GLaDOS.register({
                 }
             }
             else {
-                channel.say(user.getNick() + ': ' + error.getMessage());
-                GLaDOS.logger.error('[weather] %s', error.getMessage(), error);
+                if (util.isError(error)) {
+                    GLaDOS.logger.error('[weather]', error);
+                    channel.say(user.getNick() + ': ' + (error.getMessage()||'Unknown Error'));
+                }
+                else {
+                    channel.say(user.getNick() + ': ' + (error||'Unknown Error'));
+                }
             }
         });
     });

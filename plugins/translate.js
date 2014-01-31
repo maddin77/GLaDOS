@@ -1,4 +1,5 @@
 var request = require('request');
+var util = require('util');
 GLaDOS.register({
     'name': 'translate',
     'description': 'Translate words of full sentences from one langauge to another.',
@@ -22,9 +23,13 @@ GLaDOS.register({
                 }
             }
             else {
-                var eMsg = (error.getMessage()||'Unknown Error');
-                channel.say(user.getNick() + ': ' + eMsg);
-                GLaDOS.logger.error('[translate] %s', eMsg, error);
+                if (util.isError(error)) {
+                    GLaDOS.logger.error('[translate]', error);
+                    channel.say(user.getNick() + ': ' + (error.getMessage()||'Unknown Error'));
+                }
+                else {
+                    channel.say(user.getNick() + ': ' + (error||'Unknown Error'));
+                }
             }
         });
     });

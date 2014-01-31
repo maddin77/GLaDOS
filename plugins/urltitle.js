@@ -1,6 +1,7 @@
 var url = require('url');
 var request = require('request');
 var __ = require('underscore')._;
+var util = require('util');
 var Entities = require('html-entities').AllHtmlEntities;
 var entities = new Entities();
 GLaDOS.register({
@@ -44,7 +45,12 @@ GLaDOS.register({
                             channel.say('YouTube: ' + title + ' [' + time + ']');
                         }
                         else {
-                            GLaDOS.logger.error('[urltitle] %s', error.getMessage(), error);
+                            if (util.isError(error)) {
+                                GLaDOS.logger.error('[urltitle] %s', error.getMessage(), error);
+                            }
+                            else {
+                                GLaDOS.logger.error('[urltitle] %s', (error||'Unknown Error'));
+                            }
                         }
                     });
                 }
@@ -72,7 +78,12 @@ GLaDOS.register({
                         channel.say('Imgur: ' + title + ' [' + width + 'x' + height + ', ' + readableNumber(size) + '' + nsfw + ']');
                     }
                     else {
-                        GLaDOS.logger.error('[urltitle] %s', error.getMessage(), error);
+                        if (util.isError(error)) {
+                            GLaDOS.logger.error('[urltitle] %s', error.getMessage(), error);
+                        }
+                        else {
+                            GLaDOS.logger.error('[urltitle] %s', (error||'Unknown Error'));
+                        }
                     }
                 });
             }
@@ -89,7 +100,12 @@ GLaDOS.register({
                         channel.say('Vimeo: ' + title + ' [' + time + ']');
                     }
                     else {
-                        GLaDOS.logger.error('[urltitle] %s', error.getMessage(), error);
+                        if (util.isError(error)) {
+                            GLaDOS.logger.error('[urltitle] %s', error.getMessage(), error);
+                        }
+                        else {
+                            GLaDOS.logger.error('[urltitle] %s', (error||'Unknown Error'));
+                        }
                     }
                 });
             }
@@ -108,7 +124,12 @@ GLaDOS.register({
                         }
                     }
                     else {
-                        GLaDOS.logger.error('[urltitle] %s', error.getMessage(), error);
+                        if (util.isError(error)) {
+                            GLaDOS.logger.error('[urltitle] %s', error.getMessage(), error);
+                        }
+                        else {
+                            GLaDOS.logger.error('[urltitle] %s', (error||'Unknown Error'));
+                        }
                     }
                 });
             }

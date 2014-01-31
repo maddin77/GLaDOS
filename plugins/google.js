@@ -1,4 +1,5 @@
 var google = require('google');
+var util = require('util');
 GLaDOS.register({
     'name': 'google',
     'description': 'Returns the url and title of the first google hit for a query.',
@@ -6,8 +7,8 @@ GLaDOS.register({
 },function(ircEvent, command) {
     command(['google','g'], function(channel, user, name, text, params) {
         if( params.length === 0 ) return user.notice('!google <query>');
-        google(text, function(err, next, links) {
-            if(!err) {
+        google(text, function(error, next, links) {
+            if(!error) {
                 if(links.length > 0) {
                     channel.say(user.getNick() + ': ' + links[0].title + ' (' + links[0].link + ')' );
                 }
@@ -16,8 +17,13 @@ GLaDOS.register({
                 }
             }
             else {
-                channel.say(user.getNick() + ': ' + err.getMessage());
-                GLaDOS.logger.error('[google] %s', err.getMessage(), err);
+                if (util.isError(error)) {
+                    GLaDOS.logger.error('[google]', error);
+                    channel.say(user.getNick() + ': ' + (error.getMessage()||'Unknown Error'));
+                }
+                else {
+                    channel.say(user.getNick() + ': ' + (error||'Unknown Error'));
+                }
             }
         });
     });

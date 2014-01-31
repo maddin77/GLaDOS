@@ -1,5 +1,6 @@
 var dns = require('dns');
 var request = require('request');
+var util = require('util');
 GLaDOS.register({
     'name': 'wikipedia',
     'description': 'Query Wikipedia for an article summary or synonyms.',
@@ -14,7 +15,13 @@ GLaDOS.register({
             if (!error) {
                 channel.say(txt[0]);
             } else {
-                GLaDOS.logger.error('[wikipedia] %s', error.getMessage(), err);
+                if (util.isError(error)) {
+                    GLaDOS.logger.error('[wikipedia]', error);
+                    channel.say(user.getNick() + ': ' + (error.getMessage()||'Unknown Error'));
+                }
+                else {
+                    channel.say(user.getNick() + ': ' + (error||'Unknown Error'));
+                }
             }
         });
     });
@@ -42,8 +49,13 @@ GLaDOS.register({
                 }
             }
             else {
-                channel.say(user.getNick() + ': ' + error.getMessage());
-                GLaDOS.logger.error('[wikipedia]', error);
+                if (util.isError(error)) {
+                    GLaDOS.logger.error('[wikipedia]', error);
+                    channel.say(user.getNick() + ': ' + (error.getMessage()||'Unknown Error'));
+                }
+                else {
+                    channel.say(user.getNick() + ': ' + (error||'Unknown Error'));
+                }
             }
         });
     });

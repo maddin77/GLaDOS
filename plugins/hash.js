@@ -1,6 +1,7 @@
 var request = require('request');
 var cheerio = require('cheerio');
 var crypto = require('crypto');
+var util = require('util');
 GLaDOS.register({
     'name': 'hash',
     'description': 'various hashing algorithms.',
@@ -54,7 +55,7 @@ GLaDOS.register({
         if( params.length === 0 ) return user.notice('!md5lookup <md5 hash>');
         var url = "http://md5.noisette.ch/md5.php?hash=" + encodeURIComponent(text);
         request(url, function (error, response, body) {
-            if (!error && response.statusCode == 200) {
+            if (!error && response.statusCode === 200) {
                 var $ = cheerio.load(body, {xmlMode: true});
                 if($('error').text().length > 0) {
                     channel.say(user.getNick() + ": " + $('error').text());
@@ -63,9 +64,13 @@ GLaDOS.register({
                     channel.say(user.getNick() + ": " + $('string').text());
                 }
             } else {
-                var eMsg = (error.getMessage()||'Unknown Error');
-                channel.say(user.getNick() + ': ' + eMsg);
-                GLaDOS.logger.error('[hash] %s', eMsg, error);
+                if (util.isError(error)) {
+                    GLaDOS.logger.error('[hash]', error);
+                    channel.say(user.getNick() + ': ' + (error.getMessage()||'Unknown Error'));
+                }
+                else {
+                    channel.say(user.getNick() + ': ' + (error||'Unknown Error'));
+                }
             }
         });
     });

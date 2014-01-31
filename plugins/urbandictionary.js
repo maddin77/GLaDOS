@@ -1,4 +1,5 @@
 var request = require('request');
+var util = require('util');
 GLaDOS.register({
     'name': 'urbandictionary',
     'description': 'Define terms via Urban Dictionary.',
@@ -21,9 +22,13 @@ GLaDOS.register({
                 }
             }
             else {
-                var eMsg = (error.getMessage()||'Unknown Error');
-                channel.say(user.getNick() + ': ' + eMsg);
-                GLaDOS.logger.error('[urbandictionary] %s', eMsg, error);
+                if (util.isError(error)) {
+                    GLaDOS.logger.error('[urbandictionary]', error);
+                    channel.say(user.getNick() + ': ' + (error.getMessage()||'Unknown Error'));
+                }
+                else {
+                    channel.say(user.getNick() + ': ' + (error||'Unknown Error'));
+                }
             }
         });
     });
