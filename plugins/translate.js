@@ -23,13 +23,8 @@ GLaDOS.register({
                 }
             }
             else {
-                if (util.isError(error)) {
-                    GLaDOS.logger.error('[translate]', error);
-                    channel.say(user.getNick() + ': ' + (error.getMessage()||'Unknown Error'));
-                }
-                else {
-                    channel.say(user.getNick() + ': ' + (error||'Unknown Error'));
-                }
+                GLaDOS.logger.error('[translate] %s', (error||'Unknown Error'), error);
+                channel.say(user.getNick() + ': ' + (error.getMessage()||'Unknown Error'));
             }
         });
     });

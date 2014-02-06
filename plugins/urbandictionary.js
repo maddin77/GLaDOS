@@ -11,7 +11,7 @@ GLaDOS.register({
             uri: 'http://api.urbandictionary.com/v0/define?term='+encodeURIComponent(text),
             json: true
         }, function (error, response, body) {
-            if(!error) {
+            if (!error && response.statusCode == 200) {
                 if( body.list.length === 0 ) {
                     channel.say(user.getNick() + ': No results found for "' + text + '".');
                 }
@@ -22,13 +22,8 @@ GLaDOS.register({
                 }
             }
             else {
-                if (util.isError(error)) {
-                    GLaDOS.logger.error('[urbandictionary]', error);
-                    channel.say(user.getNick() + ': ' + (error.getMessage()||'Unknown Error'));
-                }
-                else {
-                    channel.say(user.getNick() + ': ' + (error||'Unknown Error'));
-                }
+                GLaDOS.logger.error('[urbandictionary] %s', (error||'Unknown Error'), error);
+                channel.say(user.getNick() + ': ' + (error.getMessage()||'Unknown Error'));
             }
         });
     });

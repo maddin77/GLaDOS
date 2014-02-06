@@ -11,7 +11,7 @@ GLaDOS.register({
             uri: 'http://api.openweathermap.org/data/2.1/find/name?q=' + encodeURIComponent(text) + '&units=metric',
             json: true
         }, function (error, response, body) {
-            if(!error) {
+            if (!error && response.statusCode == 200) {
                 if(body.cod == "200") {
                     var entry = body.list[0];
 
@@ -34,13 +34,8 @@ GLaDOS.register({
                 }
             }
             else {
-                if (util.isError(error)) {
-                    GLaDOS.logger.error('[weather]', error);
-                    channel.say(user.getNick() + ': ' + (error.getMessage()||'Unknown Error'));
-                }
-                else {
-                    channel.say(user.getNick() + ': ' + (error||'Unknown Error'));
-                }
+                GLaDOS.logger.error('[weather] %s', (error||'Unknown Error'), error);
+                channel.say(user.getNick() + ': ' + (error.getMessage()||'Unknown Error'));
             }
         });
     });

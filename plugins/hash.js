@@ -64,13 +64,8 @@ GLaDOS.register({
                     channel.say(user.getNick() + ": " + $('string').text());
                 }
             } else {
-                if (util.isError(error)) {
-                    GLaDOS.logger.error('[hash]', error);
-                    channel.say(user.getNick() + ': ' + (error.getMessage()||'Unknown Error'));
-                }
-                else {
-                    channel.say(user.getNick() + ': ' + (error||'Unknown Error'));
-                }
+                GLaDOS.logger.error('[hash] %s', (error||'Unknown Error'), error);
+                channel.say(user.getNick() + ': ' + (error.getMessage()||'Unknown Error'));
             }
         });
     });

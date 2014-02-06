@@ -48,7 +48,7 @@ GLaDOS.register({
 });
 function getBitoinData(currency, volume, callback) {
     request('https://data.mtgox.com/api/2/BTC' + currency + '/money/ticker_fast', function (error, response, body) {
-        if (!error) {
+        if (!error && response.statusCode == 200) {
             var bitcoin = JSON.parse(body);
             if(bitcoin.result === 'success') {
                 var buy = {
@@ -71,13 +71,8 @@ function getBitoinData(currency, volume, callback) {
             }
         }
         else {
-            if (util.isError(error)) {
-                GLaDOS.logger.error('[bitcoin]', error);
-                return callback(error.getMessage()||'Unknown Error');
-            }
-            else {
-                return callback(error||'Unknown Error');
-            }
+            GLaDOS.logger.error('[bitcoin] %s', (error||'Unknown Error'), error);
+            return callback(new Error(error||'Unknown Error'));
         }
     });
 };

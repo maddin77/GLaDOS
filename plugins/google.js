@@ -8,7 +8,7 @@ GLaDOS.register({
     command(['google','g'], function(channel, user, name, text, params) {
         if( params.length === 0 ) return user.notice('!google <query>');
         google(text, function(error, next, links) {
-            if(!error) {
+            if (!error && response.statusCode == 200) {
                 if(links.length > 0) {
                     channel.say(user.getNick() + ': ' + links[0].title + ' (' + links[0].link + ')' );
                 }
@@ -17,13 +17,8 @@ GLaDOS.register({
                 }
             }
             else {
-                if (util.isError(error)) {
-                    GLaDOS.logger.error('[google]', error);
-                    channel.say(user.getNick() + ': ' + (error.getMessage()||'Unknown Error'));
-                }
-                else {
-                    channel.say(user.getNick() + ': ' + (error||'Unknown Error'));
-                }
+                GLaDOS.logger.error('[google] %s', (error||'Unknown Error'), error);
+                channel.say(user.getNick() + ': ' + (error.getMessage()||'Unknown Error'));
             }
         });
     });

@@ -3,6 +3,7 @@ var cheerio = require('cheerio');
 var dns = require('dns');
 var whoisAvailable = require('whois-available');
 var util = require('util');
+var url = require('url');
 GLaDOS.register({
     'name': 'net',
     'description': 'Various networking utilities.',
@@ -18,21 +19,29 @@ GLaDOS.register({
 },function(ircEvent, command) {
     command('isup', function(channel, user, name, text, params) {
         if( params.length === 0 ) return user.notice('!isup <url>');
-        request('http://www.isup.me/' + text, function (error, response, body) {
-            if (!error && response.statusCode == 200) {
-                var $ = cheerio.load(body);
-                $('#container p, #container br, #container center, .ad-container').remove();
-                var result = $('#container').text().replace(/(?:(?:^|\n)\s+|\s+(?:$|\n))/g,'').replace(/\s+/g,' ');
-                channel.say(user.getNick() + ': ' + result);
+        if (text.search(/^http[s]?\:\/\//) == -1) {
+            text = 'http://' + text;
+        }
+        var host = url.parse(text).host;
+        if(host === null) return user.notice('Invalid URL.');
+        request({
+            uri: 'http://isitup.org/' + host + '.json',
+            json: true,
+            headers: {
+                'User-Agent': 'GLaDOS'
             }
-            else {
-                if (util.isError(error)) {
-                    GLaDOS.logger.error('[net]', error);
-                    channel.say(user.getNick() + ': ' + (error.getMessage()||'Unknown Error'));
+        }, function (error, response, json) {
+            if (!error && response.statusCode == 200) {
+                if(json.status_code === 3) {
+                    channel.say(user.getNick() + ': Invalid Domain.');
+                } else if(json.status_code === 2) {
+                    channel.say(user.getNick() + ': ' + json.domain + ' seems to be down!');
+                } else if(json.status_code === 1) {
+                    channel.say(user.getNick() + ': ' + json.domain + ' is up. It took ' + (json.response_time*1000) + ' ms for a ' + json.response_code + ' response code with an ip of ' + json.response_ip + '.');
                 }
-                else {
-                    channel.say(user.getNick() + ': ' + (error||'Unknown Error'));
-                }
+            } else {
+                GLaDOS.logger.error('[net] %s', (error||'Unknown Error'), error);
+                channel.say(user.getNick() + ': ' + (error.getMessage()||'Unknown Error'));
             }
         });
     });
@@ -68,13 +77,8 @@ GLaDOS.register({
                 }
             }
             else {
-                if (util.isError(error)) {
-                    GLaDOS.logger.error('[net]', error);
-                    channel.say(user.getNick() + ': ' + (error.getMessage()||'Unknown Error'));
-                }
-                else {
-                    channel.say(user.getNick() + ': ' + (error||'Unknown Error'));
-                }
+                GLaDOS.logger.error('[net] %s', (error||'Unknown Error'), error);
+                channel.say(user.getNick() + ': ' + (error.getMessage()||'Unknown Error'));
             }
         });
     });
@@ -153,13 +157,8 @@ GLaDOS.register({
                 channel.say(user.getNick() + ': "' + text + '" is ' + (isAvailable?'':'not ') + 'available.');
             }
             else {
-                if (util.isError(error)) {
-                    GLaDOS.logger.error('[net]', error);
-                    channel.say(user.getNick() + ': ' + (error.getMessage()||'Unknown Error'));
-                }
-                else {
-                    channel.say(user.getNick() + ': ' + (error||'Unknown Error'));
-                }
+                GLaDOS.logger.error('[net] %s', (error||'Unknown Error'), error);
+                channel.say(user.getNick() + ': ' + (error.getMessage()||'Unknown Error'));
             }
         });
     });

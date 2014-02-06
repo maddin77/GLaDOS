@@ -22,7 +22,7 @@ GLaDOS.register({
     command(['synonym','syno'], function(channel, user, name, text, params) {
         if( params.length === 0 ) return user.notice('!synonym <term or phrase>');
         request({uri: 'http://wikisynonyms.ipeirotis.com/api/'+text, json: true}, function (error, response, body) {
-            if(!error) {
+            if (!error && response.statusCode == 200) {
                 if(body.http === 200) {
                     var terms = [];
                     for(var i=0; i<10&&i<body.terms.length; i++) {
@@ -43,13 +43,8 @@ GLaDOS.register({
                 }
             }
             else {
-                if (util.isError(error)) {
-                    GLaDOS.logger.error('[wikipedia]', error);
-                    channel.say(user.getNick() + ': ' + (error.getMessage()||'Unknown Error'));
-                }
-                else {
-                    channel.say(user.getNick() + ': ' + (error||'Unknown Error'));
-                }
+                GLaDOS.logger.error('[wikipedia] %s', (error||'Unknown Error'), error);
+                channel.say(user.getNick() + ': ' + (error.getMessage()||'Unknown Error'));
             }
         });
     });
