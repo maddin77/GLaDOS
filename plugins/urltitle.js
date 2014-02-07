@@ -94,6 +94,31 @@ GLaDOS.register({
                     }
                 });
             }
+            /* Reddit URL */
+            else if( __.indexOf(['reddit.com', 'redd.it', 'www.reddit.com', 'www.redd.it'], URL.hostname) !== -1 ) {
+                var article = null;
+                if(URL.hostname == 'redd.it' || URL.hostname == 'www.redd.it') {
+                    article = URL.pathname.substr(1);
+                }
+                else if(URL.hostname == 'reddit.com' || URL.hostname == 'www.reddit.com') {
+                    article = URL.pathname.split("/")[4];
+                }
+                request({
+                    uri: 'http://www.reddit.com/comments/' + article + '.json',
+                    json: true,
+                    headers: {
+                        'User-Agent': 'GLaDOS/IRC-Bot - https://github.com/maddin77/GLaDOS'
+                    }
+                }, function (error, response, body) {
+                    if (!error && response.statusCode == 200) {
+                        var data = body[0].data.children[0].data;
+                        channel.say('Reddit: ' + data.title + ' - /r/' + data.subreddit + ' - Score: ' + data.score + ' (↑' + data.ups + ', ↓' + data.downs + ')');
+                    }
+                    else {
+                        console.error('[urltitle/reddit] %s', (error||'Unknown Error'), error);
+                    }
+                });
+            }
             /* Anything else */
             else {
                 if(match[0].match(/\.(png|jpg|jpeg|gif|txt|zip|7zip|tar\.bz|js|css)/)) return; //file URL

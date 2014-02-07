@@ -28,7 +28,7 @@ GLaDOS.register({
             uri: 'http://isitup.org/' + host + '.json',
             json: true,
             headers: {
-                'User-Agent': 'GLaDOS'
+                'User-Agent': 'GLaDOS/IRC-Bot - https://github.com/maddin77/GLaDOS'
             }
         }, function (error, response, json) {
             if (!error && response.statusCode == 200) {
