@@ -8,7 +8,7 @@ GLaDOS.register({
     command(['google','g'], function(channel, user, name, text, params) {
         if( params.length === 0 ) return user.notice('!google <query>');
         google(text, function(error, next, links) {
-            if (!error && response.statusCode == 200) {
+            if (!error) {
                 if(links.length > 0) {
                     channel.say(user.getNick() + ': ' + links[0].title + ' (' + links[0].link + ')' );
                 }

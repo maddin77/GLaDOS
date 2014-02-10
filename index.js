@@ -1,8 +1,3 @@
-if(process.env.hasOwnProperty('OPENSHIFT_DATA_DIR')) {
-    GLOBAL.DATA_DIR = process.env.OPENSHIFT_DATA_DIR;
-} else {
-    GLOBAL.DATA_DIR = __dirname + '/data/';
-}
 GLOBAL.VERSION = require('./package.json').version;
 GLOBAL.GLaDOS = require('./lib/GLaDOS');
 require('./lib/webserver');

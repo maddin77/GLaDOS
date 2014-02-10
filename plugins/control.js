@@ -30,6 +30,7 @@ GLaDOS.register({
         chans.push(params[0]);
         GLaDOS.config.set('irc:channels', chans);
         GLaDOS.config.save();
+        GLaDOS.brain.hset("autojoin", params[0], "");
     });
     command('part', function(channel, user, name, text, params) {
         if(!user.hasPermissions()) return user.notice('you don\'t have the permissions to use this command.');
@@ -43,6 +44,7 @@ GLaDOS.register({
         chans.splice(index, 1);
         GLaDOS.config.set('irc:channels', chans);
         GLaDOS.config.save();
+        GLaDOS.brain.hdel("autojoin", chan);
     });
     command(['mem','memory'], function(channel, user, name, text, params) {
         if(!user.hasPermissions()) return user.notice('you don\'t have the permissions to use this command.');

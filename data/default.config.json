@@ -19,5 +19,6 @@
         "certExpired": false,
         "floodProtection": false,
         "floodProtectionDelay": 500
-    }
+    },
+    "wolframAlphaKey": ""
 }
