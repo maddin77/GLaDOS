@@ -44,7 +44,7 @@ GLaDOS.register({
             }
             else {
                 GLaDOS.logger.error('[wikipedia] %s', (error||'Unknown Error'), error);
-                channel.say(user.getNick() + ': ' + (error.getMessage()||'Unknown Error'));
+                channel.say(user.getNick() + ': ' + (error||'Unknown Error'));
             }
         });
     });

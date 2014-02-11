@@ -10,15 +10,15 @@ GLaDOS.register({
         '!wa <query>'
     ]
 },function (ircEvent, command) {
-    command(['wolfram','wa'], function (channel, user, name, text, params) {
+    command(['wolfram', 'wa', 'calculate', 'calc', 'c', 'math'], function (channel, user, name, text, params) {
         if( params.length === 0 ) return user.notice('!wolfram <query>');
         wolfram(text, function (error, result) {
             if (!error) {
                 channel.say(user.getNick() + ': ' + result);
             }
             else {
-                GLaDOS.logger.error('[wolfram] %s', (error||'Unknown Error'), error);
-                channel.say(user.getNick() + ': ' + (error.getMessage()||'Unknown Error'));
+                GLaDOS.logger.error('[wolfram] %s', (error||'Unknown Error'));
+                channel.say(user.getNick() + ': ' + (error||'Unknown Error'));
             }
         });
     });
@@ -36,6 +36,7 @@ function wolfram(query, cb) {
         if (error || response.statusCode !== 200) {
             return cb(error, null);
         } else {
+            fs.writeFile('wolfram-error.log', body);
             var $ = cheerio.load(body, {xmlMode: true});
             if( $('queryresult').attr('error') !== 'false' ) {
                 fs.writeFile('wolfram-error.log', body);
@@ -81,8 +82,8 @@ function wolfram(query, cb) {
                             return cb(null, _return['Input interpretation'] + ": " + _return[key].split("\n").join(", "));
                         }
                     }
-                    GLaDOS.logger.error('[wolfram] No matching results fro %s', query, _return);
-                    return cb("no matching result", null);
+                    //GLaDOS.logger.error('[wolfram] No matching results for %s', query, _return);
+                    return cb("No matching results for " + query, null);
                 }
             }
         }

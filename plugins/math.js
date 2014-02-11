@@ -14,13 +14,18 @@ GLaDOS.register({
         '!c <expression>'
     ]
 },function(ircEvent, command) {
-    command(['calculate','calc', 'c', 'math'], function(channel, user, name, text, params) {
+    /*command(['calculate', 'calc', 'c', 'math'], function(channel, user, name, text, params) {
         if( params.length === 0 ) return user.notice('!math <expression>');
         try {
-            channel.say(user.getNick() + ": " + math.eval(text));
+            var ret = math.eval(text);
+            console.log(ret);
+            if(typeof ret === 'function') ret = 'function';
+            else if(typeof ret === 'undefined') ret = 'undefined';
+            //else if(typeof ret === 'object' && !(ret instanceof Array)) ret = 'object';
+            channel.say(user.getNick() + ": " + ret);
         }
         catch(e) {
             channel.say(user.getNick() + ": " + e);
         }
-    });
+    });*/
 });

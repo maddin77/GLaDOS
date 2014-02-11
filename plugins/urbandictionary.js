@@ -23,7 +23,7 @@ GLaDOS.register({
             }
             else {
                 GLaDOS.logger.error('[urbandictionary] %s', (error||'Unknown Error'), error);
-                channel.say(user.getNick() + ': ' + (error.getMessage()||'Unknown Error'));
+                channel.say(user.getNick() + ': ' + (error||'Unknown Error'));
             }
         });
     });
