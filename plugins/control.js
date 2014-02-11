@@ -56,6 +56,24 @@ GLaDOS.register({
         if(!user.hasPermissions()) return user.notice('you don\'t have the permissions to use this command.');
         GLaDOS.sendRaw(text);
     });
+    command('ident', function(channel, user, name, text, params) {
+        if(!user.hasPermissions()) return user.notice('you don\'t have the permissions to use this command.');
+        if(text.length > 0) {
+            GLaDOS.sendMessage('NickServ', 'IDENTIFY ' + text);
+            GLaDOS.config.set('irc:password', text);
+            GLaDOS.config.save();
+        } else {
+            var pw = GLaDOS.config.get('irc:password');
+            if(pw.length > 0) {
+                GLaDOS.sendMessage('NickServ', 'IDENTIFY ' + text);
+            } else {
+                user.notice('There\'s no password set in the config file.');
+            }
+        }
+    });
+    command('ping', function(channel, user, name, text, params) {
+        channel.say(user.getNick() + ': ' + __.sample(phrases));
+    });
     ircEvent('pm', function(user, text) {
         if(user.hasPermissions()) {
             var params = text.split(' ');
@@ -65,9 +83,6 @@ GLaDOS.register({
                 GLaDOS.config.save();
             }
         }
-    });
-    command('ping', function(channel, user, name, text, params) {
-        channel.say(user.getNick() + ': ' + __.sample(phrases));
     });
 });
 function readableNumber(bytes) {
