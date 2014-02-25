@@ -7,4 +7,5 @@ data/config.json
 *.sublime-workspace
 *.sublime-project
 *.bat
+*.rdb
 test.js

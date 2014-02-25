@@ -1,27 +1,35 @@
+/*global GLaDOS */
+'use strict';
+var request = require('request');
 var math = require('mathjs')();
 GLaDOS.register({
     'name': 'math',
     'desc': [
-        'Analyze and parse mathematical expressions.',
-        'A detailed documentation about the operators, functions, constants, units, ... can be found here:',
-        'https://github.com/josdejong/mathjs/blob/master/docs/expressions.md',
-        'Most of them should work fine. Please note that functions and variables will only exists for the command itself.'
+        'Do some math stuff.'
     ],
     'commands': [
-        '!math <expression>',
-        '!calculate <expression>',
-        '!calc <expression>',
-        '!c <expression>'
+        '!number [number] [type] - Get an interesting fact about [number]. Default [number] is random. Type can either be trivia, year, date or math. Default [type] is trivia.',
     ]
-},function(ircEvent, command) {
+}, function (ircEvent, command) {
+    command(['number', 'num'], function (channel, user, name, text, params) {
+        var number = params.length > 0 ? parseInt(params[0], 10) : 'random',
+            type = params.length > 1 ? params[1] : 'trivia';
+        request({
+            uri: 'http://numbersapi.com/' + number + '/' + type
+        }, function (error, response, body) {
+            if (!error && response.statusCode === 200) {
+                channel.say(user.getNick() + ': ' + body);
+            } else {
+                channel.say(user.getNick() + ': Unknown error.');
+            }
+        });
+    });
+
     /*command(['calculate', 'calc', 'c', 'math'], function(channel, user, name, text, params) {
         if( params.length === 0 ) return user.notice('!math <expression>');
         try {
             var ret = math.eval(text);
-            console.log(ret);
-            if(typeof ret === 'function') ret = 'function';
-            else if(typeof ret === 'undefined') ret = 'undefined';
-            //else if(typeof ret === 'object' && !(ret instanceof Array)) ret = 'object';
+            GLaDOS.logger.debug('[math] %j', ret, ret);
             channel.say(user.getNick() + ": " + ret);
         }
         catch(e) {
