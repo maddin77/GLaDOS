@@ -76,7 +76,7 @@ function getImgurTitle(URL, cb) {
     request({
         url: 'https://api.imgur.com/3/image/' + imgurID,
         headers: {
-            'Authorization': 'Client-ID 55586c3a36cef27'
+            'Authorization': 'Client-ID ' + GLaDOS.config.get('imgurKey')
         },
         'json': true
     }, function (error, response, body) {
@@ -127,7 +127,7 @@ function getRedditTitle(URL, cb) {
         }, function (error, response, body) {
             if (!error && response.statusCode === 200) {
                 var data = body.data,
-                    title = 'Reddit: ' + data.title + ' - ' + data.public_description + ' - Subscribers: ' + data.subscribers;
+                    title = 'Reddit: ' + data.title.replace(/(\r\n|\n|\r)/gm, '') + ' - ' + data.public_description + ' - Subscribers: ' + data.subscribers;
                 if (data.over18) {
                     title += ' [over18]';
                 }

@@ -26,7 +26,7 @@ GLaDOS.register({
         if (!user.hasPermissions()) {
             return user.notice('you don\'t have the permissions to use this command.');
         }
-        GLaDOS.shutdown();
+        GLaDOS.shutdown(text);
     });
     command('join', function (channel, user, name, text, params) {
         if (!user.hasPermissions()) {

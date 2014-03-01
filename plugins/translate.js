@@ -17,12 +17,12 @@ GLaDOS.register({
         request({
             uri: 'http://api.mymemory.translated.net/get?q=' + encodeURIComponent(sentence) + '&langpair=' + source + '|' + target,
             json: true
-        }, function (error, response, body) {
+        }, function (error, response, data) {
             if (!error && response.statusCode === 200) {
-                if (body.responseStatus === "200") {
-                    channel.say(user.getNick() + ': ' + body.responseData.translatedText);
+                if (data.responseStatus === 200) {
+                    channel.say(user.getNick() + ': ' + data.responseData.translatedText);
                 } else {
-                    channel.say(user.getNick() + ': ' + body.responseDetails);
+                    channel.say(user.getNick() + ': ' + data.responseDetails);
                 }
             } else {
                 GLaDOS.logger.error('[translate] %s', (error || 'Unknown Error'), error);

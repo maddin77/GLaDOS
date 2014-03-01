@@ -21,7 +21,9 @@ GLaDOS.register({
                 } else {
                     var entry = body.list[0];
                     channel.say(entry.word + ': ' + entry.definition);
-                    channel.say('Example: ' + entry.example);
+                    if (entry.example) {
+                        channel.say('Example: ' + entry.example);
+                    }
                 }
             } else {
                 GLaDOS.logger.error('[urbandictionary] %s', (error || 'Unknown Error'), error);
