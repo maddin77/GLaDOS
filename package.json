@@ -1,6 +1,6 @@
 {
   "name": "GLaDOS",
-  "version": "1.0.8-beta",
+  "version": "3.0.0",
   "author": "Martin Rump <admin@maddin.cc>",
   "description": "GLaDOS IRC-Bot",
   "contributors": [
@@ -19,23 +19,20 @@
     "url": "https://github.com/maddin77/GLaDOS/issues"
   },
   "dependencies": {
-    "cleverbot-node": "^0.1.2",
-    "colors": "^0.6.2",
     "underscore": "^1.6.0",
-    "html-entities": "^1.0.10",
-    "async": "^0.2.10",
-    "whois-available": "^0.2.2",
-    "irc": "^0.3.6",
+    "debug": "^0.7.4",
     "redis": "^0.10.1",
-    "morse": "^0.1.0",
-    "nconf": "^0.6.9",
+    "irc-replies": "^2.0.0",
     "request": "^2.34.0",
+    "cleverbot-node": "^0.1.2",
+    "html-entities": "^1.0.10",
     "google": "^0.3.2",
     "cheerio": "^0.13.1",
-    "winston": "^0.7.2",
+    "whois-available": "^0.2.2",
+    "morse": "^0.1.0",
+    "xml2js": "^0.4.1",
     "moment": "^2.5.1",
-    "mathjs": "^0.18.1",
-    "socket.io": "^0.9.16"
+    "irc-message": "^1.0.0"
   },
   "license": "MIT",
   "engines": {

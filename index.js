@@ -1,9 +1,20 @@
 'use strict';
-global.GLaDOS = require('./lib/GLaDOS');
-require('fs').readdir('./plugins', function (err, files) {
-    files.forEach(function (fileName) {
-        if (fileName !== 'example.js') {
-            require('./plugins/' + fileName);
-        }
-    });
-});
+var GLaDOS = require(__dirname + '/lib/glados');
+
+GLaDOS.use(require(__dirname + '/scripts/chancontrol')());
+GLaDOS.use(require(__dirname + '/scripts/cleverbot')());
+GLaDOS.use(require(__dirname + '/scripts/control')());
+GLaDOS.use(require(__dirname + '/scripts/cryptocoin')());
+GLaDOS.use(require(__dirname + '/scripts/google')());
+GLaDOS.use(require(__dirname + '/scripts/hash')());
+GLaDOS.use(require(__dirname + '/scripts/morse')());
+GLaDOS.use(require(__dirname + '/scripts/net')());
+GLaDOS.use(require(__dirname + '/scripts/ping')());
+GLaDOS.use(require(__dirname + '/scripts/quiz')());
+GLaDOS.use(require(__dirname + '/scripts/stats')());
+GLaDOS.use(require(__dirname + '/scripts/translate')());
+GLaDOS.use(require(__dirname + '/scripts/urbandictionary')());
+GLaDOS.use(require(__dirname + '/scripts/urltitle')());
+GLaDOS.use(require(__dirname + '/scripts/weather')());
+GLaDOS.use(require(__dirname + '/scripts/wikipedia')());
+GLaDOS.use(require(__dirname + '/scripts/wolframalpha')());

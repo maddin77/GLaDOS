@@ -1,3 +1,31 @@
+DEFAULT CONFIG
+=======
+```js 
+{
+    "debug": "glados*",
+    "admin": [],
+    "irc": {
+        "ssl": true,
+        "host": "127.0.0.1",
+        "port": 6667,
+        "nick": "nick",
+        "user": ["username", "realname"],
+        "pass": "password",
+        "channel": ["#defaultchannel"]
+    },
+    "userAgent": "DEFAULT_USERAGENT",
+    "wolframAlphaKey": "WOLFRAMALPHA_API_KEY",
+    "imgurKey": "IMGUR_API_KEY",
+    "redis": {
+        "host": "127.0.0.1",
+        "port": 6379,
+        "pass": ""
+    }
+}
+```
+
+LICENSE
+=======
 The MIT License (MIT)
 
 Copyright (c) 2014 Martin Rump

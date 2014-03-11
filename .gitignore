@@ -1,11 +1,8 @@
+*.rdb
 *.log
 node_modules
-v1
-util
-data/config.json
-.afignore
-*.sublime-workspace
+*.txt
+_OLD_VERSIONS_
+config.json
 *.sublime-project
-*.bat
-*.rdb
-test.js
+*.sublime-workspace
