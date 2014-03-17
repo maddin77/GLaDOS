@@ -13,7 +13,7 @@ var Quiz = function (quizdata, irc) {
     this.running = false;
     this.halted = false;
     this.questioncounter = 1;
-    this.question = {};
+    this.question = false;
     this.lang = '';
     this.channel = null;
     this.questiontime = null;
@@ -175,6 +175,7 @@ Quiz.prototype.halt = function () {
     }
 };
 Quiz.prototype.isRight = function (text) {
+    if (this.question === null) return false;
     text = text.toLowerCase();
     if (this.question.solved || !this.question) {
         return false;
@@ -185,13 +186,15 @@ Quiz.prototype.isRight = function (text) {
             return true;
         }
     } else {
-        var answer = this.question.answer.replace(/\#/g, '').toLowerCase(),
-            tr = {
-                "ä": "ae",
-                "ü": "ue",
-                "ö": "oe",
-                "ß": "ss"
-            };
+        var answer, tr;
+        answer = this.question.answer.replace(/\#/g, '').toLowerCase();
+        answer = answer.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+        tr = {
+            "ä": "ae",
+            "ü": "ue",
+            "ö": "oe",
+            "ß": "ss"
+        };
         if (text.search(answer) !== -1) {
             debug('search: %s', answer);
             return true;
@@ -262,7 +265,8 @@ Quiz.prototype.getHint = function () {
         }, self.hintDelay);
     }
 };
-Quiz.prototype.delayNewQuestion = function () {
+Quiz.prototype.delayNewQuestion = function (time) {
+    time = time || this.waitDelay;
     if (this.hintTimer) {
         clearTimeout(this.hintTimer);
     }
@@ -274,7 +278,7 @@ Quiz.prototype.delayNewQuestion = function () {
             self.channel.say(self.irc.clrs('[{B}QUIZ{R}] ' + questionString));
             self.startHints();
         });
-    }, self.waitDelay);
+    }, time);
 };
 Quiz.prototype.resetHaltTimer = function () {
     if (this.haltTimer) {
@@ -371,7 +375,7 @@ module.exports = function () {
                                         if (quiz.quizdata.hasOwnProperty(lang)) {
                                             quiz.start(lang, event.channel);
                                             event.channel.say(irc.clrs('[{B}QUIZ{R}] {U}' + event.user.getNick() + '{R} started the quiz: {B}' + quiz.getTotalQuestionCount() + '{R} questions in database "' + lang + '" (' + quiz.getQuizdataCreationDate() + ').'));
-                                            quiz.delayNewQuestion();
+                                            quiz.delayNewQuestion(0);
                                             quiz.resetHaltTimer();
                                         } else {
                                             event.user.notice('I don\'t have any questions in this language.');
