@@ -2,7 +2,7 @@
 var url = require('url');
 var request = require('request');
 var __ = require('underscore')._;
-var util = require('util');
+var utils = require(__dirname + '/../lib/utils');
 var Entities = require('html-entities').AllHtmlEntities;
 var debug = require('debug')('glados:script:urltitle');
 
@@ -10,22 +10,10 @@ var debug = require('debug')('glados:script:urltitle');
 
 module.exports = function () {
     return function (irc) {
-        var entities, pad, formatTime, readableNumber, getTitle, getYoutubeTitle, getImgurTitle, getRedditTitle, getVimeoTitle, getGithubTitle;
+        var entities, getTitle, getYoutubeTitle, getImgurTitle, getRedditTitle, getVimeoTitle, getGithubTitle;
 
         entities = new Entities();
 
-        pad = function (num) {
-            var s = "0" + num;
-            return s.substr(s.length - 2);
-        };
-        formatTime = function (seconds) {
-            return Math.floor(seconds / 60) + ':' + pad(seconds % 60);
-        };
-        readableNumber = function (bytes) {
-            var s = ['bytes', 'kB', 'MB', 'GB', 'TB', 'PB'],
-                e = Math.floor(Math.log(bytes) / Math.log(1024));
-            return (bytes / Math.pow(1024, e)).toFixed(2) + " " + s[e];
-        };
         getTitle = function (URL, fn) {
             request({
                 "uri": URL.href,
@@ -70,7 +58,7 @@ module.exports = function () {
                     if (!error && response.statusCode === 200) {
                         var entry = data.entry,
                             title = entry.title.$t,
-                            time = formatTime(entry.media$group.yt$duration.seconds);
+                            time = utils.formatTime(entry.media$group.yt$duration.seconds);
                         fn(true, 'YouTube: ' + title + ' [' + time + ']');
                     } else {
                         debug('[urltitle/youtube] %s', error);
@@ -102,7 +90,7 @@ module.exports = function () {
                         height = data.data.height,
                         size = data.data.size,
                         nsfw = data.data.nsfw ? ', NSFW' : '';
-                    fn(true, 'Imgur: ' + title + ' [' + width + 'x' + height + ', ' + readableNumber(size) + nsfw + ']');
+                    fn(true, 'Imgur: ' + title + ' [' + width + 'x' + height + ', ' + utils.readableNumber(size) + nsfw + ']');
                 } else {
                     debug('[urltitle/imgur] %s', error, data);
                     getTitle(URL, fn);
@@ -120,7 +108,7 @@ module.exports = function () {
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
                     var title = data[0].title,
-                        time = formatTime(data[0].duration);
+                        time = utils.formatTime(data[0].duration);
                     fn(true, 'Vimeo: ' + title + ' [' + time + ']');
                 } else {
                     debug('[urltitle/vimeo] %s', error);
