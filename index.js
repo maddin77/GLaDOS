@@ -7,6 +7,7 @@ GLaDOS.use(require(__dirname + '/scripts/control')());
 GLaDOS.use(require(__dirname + '/scripts/cryptocoin')());
 GLaDOS.use(require(__dirname + '/scripts/google')());
 GLaDOS.use(require(__dirname + '/scripts/hash')());
+GLaDOS.use(require(__dirname + '/scripts/lastfm')());
 GLaDOS.use(require(__dirname + '/scripts/morse')());
 GLaDOS.use(require(__dirname + '/scripts/net')());
 GLaDOS.use(require(__dirname + '/scripts/ping')());

@@ -16,6 +16,7 @@ DEFAULT CONFIG
     "userAgent": "DEFAULT_USERAGENT",
     "wolframAlphaKey": "WOLFRAMALPHA_API_KEY",
     "imgurKey": "IMGUR_API_KEY",
+    "lastfmKey": "LAST.FM_API_KEY",
     "redis": {
         "host": "127.0.0.1",
         "port": 6379,
