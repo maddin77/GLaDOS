@@ -121,7 +121,7 @@ module.exports = function () {
                                     values.push(value);
                                 }
                             });
-                            event.channel.reply(event.user, ': ' + event.text + ' resolves to ' + data.query + ' (' + values.join(', ') + ')');
+                            event.channel.reply(event.user, event.text + ' resolves to ' + data.query + ' (' + values.join(', ') + ')');
                         } else {
                             if (data.message === "private range") {
                                 event.channel.reply(event.user, 'The IP address is part of a private range (' + data.query + ')');
