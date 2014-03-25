@@ -23,7 +23,7 @@ module.exports = function () {
             }, function (error, res, body) {
                 if (!error) {
                     if (res.statusCode === 200) {
-                        if (res.headers['content-type'].indexOf('text/html') !== 0) {
+                        if (!res.headers.hasOwnProperty('content-type') || res.headers['content-type'].indexOf('text/html') !== 0) {
                             return fn(false, null);
                         }
                         var match = /(<\s*title[^>]*>(.+?)<\s*\/\s*title)>/gi.exec(body), title;
