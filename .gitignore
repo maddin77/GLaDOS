@@ -3,6 +3,6 @@
 node_modules
 *.txt
 _OLD_VERSIONS_
-config.json
+config/*
 *.sublime-project
 *.sublime-workspace

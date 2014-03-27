@@ -5,12 +5,13 @@ var __ = require('underscore')._;
 var utils = require(__dirname + '/../lib/utils');
 var Entities = require('html-entities').AllHtmlEntities;
 var debug = require('debug')('glados:script:urltitle');
+var cheerio = require('cheerio');
 
 //TODO: mega.co.nz
 
 module.exports = function () {
     return function (irc) {
-        var entities, getTitle, getYoutubeTitle, getImgurTitle, getRedditTitle, getVimeoTitle, getGithubTitle;
+        var entities, getTitle, getYoutubeTitle, getImgurTitle, getRedditTitle, getVimeoTitle, getGithubTitle, get4chanTitle;
 
         entities = new Entities();
 
@@ -270,6 +271,37 @@ module.exports = function () {
             }
         };
 
+        get4chanTitle = function (URL, fn) {
+            var match = URL.href.match(/^(?:http|https):\/\/boards\.4chan\.org\/([a-zA-Z0-9]*)\/res\/([0-9]*)(?:\/?)$/i);
+            request({
+                "uri": 'https://a.4cdn.org/' + match[1] + '/res/' + match[2] + '.json',
+                "json": true,
+                "headers": {
+                    "User-Agent": 'GLaDOS/IRC-Bot - https://github.com/maddin77/GLaDOS'
+                }
+            }, function (error, response, data) {
+                if (!error && response.statusCode === 200) {
+                    var msg = data.posts[0].com || null;
+                    debug('[urltitle/4chan/res] %s', msg);
+                    if (msg !== null) {
+                        //$ = cheerio.load('<div>' + msg + '</div>');
+                        //msg = $.text();
+                        msg = cheerio("<div/>").html(msg).text();
+                        debug('[urltitle/4chan/res] %s', msg);
+                        if (msg.length > 100) {
+                            debug('[urltitle/4chan/res] %s', msg);
+                            msg = msg.substr(0, 100) + '...';
+                            debug('[urltitle/4chan/res] %s', msg);
+                        }
+                    }
+                    fn(true, '4chan: ' + msg + ' - /' + match[1] + '/ - ' + data.posts.length + ' replies');
+                } else {
+                    debug('[urltitle/4chan/res] %s', error);
+                    getTitle(URL, fn);
+                }
+            });
+        };
+
         irc.on('chanmsg', function (event) {
             var URL, match = event.message.match(/(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?\^=%&amp;:\/~\+#]*[\w\-\@?\^=%&amp;\/~\+#])?/i);
             if (match !== null) {
@@ -301,6 +333,12 @@ module.exports = function () {
                     });
                 } else if (__.indexOf(['github.com', 'www.github.com', 'gist.github.com', 'www.gist.github.com'], URL.hostname) !== -1) { /* Github URL */
                     getGithubTitle(URL, function (success, title) {
+                        if (success) {
+                            event.channel.say(title);
+                        }
+                    });
+                } else if (__.indexOf(['4chan.org', 'boards.4chan.org'], URL.hostname) !== -1) { /* Github URL */
+                    get4chanTitle(URL, function (success, title) {
                         if (success) {
                             event.channel.say(title);
                         }

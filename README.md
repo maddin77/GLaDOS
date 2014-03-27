@@ -1,5 +1,6 @@
 DEFAULT CONFIG
 =======
+Uses [config-node](https://github.com/flesler/config-node) JSON files.
 ```js 
 {
     "debug": "glados*",
