@@ -282,16 +282,10 @@ module.exports = function () {
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
                     var msg = data.posts[0].com || null;
-                    debug('[urltitle/4chan/res] %s', msg);
                     if (msg !== null) {
-                        //$ = cheerio.load('<div>' + msg + '</div>');
-                        //msg = $.text();
                         msg = cheerio("<div/>").html(msg).text();
-                        debug('[urltitle/4chan/res] %s', msg);
                         if (msg.length > 100) {
-                            debug('[urltitle/4chan/res] %s', msg);
                             msg = msg.substr(0, 100) + '...';
-                            debug('[urltitle/4chan/res] %s', msg);
                         }
                     }
                     fn(true, '4chan: ' + msg + ' - /' + match[1] + '/ - ' + data.posts.length + ' replies');
