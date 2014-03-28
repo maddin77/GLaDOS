@@ -1,7 +1,7 @@
 'use strict';
 var url = require('url');
 var request = require('request');
-var __ = require('underscore')._;
+var _ = require('underscore')._;
 var utils = require(__dirname + '/../lib/utils');
 var Entities = require('html-entities').AllHtmlEntities;
 var debug = require('debug')('glados:script:urltitle');
@@ -297,41 +297,41 @@ module.exports = function () {
         };
 
         irc.on('chanmsg', function (event) {
-            var URL, match = event.message.match(/(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?\^=%&amp;:\/~\+#]*[\w\-\@?\^=%&amp;\/~\+#])?/i);
-            if (match !== null) {
+            var URL, match;
+            if ((match = event.message.match(/(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?\^=%&amp;:\/~\+#]*[\w\-\@?\^=%&amp;\/~\+#])?/i)) !== null) {
                 URL = url.parse(match[0], true, true);
 
-                if (__.indexOf(['youtube.com', 'www.youtube.com', 'youtu.be', 'www.youtu.be'], URL.hostname) !== -1) {
+                if (_.indexOf(['youtube.com', 'www.youtube.com', 'youtu.be', 'www.youtu.be'], URL.hostname) !== -1) {
                     getYoutubeTitle(URL, function (success, title) {
                         if (success) {
                             event.channel.say(title);
                         }
                     });
-                } else if (__.indexOf(['i.imgur.com', 'www.i.imgur.com', 'imgur.com', 'www.imgur.com'], URL.hostname) !== -1) { /* Imgur URL */
+                } else if (_.indexOf(['i.imgur.com', 'www.i.imgur.com', 'imgur.com', 'www.imgur.com'], URL.hostname) !== -1) { /* Imgur URL */
                     getImgurTitle(URL, function (success, title) {
                         if (success) {
                             event.channel.say(title);
                         }
                     });
-                } else if (__.indexOf(['vimeo.com', 'www.vimeo.com'], URL.hostname) !== -1) { /* Vimeo URL */
+                } else if (_.indexOf(['vimeo.com', 'www.vimeo.com'], URL.hostname) !== -1) { /* Vimeo URL */
                     getVimeoTitle(URL, function (success, title) {
                         if (success) {
                             event.channel.say(title);
                         }
                     });
-                } else if (__.indexOf(['reddit.com', 'redd.it', 'www.reddit.com', 'www.redd.it'], URL.hostname) !== -1) { /* Reddit URL */
+                } else if (_.indexOf(['reddit.com', 'redd.it', 'www.reddit.com', 'www.redd.it'], URL.hostname) !== -1) { /* Reddit URL */
                     getRedditTitle(URL, function (success, title) {
                         if (success) {
                             event.channel.say(title);
                         }
                     });
-                } else if (__.indexOf(['github.com', 'www.github.com', 'gist.github.com', 'www.gist.github.com'], URL.hostname) !== -1) { /* Github URL */
+                } else if (_.indexOf(['github.com', 'www.github.com', 'gist.github.com', 'www.gist.github.com'], URL.hostname) !== -1) { /* Github URL */
                     getGithubTitle(URL, function (success, title) {
                         if (success) {
                             event.channel.say(title);
                         }
                     });
-                } else if (__.indexOf(['4chan.org', 'boards.4chan.org'], URL.hostname) !== -1) { /* Github URL */
+                } else if (_.indexOf(['4chan.org', 'boards.4chan.org'], URL.hostname) !== -1) { /* Github URL */
                     get4chanTitle(URL, function (success, title) {
                         if (success) {
                             event.channel.say(title);
@@ -341,6 +341,60 @@ module.exports = function () {
                     getTitle(URL, function (success, title) {
                         if (success) {
                             event.channel.say(title);
+                        }
+                    });
+                }
+            } else if ((match = event.message.match(/(?:spotify)\:(artist|album|track)\:(.+)/i)) !== null) {
+                if (match[1] === 'artist') {
+                    request({
+                        "url": 'http://ws.spotify.com/lookup/1/.json?uri=spotify:artist:' + match[2] + '&extras=album',
+                        "json": true,
+                        "headers": {
+                            "User-Agent": irc.config.userAgent
+                        }
+                    }, function (error, response, data) {
+                        if (!error && response.statusCode === 200) {
+                            event.channel.say(irc.clrs('Spotify: {B}{C}' + data.artist.name + '{R} (' + data.artist.albums.length + ' albums).'));
+                        } else {
+                            debug('[urltitle/spotify/artist] %s', error);
+                        }
+                    });
+                } else if (match[1] === 'album') {
+                    request({
+                        "url": 'http://ws.spotify.com/lookup/1/.json?uri=spotify:album:' + match[2] + '&extras=track',
+                        "json": true,
+                        "headers": {
+                            "User-Agent": irc.config.userAgent
+                        }
+                    }, function (error, response, data) {
+                        if (!error && response.statusCode === 200) {
+                            event.channel.say(irc.clrs('Spotify: {B}{O}' + data.album.name + '{R} by {B}{C}' + data.album.artist + '{R}. ' + data.album.tracks.length + ' tracks, released ' + data.album.released + '.'));
+                        } else {
+                            debug('[urltitle/spotify/album] %s', error);
+                        }
+                    });
+                } else if (match[1] === 'track') {
+                    request({
+                        "url": 'http://ws.spotify.com/lookup/1/.json?uri=spotify:track:' + match[2],
+                        "json": true,
+                        "headers": {
+                            "User-Agent": irc.config.userAgent
+                        }
+                    }, function (error, response, data) {
+                        if (!error && response.statusCode === 200) {
+                            var artistStr = '', time, artists = _.map(data.track.artists, function (artist) {
+                                return artist.name;
+                            });
+                            if (artists.length > 1) {
+                                artistStr = ' & ' + artists.pop();
+                                artistStr = artists.join(', ') + artistStr;
+                            } else {
+                                artistStr = artists[0];
+                            }
+                            time = utils.formatTime(Math.round(data.track.length));
+                            event.channel.say(irc.clrs('Spotify: {B}{C}' + artistStr + ' - ' + data.track.name + '{R} (Track No. ' + data.track['track-number'] + ' on {B}{O}' + data.track.album.name + '{R}) [' + time + ']'));
+                        } else {
+                            debug('[urltitle/spotify/track] %s', error);
                         }
                     });
                 }
