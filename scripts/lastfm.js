@@ -28,9 +28,9 @@ module.exports = function () {
                                 success: function (data) {
                                     var trackinfo = data.track;
                                     if (track.nowplaying) {
-                                        fn(irc.clrs('"{B}' + name + '{R}" is now playing: {B}{C}' + trackinfo.artist.name + ' - ' + trackinfo.name + '{R} [playcount {B}' + trackinfo.userplaycount + 'x{R}] [{B}{O}' + utils.formatTime(trackinfo.duration / 1000) + '{R}]'));
+                                        fn(irc.clrs('\'{B}' + name + '{R}\' is now playing: {B}{C}' + trackinfo.artist.name + ' - ' + trackinfo.name + '{R} [playcount {B}' + trackinfo.userplaycount + 'x{R}] [{B}{O}' + utils.formatTime(trackinfo.duration / 1000) + '{R}]'));
                                     } else {
-                                        fn(irc.clrs('"{B}' + name + '{R}" is not listening to anything right now. The last played track is {B}{C}' + trackinfo.artist.name + ' - ' + trackinfo.name + '{R}, back in ' + track.date['#text'] + ' UTC.'));
+                                        fn(irc.clrs('\'{B}' + name + '{R}\' is not listening to anything right now. The last played track is {B}{C}' + trackinfo.artist.name + ' - ' + trackinfo.name + '{R}, back in ' + track.date['#text'] + ' UTC.'));
                                     }
                                 },
                                 error: function (error) {
@@ -123,9 +123,9 @@ module.exports = function () {
                     getRecentTrackInfo(name, function (error, song) {
                         if (!error) {
                             if (song.nowplaying) {
-                                event.channel.say(irc.clrs('"{B}' + name + '{R}" is now playing: {B}{C}' + song.artist + ' - ' + song.title + '{R} [playcount ' + song.playcount + 'x] [{B}' + song.durationf + '{R}]'));
+                                event.channel.say(irc.clrs('\'{B}' + name + '{R}\' is now playing: {B}{C}' + song.artist + ' - ' + song.title + '{R} [playcount ' + song.playcount + 'x] [{B}' + song.durationf + '{R}]'));
                             } else {
-                                event.channel.say(irc.clrs('"{B}' + name + '{R}" is not listening to anything right now. The last played track is {B}{C}' + song.artist + ' - ' + song.title + '{R}, back in ' + song.date + ' UTC.'));
+                                event.channel.say(irc.clrs('\'{B}' + name + '{R}\' is not listening to anything right now. The last played track is {B}{C}' + song.artist + ' - ' + song.title + '{R}, back in ' + song.date + ' UTC.'));
                             }
                         } else {
                             event.channel.say(error);
