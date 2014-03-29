@@ -47,6 +47,8 @@ module.exports = function () {
                 videoID = URL.query.v;
             } else if (URL.hostname === 'youtu.be' || URL.hostname === 'www.youtu.be') {
                 videoID = URL.pathname.substr(1);
+            } else if (URL.hostname === 'y2u.be' || URL.hostname === 'www.y2u.be') {
+                videoID = URL.pathname.substr(1);
             }
             if (videoID) {
                 request({
@@ -301,7 +303,7 @@ module.exports = function () {
             if ((match = event.message.match(/(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?\^=%&amp;:\/~\+#]*[\w\-\@?\^=%&amp;\/~\+#])?/i)) !== null) {
                 URL = url.parse(match[0], true, true);
 
-                if (_.indexOf(['youtube.com', 'www.youtube.com', 'youtu.be', 'www.youtu.be'], URL.hostname) !== -1) {
+                if (_.indexOf(['youtube.com', 'www.youtube.com', 'youtu.be', 'www.youtu.be', 'www.y2u.be', 'y2u.be'], URL.hostname) !== -1) {
                     getYoutubeTitle(URL, function (success, title) {
                         if (success) {
                             event.channel.say(title);
