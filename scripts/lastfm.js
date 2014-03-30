@@ -19,26 +19,32 @@ module.exports = function () {
                 limit: 1,
                 handlers: {
                     success: function (data) {
-                        var track = _.isArray(data.recenttracks.track) ? data.recenttracks.track[0] : data.recenttracks.track;
-                        track.nowplaying = track.hasOwnProperty('@attr') && track['@attr'].nowplaying === 'true';
-                        lastfm.request('track.getInfo', {
-                            mbid: track.mbid,
-                            username: name,
-                            handlers: {
-                                success: function (data) {
-                                    var trackinfo = data.track,
-                                        playcount = trackinfo.userplaycount ? (trackinfo.userplaycount + 'x') : 'Unknown';
-                                    if (track.nowplaying) {
-                                        fn(irc.clrs('\'{B}' + name + '{R}\' is now playing: {B}{C}' + trackinfo.artist.name + ' - ' + trackinfo.name + '{R} [playcount {B}' + playcount + 'x{R}] [{B}{O}' + utils.formatTime(trackinfo.duration / 1000) + '{R}]'));
-                                    } else {
-                                        fn(irc.clrs('\'{B}' + name + '{R}\' is not listening to anything right now. The last played track is {B}{C}' + trackinfo.artist.name + ' - ' + trackinfo.name + '{R}, back in ' + track.date['#text'] + ' UTC.'));
+                        if (data.recenttracks.hasOwnProperty('track')) {
+                            var track = _.isArray(data.recenttracks.track) ? data.recenttracks.track[0] : data.recenttracks.track;
+                            track.nowplaying = track.hasOwnProperty('@attr') && track['@attr'].nowplaying === 'true';
+                            lastfm.request('track.getInfo', {
+                                mbid: track.mbid,
+                                track: track.name,
+                                artist: track.artist['#text'],
+                                username: name,
+                                handlers: {
+                                    success: function (data) {
+                                        var trackinfo = data.track,
+                                            playcount = trackinfo.userplaycount ? (trackinfo.userplaycount + 'x') : 'Unknown';
+                                        if (track.nowplaying) {
+                                            fn(irc.clrs('\'{B}' + name + '{R}\' is now playing: {B}{C}' + trackinfo.artist.name + ' - ' + trackinfo.name + '{R} [playcount {B}' + playcount + '{R}] [{B}{O}' + utils.formatTime(trackinfo.duration / 1000) + '{R}]'));
+                                        } else {
+                                            fn(irc.clrs('\'{B}' + name + '{R}\' is not listening to anything right now. The last played track is {B}{C}' + trackinfo.artist.name + ' - ' + trackinfo.name + '{R}, back in ' + track.date['#text'] + ' UTC.'));
+                                        }
+                                    },
+                                    error: function (error) {
+                                        fn(error.message);
                                     }
-                                },
-                                error: function (error) {
-                                    fn(error.message);
                                 }
-                            }
-                        });
+                            });
+                        } else {
+                            fn('\'' + name + '\' hasn\'t scrobbled any tracks yet.');
+                        }
                     },
                     error: function (error) {
                         fn(error.message);
@@ -120,17 +126,10 @@ module.exports = function () {
                         event.user.notice('Use: !np COMPARE <last.fm username> [last.fm username]');
                     }
                 } else {
-                    var name = event.params[0];
-                    getRecentTrackInfo(name, function (error, song) {
-                        if (!error) {
-                            if (song.nowplaying) {
-                                event.channel.say(irc.clrs('\'{B}' + name + '{R}\' is now playing: {B}{C}' + song.artist + ' - ' + song.title + '{R} [playcount ' + song.playcount + 'x] [{B}' + song.durationf + '{R}]'));
-                            } else {
-                                event.channel.say(irc.clrs('\'{B}' + name + '{R}\' is not listening to anything right now. The last played track is {B}{C}' + song.artist + ' - ' + song.title + '{R}, back in ' + song.date + ' UTC.'));
-                            }
-                        } else {
-                            event.channel.say(error);
-                        }
+                    irc.brain.hget('last.fm', event.params[0], function (err, name) {
+                        getRecentTrackInfo(name || event.params[0], function (message) {
+                            event.channel.say(message);
+                        });
                     });
                 }
             }
