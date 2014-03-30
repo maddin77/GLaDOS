@@ -26,9 +26,10 @@ module.exports = function () {
                             username: name,
                             handlers: {
                                 success: function (data) {
-                                    var trackinfo = data.track;
+                                    var trackinfo = data.track,
+                                        playcount = trackinfo.userplaycount ? (trackinfo.userplaycount + 'x') : 'Unknown';
                                     if (track.nowplaying) {
-                                        fn(irc.clrs('\'{B}' + name + '{R}\' is now playing: {B}{C}' + trackinfo.artist.name + ' - ' + trackinfo.name + '{R} [playcount {B}' + trackinfo.userplaycount + 'x{R}] [{B}{O}' + utils.formatTime(trackinfo.duration / 1000) + '{R}]'));
+                                        fn(irc.clrs('\'{B}' + name + '{R}\' is now playing: {B}{C}' + trackinfo.artist.name + ' - ' + trackinfo.name + '{R} [playcount {B}' + playcount + 'x{R}] [{B}{O}' + utils.formatTime(trackinfo.duration / 1000) + '{R}]'));
                                     } else {
                                         fn(irc.clrs('\'{B}' + name + '{R}\' is not listening to anything right now. The last played track is {B}{C}' + trackinfo.artist.name + ' - ' + trackinfo.name + '{R}, back in ' + track.date['#text'] + ' UTC.'));
                                     }
@@ -84,7 +85,7 @@ module.exports = function () {
                 });
             } else {
                 if (event.params[0].toUpperCase() === 'SET') {
-                    if (event.params.length === 1) {
+                    if (event.params.length === 2) {
                         irc.brain.hset('last.fm', event.user.getNick(), event.params[1]);
                         event.user.notice('You\'re now associated with http://last.fm/user/' + event.params[1]);
                     } else {
