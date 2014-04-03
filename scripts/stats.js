@@ -1,6 +1,7 @@
 'use strict';
 var _ = require('underscore');
 var debug = require('debug')('glados:script:stats');
+var _ = require('underscore');
 
 module.exports = function () {
     var smileys, smileyRegexp, countSmileys;
@@ -115,6 +116,33 @@ module.exports = function () {
             if (event.topicChanged) {
                 irc.brain.hincrby('stats:' + event.channel.getName(), 'topicchanges', 1);
             }
+        });
+        irc.command('stats', function (event) {
+            irc.brain.hgetall('stats:' + event.channel.getName(), function (err, obj) {
+                var stats = _.defaults(obj || {}, {
+                    "joins": "0",
+                    "start": "1395000994802",
+                    "peak": "0,1395000994803",
+                    "messages": "0",
+                    "characters": "0",
+                    "words": "0",
+                    "smileys": "0",
+                    "questions": "0",
+                    "allcaps": "0",
+                    "modes": "0",
+                    "commands": "0",
+                    "kicks": "0",
+                    "urls": "0",
+                    "actions": "0",
+                    "bans": "0",
+                    "parts": "0",
+                    "quits": "0",
+                    "topicchanges": "0"
+                });
+                event.channel.say('On ' + event.channel.getName() + ' there have been ' + stats.messages + ' messages, containing ' + stats.characters + ' characters, ' + stats.words + ' words and ' + stats.smileys + ' smileys; ' + stats.actions + ' of those messages were ACTIONs.');
+                event.channel.say('There have been ' + stats.joins + ' joins, ' + stats.parts + ' parts, ' + stats.quits + ' quits, ' + stats.kicks + ' kicks, ' + stats.modes + ' mode changes, and ' + stats.topicchanges + ' topic changes.');
+                event.channel.say('There are currently ' + Object.keys(event.channel.getNames()).length + ' users and the channel has peaked at ' + stats.peak.split(',')[0] + ' users.');
+            });
         });
     };
 };

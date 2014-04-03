@@ -7,7 +7,11 @@ var Entities = require('html-entities').AllHtmlEntities;
 var debug = require('debug')('glados:script:urltitle');
 var cheerio = require('cheerio');
 
-//TODO: mega.co.nz
+/*
+    TODO:
+        mega.co.nz
+        twitter
+*/
 
 module.exports = function () {
     return function (irc) {

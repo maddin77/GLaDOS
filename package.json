@@ -33,7 +33,8 @@
     "xml2js": "^0.4.1",
     "moment": "^2.5.1",
     "irc-message": "^1.0.0",
-    "config-node": "^1.0.0"
+    "config-node": "^1.0.0",
+    "sandbox": "^0.8.4"
   },
   "license": "MIT",
   "engines": {
