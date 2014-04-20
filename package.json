@@ -1,6 +1,6 @@
 {
   "name": "GLaDOS",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "author": "Martin Rump <admin@maddin.cc>",
   "description": "GLaDOS IRC-Bot",
   "contributors": [
@@ -22,7 +22,6 @@
     "underscore": "^1.6.0",
     "debug": "^0.7.4",
     "redis": "^0.10.1",
-    "irc-replies": "^2.0.0",
     "request": "^2.34.0",
     "cleverbot-node": "^0.1.2",
     "html-entities": "^1.0.10",
@@ -32,9 +31,13 @@
     "morse": "^0.1.0",
     "xml2js": "^0.4.1",
     "moment": "^2.5.1",
-    "irc-message": "^1.0.0",
     "config-node": "^1.0.0",
-    "sandbox": "^0.8.4"
+    "sandbox": "^0.8.4",
+    "coffea": "^0.1.0",
+    "lastfm": "^0.9.0"
+  },
+  "scripts": {
+    "start": "NODE_ENV=production node index.js"
   },
   "license": "MIT",
   "engines": {

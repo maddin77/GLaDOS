@@ -7,9 +7,9 @@ var util = require('util');
 var url = require('url');
 var net = require('net');
 var _ = require('underscore');
-var debug = require('debug')('glados:script:net');
+var debug = require('debug')('GLaDOS:script:net');
 
-module.exports = function () {
+module.exports = function (irc) {
 
     var getError = function (code) {
         switch (code) {
@@ -68,170 +68,168 @@ module.exports = function () {
         }
     };
 
-    return function (irc) {
-        irc.command('isup', function (event) {
-            if (event.params.length > 0) {
-                var text = event.text, host;
-                if (text.search(/^http[s]?\:\/\//) === -1) {
-                    text = 'http://' + text;
-                }
-                host = url.parse(text).host;
-                if (host !== null) {
-                    request({
-                        "uri": 'http://isitup.org/' + host + '.json',
-                        "json": true,
-                        "headers": {
-                            "User-Agent": irc.config.userAgent
-                        }
-                    }, function (error, response, json) {
-                        if (!error && response.statusCode === 200) {
-                            if (json.status_code === 3) {
-                                event.channel.reply(event.user, 'Invalid Domain.');
-                            } else if (json.status_code === 2) {
-                                event.channel.reply(event.user, json.domain + ' seems to be down!');
-                            } else if (json.status_code === 1) {
-                                event.channel.reply(event.user, json.domain + ' is up. It took ' + (json.response_time * 1000) + ' ms for a ' + json.response_code + ' response code with an ip of ' + json.response_ip + '.');
-                            }
-                        } else {
-                            event.channel.reply(event.user, 'Gratz. You broke it. (' + error + ')');
-                            debug('[isup] %s', error);
-                        }
-                    });
-                } else {
-                    event.user.notice('Invalid URL.');
-                }
-            } else {
-                event.user.notice('Use: !isup <url>');
+    irc.command('isup', function (event) {
+        if (event.params.length > 0) {
+            var text = event.text, host;
+            if (text.search(/^http[s]?\:\/\//) === -1) {
+                text = 'http://' + text;
             }
-        });
-        irc.command('geo', function (event) {
-            if (event.params.length > 0) {
+            host = url.parse(text).host;
+            if (host !== null) {
                 request({
-                    "uri": 'http://ip-api.com/json/' + event.text,
+                    "uri": 'http://isitup.org/' + host + '.json',
                     "json": true,
                     "headers": {
                         "User-Agent": irc.config.userAgent
                     }
-                }, function (error, response, data) {
+                }, function (error, response, json) {
                     if (!error && response.statusCode === 200) {
-                        if (data.status === "success") {
-                            var values = [];
-                            _.each(data, function (value, key, list) {
-                                if (value.length > 0 && key !== 'query' && key !== 'status' && key !== 'countryCode' && key !== 'region' && key !== 'zip' && key !== 'lat' && key !== 'lon' && key !== 'timezone') {
-                                    values.push(value);
-                                }
-                            });
-                            event.channel.reply(event.user, event.text + ' resolves to ' + data.query + ' (' + values.join(', ') + ')');
-                        } else {
-                            if (data.message === "private range") {
-                                event.channel.reply(event.user, 'The IP address is part of a private range (' + data.query + ')');
-                            } else if (data.message === "reserved range") {
-                                event.channel.reply(event.user, 'The IP address is part of a reserved range (' + data.query + ')');
-                            } else if (data.message === "invalid query") {
-                                event.channel.reply(event.user, 'Invalid IP address or domain name (' + data.query + ')');
-                            } else {
-                                event.channel.reply(event.user, data.message + ' (' + data.query + ')');
-                            }
+                        if (json.status_code === 3) {
+                            event.channel.reply(event.user, 'Invalid Domain.');
+                        } else if (json.status_code === 2) {
+                            event.channel.reply(event.user, json.domain + ' seems to be down!');
+                        } else if (json.status_code === 1) {
+                            event.channel.reply(event.user, json.domain + ' is up. It took ' + (json.response_time * 1000) + ' ms for a ' + json.response_code + ' response code with an ip of ' + json.response_ip + '.');
                         }
                     } else {
                         event.channel.reply(event.user, 'Gratz. You broke it. (' + error + ')');
-                        debug('[geo] %s', error);
+                        debug('[isup] %s', error);
                     }
                 });
             } else {
-                event.user.notice('Use: !geo <ip, domain, etc>');
+                event.user.notice('Invalid URL.');
             }
-        });
-        irc.command('dnslookup', function (event) {
-            if (event.params.length > 0) {
-                try {
-                    dns.lookup(event.text, function (error, address, family) {
-                        if (error) {
-                            event.channel.reply(event.user, getError(error.code));
-                        } else {
-                            event.channel.reply(event.user, address);
-                        }
-                    });
-                } catch (error) {
-                    event.channel.reply(event.user, 'Gratz. You broke it. (' + getError(error.code) + ')');
-                    debug('[dnslookup] %s', getError(error.code), error);
+        } else {
+            event.user.notice('Use: !isup <url>');
+        }
+    });
+    irc.command('geo', function (event) {
+        if (event.params.length > 0) {
+            request({
+                "uri": 'http://ip-api.com/json/' + event.text,
+                "json": true,
+                "headers": {
+                    "User-Agent": irc.config.userAgent
                 }
-            } else {
-                event.user.notice('Use: !dnslookup <domain>');
-            }
-        });
-        irc.command('dnsreverse', function (event) {
-            if (event.params.length > 0) {
-                try {
-                    dns.reverse(event.text, function (error, domains) {
-                        if (error) {
-                            event.channel.reply(event.user, getError(error.code));
-                        } else {
-                            event.channel.reply(event.user, domains.join(', '));
-                        }
-                    });
-                } catch (error) {
-                    event.channel.reply(event.user, 'Gratz. You broke it. (' + getError(error.code) + ')');
-                    debug('[dnsreverse] %s', getError(error.code), error);
-                }
-            } else {
-                event.user.notice('Use: !dnsreverse <ip>');
-            }
-        });
-        irc.command('dnsresolve', function (event) {
-            if (event.params.length > 0) {
-                var rrtype = event.params.length === 2 ? event.params[1].toUpperCase() : 'A';
-                try {
-                    dns.resolve(event.params[0], rrtype, function (error, addresses) {
-                        if (error) {
-                            event.channel.reply(event.user, getError(error.code));
-                        } else {
-                            if (rrtype === 'MX') {
-                                var exchanges = [];
-                                addresses.forEach(function (entry) {
-                                    exchanges.push(entry.exchange + '(' + entry.priority + ')');
-                                });
-                                event.channel.reply(event.user, exchanges.join(', '));
-                            } else {
-                                event.channel.reply(event.user, addresses.join(', '));
+            }, function (error, response, data) {
+                if (!error && response.statusCode === 200) {
+                    if (data.status === "success") {
+                        var values = [];
+                        _.each(data, function (value, key, list) {
+                            if (value.length > 0 && key !== 'query' && key !== 'status' && key !== 'countryCode' && key !== 'region' && key !== 'zip' && key !== 'lat' && key !== 'lon' && key !== 'timezone') {
+                                values.push(value);
                             }
+                        });
+                        event.channel.reply(event.user, event.text + ' resolves to ' + data.query + ' (' + values.join(', ') + ')');
+                    } else {
+                        if (data.message === "private range") {
+                            event.channel.reply(event.user, 'The IP address is part of a private range (' + data.query + ')');
+                        } else if (data.message === "reserved range") {
+                            event.channel.reply(event.user, 'The IP address is part of a reserved range (' + data.query + ')');
+                        } else if (data.message === "invalid query") {
+                            event.channel.reply(event.user, 'Invalid IP address or domain name (' + data.query + ')');
+                        } else {
+                            event.channel.reply(event.user, data.message + ' (' + data.query + ')');
                         }
-                    });
-                } catch (error) {
-                    event.channel.reply(event.user, 'Gratz. You broke it. (' + getError(error.code) + ')');
-                    debug('[dnsresolve] %s', getError(error.code), error);
-                }
-            } else {
-                event.user.notice('Use: !dnsresolve <domain> [A/AAAA/MX/TXT/SRV/PTR/NS/CNAME]');
-            }
-        });
-        irc.command('isip', function (event) {
-            if (event.params.length > 0) {
-                var ret = net.isIP(event.text);
-                if (ret === 4) {
-                    event.channel.reply(event.user, '"' + event.text + '" is an IP version 4 address.');
-                } else if (ret === 6) {
-                    event.channel.reply(event.user, '"' + event.text + '" is an IP version 6 address.');
+                    }
                 } else {
-                    event.channel.reply(event.user, '"' + event.text + '" is not an ip.');
+                    event.channel.reply(event.user, 'Gratz. You broke it. (' + error + ')');
+                    debug('[geo] %s', error);
                 }
-            } else {
-                event.user.notice('Use: !isip <string>');
-            }
-        });
-        irc.command('avail', function (event) {
-            if (event.params.length > 0) {
-                whoisAvailable(event.text, function (error, whoisResponse, isAvailable) {
-                    if (!error) {
-                        event.channel.reply(event.user, '"' + event.text + '" is ' + (isAvailable ? '' : 'not ') + 'available.');
+            });
+        } else {
+            event.user.notice('Use: !geo <ip, domain, etc>');
+        }
+    });
+    irc.command('dnslookup', function (event) {
+        if (event.params.length > 0) {
+            try {
+                dns.lookup(event.text, function (error, address, family) {
+                    if (error) {
+                        event.channel.reply(event.user, getError(error.code));
                     } else {
-                        event.channel.reply(event.user, 'Gratz. You broke it. (' + error + ')');
-                        debug('[avail] %s', getError(error.code), error);
+                        event.channel.reply(event.user, address);
                     }
                 });
-            } else {
-                event.user.notice('Use: !avail <domain>');
+            } catch (error) {
+                event.channel.reply(event.user, 'Gratz. You broke it. (' + getError(error.code) + ')');
+                debug('[dnslookup] %s', getError(error.code), error);
             }
-        });
-    };
+        } else {
+            event.user.notice('Use: !dnslookup <domain>');
+        }
+    });
+    irc.command('dnsreverse', function (event) {
+        if (event.params.length > 0) {
+            try {
+                dns.reverse(event.text, function (error, domains) {
+                    if (error) {
+                        event.channel.reply(event.user, getError(error.code));
+                    } else {
+                        event.channel.reply(event.user, domains.join(', '));
+                    }
+                });
+            } catch (error) {
+                event.channel.reply(event.user, 'Gratz. You broke it. (' + getError(error.code) + ')');
+                debug('[dnsreverse] %s', getError(error.code), error);
+            }
+        } else {
+            event.user.notice('Use: !dnsreverse <ip>');
+        }
+    });
+    irc.command('dnsresolve', function (event) {
+        if (event.params.length > 0) {
+            var rrtype = event.params.length === 2 ? event.params[1].toUpperCase() : 'A';
+            try {
+                dns.resolve(event.params[0], rrtype, function (error, addresses) {
+                    if (error) {
+                        event.channel.reply(event.user, getError(error.code));
+                    } else {
+                        if (rrtype === 'MX') {
+                            var exchanges = [];
+                            addresses.forEach(function (entry) {
+                                exchanges.push(entry.exchange + '(' + entry.priority + ')');
+                            });
+                            event.channel.reply(event.user, exchanges.join(', '));
+                        } else {
+                            event.channel.reply(event.user, addresses.join(', '));
+                        }
+                    }
+                });
+            } catch (error) {
+                event.channel.reply(event.user, 'Gratz. You broke it. (' + getError(error.code) + ')');
+                debug('[dnsresolve] %s', getError(error.code), error);
+            }
+        } else {
+            event.user.notice('Use: !dnsresolve <domain> [A/AAAA/MX/TXT/SRV/PTR/NS/CNAME]');
+        }
+    });
+    irc.command('isip', function (event) {
+        if (event.params.length > 0) {
+            var ret = net.isIP(event.text);
+            if (ret === 4) {
+                event.channel.reply(event.user, '"' + event.text + '" is an IP version 4 address.');
+            } else if (ret === 6) {
+                event.channel.reply(event.user, '"' + event.text + '" is an IP version 6 address.');
+            } else {
+                event.channel.reply(event.user, '"' + event.text + '" is not an ip.');
+            }
+        } else {
+            event.user.notice('Use: !isip <string>');
+        }
+    });
+    irc.command('avail', function (event) {
+        if (event.params.length > 0) {
+            whoisAvailable(event.text, function (error, whoisResponse, isAvailable) {
+                if (!error) {
+                    event.channel.reply(event.user, '"' + event.text + '" is ' + (isAvailable ? '' : 'not ') + 'available.');
+                } else {
+                    event.channel.reply(event.user, 'Gratz. You broke it. (' + error + ')');
+                    debug('[avail] %s', getError(error.code), error);
+                }
+            });
+        } else {
+            event.user.notice('Use: !avail <domain>');
+        }
+    });
 };
