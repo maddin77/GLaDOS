@@ -34,7 +34,8 @@
     "config-node": "^1.0.0",
     "sandbox": "^0.8.4",
     "coffea": "^0.1.0",
-    "lastfm": "^0.9.0"
+    "lastfm": "^0.9.0",
+    "cli-table": "^0.3.0"
   },
   "scripts": {
     "start": "NODE_ENV=production node index.js"
