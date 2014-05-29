@@ -1,7 +1,6 @@
 'use strict';
 var _ = require('underscore');
 var debug = require('debug')('GLaDOS:script:stats');
-var _ = require('underscore');
 
 module.exports = function (irc) {
     var smileys, smileyRegexp, countSmileys;
