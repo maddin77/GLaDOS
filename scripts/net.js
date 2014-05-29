@@ -1,6 +1,5 @@
 'use strict';
 var request = require('request');
-var cheerio = require('cheerio');
 var dns = require('dns');
 var whoisAvailable = require('whois-available');
 var util = require('util');
