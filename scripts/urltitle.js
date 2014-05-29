@@ -11,7 +11,6 @@ var cheerio = require('cheerio');
     TODO:
         mega.co.nz
         twitter
-        4chan
 */
 
 module.exports = function (irc) {
@@ -20,7 +19,7 @@ module.exports = function (irc) {
     entities = new Entities();
 
     getTitle = function (URL, fn) {
-        request({
+        request.head({
             "uri": URL.href,
             "headers": {
                 "User-Agent": irc.config.userAgent
@@ -28,13 +27,28 @@ module.exports = function (irc) {
         }, function (error, res, body) {
             if (!error) {
                 if (res.statusCode === 200) {
-                    if (!res.headers.hasOwnProperty('content-type') || res.headers['content-type'].indexOf('text/html') !== 0) {
-                        return fn(false, null);
-                    }
-                    var title = cheerio(body).find('title').text();
-                    if (title.length > 0) {
-                        title = title.replace(/(\r\n|\n|\r)/gm, "").trim();
-                        fn(true, 'Title: ' + entities.decode(title) + ' (at ' + URL.host + ')');
+                    if (res.headers.hasOwnProperty('content-type') && res.headers['content-type'].indexOf('text/html') > -1) {
+                        request({
+                            "uri": URL.href,
+                            "headers": {
+                                "User-Agent": irc.config.userAgent
+                            }
+                        }, function (error, res, body) {
+                            if (!error) {
+                                if (res.statusCode === 200) {
+                                    var title = cheerio(body).find('title').text();
+                                    if (title.length > 0) {
+                                        title = title.replace(/(\r\n|\n|\r)/gm, "").trim();
+                                        fn(true, 'Title: ' + entities.decode(title) + ' (at ' + URL.host + ')');
+                                    }
+                                } else {
+                                    fn(false, null);
+                                }
+                            } else {
+                                debug('[urltitle/*] %s', error);
+                                fn(false, null);
+                            }
+                        });
                     }
                 } else {
                     fn(false, null);
@@ -135,7 +149,7 @@ module.exports = function (irc) {
                 "uri": 'http://www.reddit.com/comments/' + id + '.json',
                 "json": true,
                 "headers": {
-                    "User-Agent": 'GLaDOS/IRC-Bot - https://github.com/maddin77/GLaDOS'
+                    "User-Agent": irc.config.userAgent
                 }
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
@@ -155,7 +169,7 @@ module.exports = function (irc) {
                 "uri": 'http://www.reddit.com/r/' + id + '/about.json',
                 "json": true,
                 "headers": {
-                    "User-Agent": 'GLaDOS/IRC-Bot - https://github.com/maddin77/GLaDOS'
+                    "User-Agent": irc.config.userAgent
                 }
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
@@ -180,7 +194,7 @@ module.exports = function (irc) {
                 "uri": 'http://www.reddit.com/user/' + id + '/about.json',
                 "json": true,
                 "headers": {
-                    "User-Agent": 'GLaDOS/IRC-Bot - https://github.com/maddin77/GLaDOS'
+                    "User-Agent": irc.config.userAgent
                 }
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
@@ -202,7 +216,7 @@ module.exports = function (irc) {
                 "uri": 'https://api.github.com/gists/' + match[1],
                 "json": true,
                 "headers": {
-                    "User-Agent": 'GLaDOS/IRC-Bot - https://github.com/maddin77/GLaDOS'
+                    "User-Agent": irc.config.userAgent
                 }
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
@@ -217,7 +231,7 @@ module.exports = function (irc) {
                 "uri": 'https://api.github.com/repos/' + match[1] + '/' + match[2] + '/issues/' + match[3],
                 "json": true,
                 "headers": {
-                    "User-Agent": 'GLaDOS/IRC-Bot - https://github.com/maddin77/GLaDOS'
+                    "User-Agent": irc.config.userAgent
                 }
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
@@ -232,7 +246,7 @@ module.exports = function (irc) {
                 "uri": 'https://api.github.com/repos/' + match[1] + '/' + match[2] + '/pulls/' + match[3],
                 "json": true,
                 "headers": {
-                    "User-Agent": 'GLaDOS/IRC-Bot - https://github.com/maddin77/GLaDOS'
+                    "User-Agent": irc.config.userAgent
                 }
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
@@ -247,7 +261,7 @@ module.exports = function (irc) {
                 "uri": 'https://api.github.com/repos/' + match[1] + '/' + match[2],
                 "json": true,
                 "headers": {
-                    "User-Agent": 'GLaDOS/IRC-Bot - https://github.com/maddin77/GLaDOS'
+                    "User-Agent": irc.config.userAgent
                 }
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
@@ -262,7 +276,7 @@ module.exports = function (irc) {
                 "uri": 'https://api.github.com/users/' + match[1],
                 "json": true,
                 "headers": {
-                    "User-Agent": 'GLaDOS/IRC-Bot - https://github.com/maddin77/GLaDOS'
+                    "User-Agent": irc.config.userAgent
                 }
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
@@ -281,28 +295,30 @@ module.exports = function (irc) {
         //http://boards.4chan.org/b/
         //http://boards.4chan.org/b/res/540960782
         //http://boards.4chan.org/b/res/540960782#p123456789
-        var match = URL.href.match(/^(?:http|https):\/\/boards\.4chan\.org\/([a-zA-Z0-9]*)\/res\/([0-9]*)(?:\/?)$/i);
-        request({
-            "uri": 'https://a.4cdn.org/' + match[1] + '/res/' + match[2] + '.json',
-            "json": true,
-            "headers": {
-                "User-Agent": 'GLaDOS/IRC-Bot - https://github.com/maddin77/GLaDOS'
-            }
-        }, function (error, response, data) {
-            if (!error && response.statusCode === 200) {
-                var msg = data.posts[0].com || null;
-                if (msg !== null) {
-                    msg = cheerio("<div/>").html(msg).text();
-                    if (msg.length > 100) {
-                        msg = msg.substr(0, 100) + '...';
-                    }
+        var match;
+        if ((match = URL.href.match(/^(?:http|https):\/\/boards\.4chan\.org\/([a-zA-Z0-9]*)\/thread\/([0-9]*)(?:\/?)$/i)) !== null) {
+            request({
+                "uri": 'https://a.4cdn.org/' + match[1] + '/res/' + match[2] + '.json',
+                "json": true,
+                "headers": {
+                    "User-Agent": irc.config.userAgent
                 }
-                fn(true, '4chan: ' + msg + ' - /' + match[1] + '/ - ' + data.posts.length + ' replies');
-            } else {
-                debug('[urltitle/4chan/res] %s', error);
-                getTitle(URL, fn);
-            }
-        });
+            }, function (error, response, data) {
+                if (!error && response.statusCode === 200) {
+                    var msg = data.posts[0].com || null;
+                    if (msg !== null) {
+                        msg = cheerio("<div/>").html(msg).text();
+                        if (msg.length > 100) {
+                            msg = msg.substr(0, 100) + '...';
+                        }
+                    }
+                    fn(true, '4chan: ' + msg + ' - /' + match[1] + '/ - ' + data.posts.length + ' replies');
+                } else {
+                    debug('[urltitle/4chan/res] %s', error);
+                    getTitle(URL, fn);
+                }
+            });
+        }
     };
 
     getSoundcloudTitle = function (URL, fn) {
@@ -311,7 +327,7 @@ module.exports = function (irc) {
             "uri": 'http://api.soundcloud.com/resolve.json?client_id=' + irc.config.soundcloudKey + '&url=' + match[0],
             "json": true,
             "headers": {
-                "User-Agent": 'GLaDOS/IRC-Bot - https://github.com/maddin77/GLaDOS'
+                "User-Agent": irc.config.userAgent
             }
         }, function (error, response, data) {
             if (!error && response.statusCode === 200) {
