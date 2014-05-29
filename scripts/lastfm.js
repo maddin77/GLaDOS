@@ -1,5 +1,4 @@
 'use strict';
-var debug = require('debug')('GLaDOS:script:lastfm');
 var _ = require('underscore');
 var utils = require(__dirname + '/../lib/utils');
 var LastFmNode = require('lastfm').LastFmNode;
