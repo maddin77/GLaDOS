@@ -79,6 +79,18 @@ module.exports = function (irc) {
             event.user.notice('You don\'t have the permissions to use this command.');
         }
     });
+    irc.command(['say', 'msg'], function (event) {
+        if (irc.config.admin.indexOf(event.user.getNick()) > -1) {
+            if (event.params.length > 0) {
+                var parts = event.params;
+                irc.send(parts.shift(), parts.join(' '));
+            } else {
+                event.user.notice('Use: !say <target> <message>');
+            }
+        } else {
+            event.user.notice('You don\'t have the permissions to use this command.');
+        }
+    });
     irc.on('message', function (event) {
         if (irc.config.admin.indexOf(event.user.getNick()) > -1 && !event.isAction) {
             var params = event.message.split(' ');
