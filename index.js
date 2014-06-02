@@ -21,6 +21,7 @@ GLaDOS.require(__dirname + '/scripts/control');
 GLaDOS.require(__dirname + '/scripts/cryptocoin');
 GLaDOS.require(__dirname + '/scripts/dice');
 GLaDOS.require(__dirname + '/scripts/domaininfo');
+GLaDOS.require(__dirname + '/scripts/flip');
 GLaDOS.require(__dirname + '/scripts/google');
 GLaDOS.require(__dirname + '/scripts/hash');
 GLaDOS.require(__dirname + '/scripts/heartbleed');
