@@ -7,14 +7,8 @@ var Entities = require('html-entities').AllHtmlEntities;
 var debug = require('debug')('GLaDOS:script:urltitle');
 var cheerio = require('cheerio');
 
-/*
-    TODO:
-        mega.co.nz
-        twitter
-*/
-
 module.exports = function (irc) {
-    var entities, getTitle, getYoutubeTitle, getImgurTitle, getRedditTitle, getVimeoTitle, getGithubTitle, get4chanTitle, getSoundcloudTitle, getBreadfishTitle;
+    var entities, getTitle, getYoutubeTitle, getImgurTitle, getRedditTitle, getVimeoTitle, getGithubTitle, get4chanTitle, getSoundcloudTitle, getBreadfishTitle, getTiwtterTitle;
 
     entities = new Entities();
 
@@ -372,6 +366,26 @@ module.exports = function (irc) {
         });
     };
 
+    getTiwtterTitle = function (URL, fn) {
+        var match;
+        if ((match = URL.href.match(/^(?:http|https):\/\/twitter\.com\/(?:\w){1,15}\/status\/([0-9]+)(?:\/?)/i) || URL.href.match(/^(?:http|https):\/\/twitter\.com\/(?:\w){1,15}\/status\/([0-9]+)(?:\/photo\/[0-9]+?)(?:\/?)/i)) !== null) {
+            request({
+                "uri": 'http://noauth.jit.su/1/statuses/show.json?id=' + match[1],
+                "json": true,
+                "headers": {
+                    "User-Agent": irc.config.userAgent
+                }
+            }, function (error, response, data) {
+                if (!error && response.statusCode === 200) {
+                    fn(true, 'Twitter: @' + data.user.screen_name + ': ' + data.text);
+                } else {
+                    debug('[urltitle/twitter/status] %s', error);
+                    getTitle(URL, fn);
+                }
+            });
+        }
+    };
+
     irc.on('message', function (event) {
         var URL, match;
         if ((match = event.message.match(/(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?\^=%&amp;:\/~\+#]*[\w\-\@?\^=%&amp;\/~\+#])?/i)) !== null) {
@@ -421,6 +435,12 @@ module.exports = function (irc) {
                 });
             } else if (_.indexOf(['sa-mp.de', 'forum.sa-mp.de'], URL.hostname) !== -1) { /* Breadfish URL */
                 getBreadfishTitle(URL, function (success, title) {
+                    if (success) {
+                        event.channel.say(title);
+                    }
+                });
+            } else if (_.indexOf(['twitter.com'], URL.hostname) !== -1) { /* Twitter URL */
+                getTiwtterTitle(URL, function (success, title) {
                     if (success) {
                         event.channel.say(title);
                     }
