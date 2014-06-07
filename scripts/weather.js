@@ -6,23 +6,22 @@ module.exports = function (irc) {
     irc.command(['w', 'weather'], function (event) {
         if (event.params.length > 0) {
             request({
-                "uri": 'http://api.openweathermap.org/data/2.1/find/name?q=' + encodeURIComponent(event.text) + '&units=metric',
+                "uri": 'http://api.openweathermap.org/data/2.5/weather?q=' + encodeURIComponent(event.text) + '&units=metric',
                 "json": true,
                 "headers": {
                     "User-Agent": irc.config.userAgent
                 }
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
-                    if (data.cod === "200") {
-                        var entry = data.list[0],
-                            country = entry.sys.country,
-                            desc = entry.weather[0].description,
-                            cName = entry.name,
-                            temp = 'Temperature: ' + entry.main.temp + '°C (' + entry.main.temp_min + '°C - ' + entry.main.temp_max + '°C). ',
-                            wind = entry.wind.speed ? ('Wind: ' + entry.wind.speed + 'm/s. ') : '',
-                            clouds = entry.clouds.all ? ('Clouds: ' + entry.clouds.all + '%. ') : '',
-                            humidity = entry.main.humidity ? ('Humidity: ' + entry.main.humidity + '%. ') : '',
-                            hpa = entry.main.pressure ? ('Atmospheric pressure: ' + entry.main.pressure + ' hPa. ') : '';
+                    if (data.cod === 200) {
+                        var country = data.sys.country,
+                            desc = data.weather[0].description,
+                            cName = data.name,
+                            temp = 'Temperature: ' + data.main.temp + '°C (' + data.main.temp_min + '°C - ' + data.main.temp_max + '°C). ',
+                            wind = data.wind.speed ? ('Wind: ' + data.wind.speed + 'm/s. ') : '',
+                            clouds = data.clouds.all ? ('Clouds: ' + data.clouds.all + '%. ') : '',
+                            humidity = data.main.humidity ? ('Humidity: ' + data.main.humidity + '%. ') : '',
+                            hpa = data.main.pressure ? ('Atmospheric pressure: ' + data.main.pressure + ' hPa. ') : '';
                         event.channel.reply(event.user, cName + ' (' + country + '): ' + desc + '. ' + temp + wind + clouds + humidity + hpa);
                     } else {
                         event.channel.reply(event.user, data.message);
