@@ -59,7 +59,6 @@ module.exports = function (irc) {
             value2: name2,
             handlers: {
                 success: function (data) {
-                    console.log(data);
                     fn(null, {
                         "name1": data.comparison.input.user[0].name,
                         "name2": data.comparison.input.user[1].name,
@@ -106,7 +105,11 @@ module.exports = function (irc) {
                                     if (error) {
                                         event.channel.reply(event.user, error);
                                     } else {
-                                        event.channel.say(irc.clrs(comparison.name1 + ' vs ' + comparison.name2 + ': {B}' + comparison.score + '%{R} - Common artists include: ' + comparison.common.join(', ')));
+                                        var str = comparison.name1 + ' vs ' + comparison.name2 + ': {B}' + comparison.score + '%{R}';
+                                        if (comparison.common.length > 0) {
+                                            str += ' - Common artists include: ' + comparison.common.join(', ');
+                                        }
+                                        event.channel.say(irc.clrs(str));
                                     }
                                 });
                             }
@@ -116,7 +119,11 @@ module.exports = function (irc) {
                             if (error) {
                                 event.channel.reply(event.user, error);
                             } else {
-                                event.channel.say(irc.clrs(comparison.name1 + ' vs ' + comparison.name2 + ': {B}' + comparison.score + '%{R} - Common artists include: ' + comparison.common.join(', ')));
+                                var str = comparison.name1 + ' vs ' + comparison.name2 + ': {B}' + comparison.score + '%{R}';
+                                if (comparison.common.length > 0) {
+                                    str += ' - Common artists include: ' + comparison.common.join(', ');
+                                }
+                                event.channel.say(irc.clrs(str));
                             }
                         });
                     }
