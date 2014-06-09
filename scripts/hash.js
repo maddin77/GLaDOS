@@ -5,8 +5,8 @@ var crypto = require('crypto');
 var util = require('util');
 var debug = require('debug')('GLaDOS:script:hash');
 
-module.exports = function (irc) {
-    irc.command('md5', function (event) {
+module.exports = function (scriptLoader, irc) {
+    scriptLoader.registerCommand('md5', function (event) {
         if (event.params.length > 0) {
             var sum = crypto.createHash('md5');
             sum.update(event.text, 'utf8');
@@ -15,7 +15,7 @@ module.exports = function (irc) {
             event.user.notice('Use: !md5 <string>');
         }
     });
-    irc.command('sha', function (event) {
+    scriptLoader.registerCommand('sha', function (event) {
         if (event.params.length > 0) {
             var sum = crypto.createHash('sha');
             sum.update(event.text, 'utf8');
@@ -24,7 +24,7 @@ module.exports = function (irc) {
             event.user.notice('Use: !sha <string>');
         }
     });
-    irc.command('sha1', function (event) {
+    scriptLoader.registerCommand('sha1', function (event) {
         if (event.params.length > 0) {
             var sum = crypto.createHash('sha1');
             sum.update(event.text, 'utf8');
@@ -33,7 +33,7 @@ module.exports = function (irc) {
             event.user.notice('Use: !sha1 <string>');
         }
     });
-    irc.command('sha256', function (event) {
+    scriptLoader.registerCommand('sha256', function (event) {
         if (event.params.length > 0) {
             var sum = crypto.createHash('sha256');
             sum.update(event.text, 'utf8');
@@ -42,7 +42,7 @@ module.exports = function (irc) {
             event.user.notice('Use: !sha256 <string>');
         }
     });
-    irc.command('sha512', function (event) {
+    scriptLoader.registerCommand('sha512', function (event) {
         if (event.params.length > 0) {
             var sum = crypto.createHash('sha512');
             sum.update(event.text, 'utf8');
@@ -51,7 +51,7 @@ module.exports = function (irc) {
             event.user.notice('Use: !sha512 <string>');
         }
     });
-    irc.command('rmd160', function (event) {
+    scriptLoader.registerCommand('rmd160', function (event) {
         if (event.params.length > 0) {
             var sum = crypto.createHash('rmd160');
             sum.update(event.text, 'utf8');
@@ -60,7 +60,7 @@ module.exports = function (irc) {
             event.user.notice('Use: !rmd160 <string>');
         }
     });
-    irc.command('md5lookup', function (event) {
+    scriptLoader.registerCommand('md5lookup', function (event) {
         if (event.params.length > 0) {
             request({
                 "uri": 'http://md5.noisette.ch/md5.php?hash=' + encodeURIComponent(event.text),

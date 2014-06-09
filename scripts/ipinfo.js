@@ -4,13 +4,9 @@ var cheerio = require('cheerio');
 var net = require('net');
 var _ = require('underscore');
 var debug = require('debug')('GLaDOS:script:ipinfo');
-var Table = require('cli-table');
+var Table = require('easy-table');
 
-/* TODO
-    filter this shit $('a[href^="http://www.tcpiputils.com/browse/domain/]')
-*/
-
-module.exports = function (irc) {
+module.exports = function (scriptLoader, irc) {
     var formatTitle, formatBlock, sprunge;
 
     formatTitle = function (str) {
@@ -18,37 +14,17 @@ module.exports = function (irc) {
     };
 
     formatBlock = function (block) {
-        var table = new Table({
-            chars: {
-                'top': '',
-                'top-mid': '',
-                'top-left': '',
-                'top-right': '',
-                'bottom': '',
-                'bottom-mid': '',
-                'bottom-left': '',
-                'bottom-right': '',
-                'left': '',
-                'left-mid': '',
-                'mid': '',
-                'mid-mid': '',
-                'right': '',
-                'right-mid': '',
-                'middle': ' '
-            },
-            style: {
-                'padding-left': 1,
-                'padding-right': 1,
-                head: [],
-                border: []
-            },
-            colAligns: ['right', 'left']
-        });
+        var t = new Table();
         block.forEach(function (row) {
-            row[1] = row[1].replace(/__NEWLINE__/gmi, '\n').replace(/^\s+|\s+$/g, '');
-            table.push(row);
+            t.cell('key', row[0]);
+            _.each(row[1].split(/__NEWLINE__/gmi), function (element, index, list) {
+                if (!_.isEmpty(element) || (list.length === 1 && _.isEmpty(element))) {
+                    t.cell('value', element.replace(/^\s+|\s+$/g, ''));
+                    t.newRow();
+                }
+            });
         });
-        return '\n' + table.toString();
+        return '\n' + t.print();
     };
 
     sprunge = function (string, fn) {
@@ -62,7 +38,7 @@ module.exports = function (irc) {
         });
     };
 
-    irc.command('ipinfo', function (event) {
+    scriptLoader.registerCommand('ipinfo', function (event) {
         if (event.params.length > 0) {
             var ip = event.text,
                 ret = net.isIP(ip),
@@ -84,16 +60,28 @@ module.exports = function (irc) {
                         $('.result').each(function () {
                             var block = null;
                             $(this).find('tr').each(function (i) {
+                                var text, key, value;
                                 if ($(this).text().trim().length > 0) {
                                     if (i === 0) {
                                         string += formatTitle($(this).text());
-                                    } else {
+                                        block = [];
+                                    } else if (block !== null) {
                                         if ($(this).find('td').length > 1) {
-                                            block = block || [];
-                                            block.push([$(this).find('td').first().text(), $(this).find('td').last().text().trim()]);
+                                            key = $(this).find('td').first().text();
+                                            value = $(this).find('td').last().text().trim();
+                                            if (key !== 'Network tools' && key !== 'Fresh lookup for more domains on this IP.') {
+                                                if (value === 'domain info') {
+                                                    value = '';
+                                                }
+                                                block.push([key, value]);
+                                            }
                                         } else {
-                                            if ($(this).find('td').attr('colspan') !== '2') {
-                                                string += '\n' + $(this).text();
+                                            text = $(this).text();
+                                            if ($(this).find('td').attr('colspan') !== '2' && text !== 'Fresh lookup for more domains on this IP.') {
+                                                if (text.substr(text.split(String.fromCharCode(160))[0].length + 1) === 'domain info') {
+                                                    text = text.split(String.fromCharCode(160))[0];
+                                                }
+                                                string += '\n' + text;
                                             }
                                         }
                                     }

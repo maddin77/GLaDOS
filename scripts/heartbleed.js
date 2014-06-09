@@ -2,8 +2,8 @@
 var request = require('request');
 var debug = require('debug')('GLaDOS:script:heartbleed');
 
-module.exports = function (irc) {
-    irc.command('heartbleed', function (event) {
+module.exports = function (scriptLoader, irc) {
+    scriptLoader.registerCommand('heartbleed', function (event) {
         if (event.params.length > 0) {
             request({
                 "uri": 'https://hbelb.filippo.io/bleed/' + encodeURIComponent(event.text),

@@ -4,7 +4,7 @@ var _ = require('underscore');
 var moment = require('moment');
 var debug = require('debug')('GLaDOS:script:cryptocoin');
 
-module.exports = function (irc) {
+module.exports = function (scriptLoader, irc) {
 
     moment.lang('precise-en', {
         "relativeTime" : {
@@ -48,7 +48,7 @@ module.exports = function (irc) {
             }
         });
     };
-    irc.command(['crypto'], function (event) {
+    scriptLoader.registerCommand(['crypto'], function (event) {
         if (event.params.length > 0) {
             getCoinData(event.text, function (error, coin) {
                 if (!error) {
@@ -89,7 +89,7 @@ module.exports = function (irc) {
             event.user.notice('Use: !crypto <coin>');
         }
     });
-    irc.command(['btc', 'bitcoin'], function (event) {
+    scriptLoader.registerCommand(['btc', 'bitcoin'], function (event) {
         var currency, quantity, param;
         if (event.params.length === 0) {
             currency = 'EUR';
@@ -132,7 +132,7 @@ module.exports = function (irc) {
             }
         });
     });
-    irc.command(['doge', 'dogecoin'], function (event) {
+    scriptLoader.registerCommand(['doge', 'dogecoin'], function (event) {
         var quantity = 1.0;
         if (event.params.length > 0) {
             quantity = parseFloat(event.params[0].toString().replace(/\,/g, '.'));

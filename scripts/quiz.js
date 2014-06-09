@@ -291,7 +291,7 @@ Quiz.prototype.resetHaltTimer = function () {
     }, this.haltDelay);
 };
 
-module.exports = function (irc) {
+module.exports = function (scriptLoader, irc) {
     moment.lang('precise-en', {
         "relativeTime" : {
             "future" : "in %s",
@@ -315,7 +315,7 @@ module.exports = function (irc) {
     var quiz = new Quiz(require(__dirname + '/../quizdata.json'), irc),
         quizChannelName = '#quiz';
 
-    irc.command('quizop', function (event) {
+    scriptLoader.registerCommand('quizop', function (event) {
         if (irc.config.admin.indexOf(event.user.getNick()) > -1) {
             var nick = event.params.length > 0 ? event.params[0] : event.user.getNick();
             quiz.opNick(nick, function (isOp) {
@@ -336,7 +336,7 @@ module.exports = function (irc) {
             event.user.notice('You don\'t have the permissions to use this command.');
         }
     });
-    irc.command('setscore', function (event) {
+    scriptLoader.registerCommand('setscore', function (event) {
         if (irc.config.admin.indexOf(event.user.getNick()) > -1) {
             if (event.params.length > 0) {
                 var nick, score;
@@ -362,7 +362,7 @@ module.exports = function (irc) {
             event.user.notice('You don\'t have the permissions to use this command.');
         }
     });
-    irc.command('quiz', function (event) {
+    scriptLoader.registerCommand('quiz', function (event) {
         quiz.isQuizOp(event.user.getNick(), function (isop) {
             if (isop) {
                 if (event.channel.getName() === quizChannelName) {
@@ -421,7 +421,7 @@ module.exports = function (irc) {
             }
         });
     });
-    irc.command('ask', function (event) {
+    scriptLoader.registerCommand('ask', function (event) {
         if (event.channel.getName() === quizChannelName) {
             if (quiz.isRunning() && !quiz.isHalted()) {
                 event.user.notice(irc.clrs('[{B}QUIZ{R}] The question no. {B}' + quiz.getCounter() + '{R} is:'));
@@ -437,7 +437,7 @@ module.exports = function (irc) {
             event.user.notice('This only works in ' + quizChannelName + '.');
         }
     });
-    irc.command('rules', function (event) {
+    scriptLoader.registerCommand('rules', function (event) {
         if (event.channel.getName() === quizChannelName) {
             quiz.rules.forEach(function (rule) {
                 event.user.notice(rule);
@@ -446,7 +446,7 @@ module.exports = function (irc) {
             event.user.notice('This only works in ' + quizChannelName + '.');
         }
     });
-    irc.command('rank', function (event) {
+    scriptLoader.registerCommand('rank', function (event) {
         if (event.channel.getName() === quizChannelName) {
             quiz.getToplist(function (scores) {
                 var userscore = {
@@ -485,7 +485,7 @@ module.exports = function (irc) {
         }
     });
 
-    irc.on('message', function (event) {
+    scriptLoader.registerEvent('message', function (event) {
         if (event.channel.getName() === quizChannelName && quiz.isRunning() && !quiz.isHalted()) {
             if (quiz.isRight(event.message)) {
                 var question = quiz.getQuestion(),
@@ -504,7 +504,7 @@ module.exports = function (irc) {
             quiz.resetHaltTimer();
         }
     });
-    irc.on('join', function (event) {
+    scriptLoader.registerEvent('join', function (event) {
         if (event.channel.getName() === quizChannelName) {
             quiz.isQuizOp(event.user.getNick(), function (isOp) {
                 if (isOp) {

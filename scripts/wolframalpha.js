@@ -5,8 +5,8 @@ var parseString = require('xml2js').parseString;
 var _ = require('underscore');
 var debug = require('debug')('GLaDOS:script:wolframalpha');
 
-module.exports = function (irc) {
-    irc.command(['wa', 'wolfram', 'wolframalpha'], function (event) {
+module.exports = function (scriptLoader, irc) {
+    scriptLoader.registerCommand(['wa', 'wolfram', 'wolframalpha'], function (event) {
         if (event.params.length > 0) {
             var uri = 'http://api.wolframalpha.com/v2/query?' + querystring.stringify({
                 "input": event.text,

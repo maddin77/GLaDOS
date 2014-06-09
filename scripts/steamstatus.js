@@ -4,7 +4,7 @@ var util = require('util');
 var moment = require('moment');
 var debug = require('debug')('GLaDOS:script:steamstatus');
 
-module.exports = function (irc) {
+module.exports = function (scriptLoader, irc) {
 
     var formatColor, formatTime;
 
@@ -23,7 +23,7 @@ module.exports = function (irc) {
         return (6E4 > a ? "just now" : 36E5 > a ? Math.round(a / 6E4) + "m" : 864E5 > a ? Math.round(a / 36E5) + "h" : 2592E6 > a ? "\u2248" + Math.round(a / 864E5) + "d" : 31536E6 > a ? "\u2248" + Math.round(a / 2592E6) + "m" : "\u2248" + Math.round(a / 31536E6) + "y");
     };
 
-    irc.command(['steam', 'steamstatus'], function (event) {
+    scriptLoader.registerCommand(['steam', 'steamstatus'], function (event) {
         request({
             "uri": 'http://steamstat.us/status.json',
             "json": true,

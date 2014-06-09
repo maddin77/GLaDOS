@@ -2,8 +2,8 @@
 var request = require('request');
 var debug = require('debug')('GLaDOS:script:translate');
 
-module.exports = function (irc) {
-    irc.command(['t', 'translate'], function (event) {
+module.exports = function (scriptLoader, irc) {
+    scriptLoader.registerCommand(['t', 'translate'], function (event) {
         if (event.params.length > 2) {
             var source = event.params[0],
                 target = event.params[1],

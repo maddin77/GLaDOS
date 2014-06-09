@@ -6,3 +6,4 @@ _OLD_VERSIONS_
 config/*
 *.sublime-project
 *.sublime-workspace
+test.*

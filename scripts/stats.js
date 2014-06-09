@@ -2,7 +2,7 @@
 var _ = require('underscore');
 var debug = require('debug')('GLaDOS:script:stats');
 
-module.exports = function (irc) {
+module.exports = function (scriptLoader, irc) {
     var smileys, smileyRegexp, countSmileys;
 
     smileys = [
@@ -37,7 +37,7 @@ module.exports = function (irc) {
         return (msg.match(smileyRegexp) || []).length;
     };
 
-    irc.on('message', function (event) {
+    scriptLoader.registerEvent('message', function (event) {
         irc.brain.hincrby('stats:' + event.channel.getName(), 'messages', 1);
         irc.brain.hincrby('stats:' + event.channel.getName(), 'characters', event.message.length);
         irc.brain.hincrby('stats:' + event.channel.getName(), 'words', event.message.split(' ').length);
@@ -55,10 +55,10 @@ module.exports = function (irc) {
             irc.brain.hincrby('stats:' + event.channel.getName(), 'questions', 1);
         }
     });
-    irc.on('command', function (event) {
+    scriptLoader.registerEvent('command', function (event) {
         irc.brain.hincrby('stats:' + event.channel.getName(), 'commands', 1);
     });
-    irc.on('join', function (event) {
+    scriptLoader.registerEvent('join', function (event) {
         if (event.user.getNick() === irc.config.irc.nick) {
             irc.brain.hexists('stats:' + event.channel.getName(), 'start', function (error, value) {
                 if (!error) {
@@ -83,7 +83,7 @@ module.exports = function (irc) {
             }
         });
     });
-    irc.on('names', function (event) {
+    scriptLoader.registerEvent('names', function (event) {
         irc.brain.hget('stats:' + event.channel.getName(), 'peak', function (error, peak) {
             var count = Object.keys(event.names).length;
             peak = peak || 0;
@@ -96,15 +96,15 @@ module.exports = function (irc) {
             }
         });
     });
-    irc.on('part', function (event) {
+    scriptLoader.registerEvent('part', function (event) {
 		event.channels.forEach(function (channel) {
 			irc.brain.hincrby('stats:' + channel.getName(), 'parts', 1);
 		});
     });
-    irc.on('kick', function (event) {
+    scriptLoader.registerEvent('kick', function (event) {
         irc.brain.hincrby('stats:' + event.channel.getName(), 'kicks', 1);
     });
-    irc.on('mode', function (event) {
+    scriptLoader.registerEvent('mode', function (event) {
         if (event.channel !== null) {
             irc.brain.hincrby('stats:' + event.channel.getName(), 'modes', 1);
             if (event.mode === 'b') {
@@ -112,12 +112,12 @@ module.exports = function (irc) {
             }
         }
     });
-    irc.on('topic', function (event) {
+    scriptLoader.registerEvent('topic', function (event) {
         if (event.topicChanged) {
             irc.brain.hincrby('stats:' + event.channel.getName(), 'topicchanges', 1);
         }
     });
-    irc.command('stats', function (event) {
+    scriptLoader.registerCommand('stats', function (event) {
         irc.brain.hgetall('stats:' + event.channel.getName(), function (err, obj) {
             var stats = _.defaults(obj || {}, {
                 "joins": "0",

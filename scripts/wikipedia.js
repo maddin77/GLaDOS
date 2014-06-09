@@ -3,8 +3,8 @@ var request = require('request');
 var dns = require('dns');
 var debug = require('debug')('GLaDOS:script:wikipedia');
 
-module.exports = function (irc) {
-    irc.command(['wiki', 'wikipedia'], function (event) {
+module.exports = function (scriptLoader, irc) {
+    scriptLoader.registerCommand(['wiki', 'wikipedia'], function (event) {
         if (event.params.length > 0) {
             dns.resolveTxt(event.params.join('_') + ".wp.dg.cx", function (error, txt) {
                 if (!error) {
@@ -18,7 +18,7 @@ module.exports = function (irc) {
             event.user.notice('Use: !wikipedia <term>');
         }
     });
-    irc.command(['syno', 'synonym'], function (event) {
+    scriptLoader.registerCommand(['syno', 'synonym'], function (event) {
         if (event.params.length > 0) {
             request({
                 "uri": 'http://wikisynonyms.ipeirotis.com/api/' + event.text,

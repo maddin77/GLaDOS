@@ -8,7 +8,7 @@ var net = require('net');
 var _ = require('underscore');
 var debug = require('debug')('GLaDOS:script:net');
 
-module.exports = function (irc) {
+module.exports = function (scriptLoader, irc) {
 
     var getError = function (code) {
         switch (code) {
@@ -67,7 +67,7 @@ module.exports = function (irc) {
         }
     };
 
-    irc.command('isup', function (event) {
+    scriptLoader.registerCommand('isup', function (event) {
         if (event.params.length > 0) {
             var text = event.text, host;
             if (text.search(/^http[s]?\:\/\//) === -1) {
@@ -102,7 +102,7 @@ module.exports = function (irc) {
             event.user.notice('Use: !isup <url>');
         }
     });
-    irc.command('geo', function (event) {
+    scriptLoader.registerCommand('geo', function (event) {
         if (event.params.length > 0) {
             request({
                 "uri": 'http://ip-api.com/json/' + event.text,
@@ -140,7 +140,7 @@ module.exports = function (irc) {
             event.user.notice('Use: !geo <ip, domain, etc>');
         }
     });
-    irc.command('dnslookup', function (event) {
+    scriptLoader.registerCommand('dnslookup', function (event) {
         if (event.params.length > 0) {
             try {
                 dns.lookup(event.text, function (error, address, family) {
@@ -158,7 +158,7 @@ module.exports = function (irc) {
             event.user.notice('Use: !dnslookup <domain>');
         }
     });
-    irc.command('dnsreverse', function (event) {
+    scriptLoader.registerCommand('dnsreverse', function (event) {
         if (event.params.length > 0) {
             try {
                 dns.reverse(event.text, function (error, domains) {
@@ -176,7 +176,7 @@ module.exports = function (irc) {
             event.user.notice('Use: !dnsreverse <ip>');
         }
     });
-    irc.command('dnsresolve', function (event) {
+    scriptLoader.registerCommand('dnsresolve', function (event) {
         if (event.params.length > 0) {
             var rrtype = event.params.length === 2 ? event.params[1].toUpperCase() : 'A';
             try {
@@ -203,7 +203,7 @@ module.exports = function (irc) {
             event.user.notice('Use: !dnsresolve <domain> [A/AAAA/MX/TXT/SRV/PTR/NS/CNAME]');
         }
     });
-    irc.command('isip', function (event) {
+    scriptLoader.registerCommand('isip', function (event) {
         if (event.params.length > 0) {
             var ret = net.isIP(event.text);
             if (ret === 4) {
@@ -217,7 +217,7 @@ module.exports = function (irc) {
             event.user.notice('Use: !isip <string>');
         }
     });
-    irc.command('avail', function (event) {
+    scriptLoader.registerCommand('avail', function (event) {
         if (event.params.length > 0) {
             whoisAvailable(event.text, function (error, whoisResponse, isAvailable) {
                 if (!error) {

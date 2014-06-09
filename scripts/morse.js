@@ -1,8 +1,8 @@
 'use strict';
 var morse = require('morse');
 
-module.exports = function (irc) {
-    irc.command('morse', function (event) {
+module.exports = function (scriptLoader, irc) {
+    scriptLoader.registerCommand('morse', function (event) {
         if (event.params.length > 1) {
             if (event.params[0].toUpperCase() === 'ENCODE') {
                 event.channel.reply(event.user, morse.encode(event.text.substr(7)));

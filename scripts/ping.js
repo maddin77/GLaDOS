@@ -1,7 +1,7 @@
-'use strict';
+"use strict";
 var _ = require('underscore');
 
-module.exports = function (irc) {
+module.exports = function (scriptLoader, irc) {
     var phrases = ["Yes, master?", "At your service", "Unleash my strength", "I'm here. As always", "By your command",
         "Ready to work!", "Yes, milord?", "More work?", "Ready for action", "Orders?",
         "What do you need?", "Say the word", "Aye, my lord", "Locked and loaded", "Aye, sir?",
@@ -11,7 +11,7 @@ module.exports = function (irc) {
         "At your call", "You require my assistance?", "What is it now?", "Hmm?", "I'm coming through!",
         "I'm here, mortal", "I'm ready and waiting", "Ah, at last", "I'm here", "Something need doing?"];
 
-    irc.command('ping', function (event) {
+    scriptLoader.registerCommand('ping', function (event) {
         event.channel.reply(event.user, _.sample(phrases));
     });
 };

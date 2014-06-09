@@ -3,7 +3,7 @@ var _ = require('underscore');
 var utils = require(__dirname + '/../lib/utils');
 var LastFmNode = require('lastfm').LastFmNode;
 
-module.exports = function (irc) {
+module.exports = function (scriptLoader, irc) {
     var lastfm, getRecentTrackInfo, getComparison;
 
     lastfm = new LastFmNode({
@@ -75,7 +75,7 @@ module.exports = function (irc) {
         });
     };
 
-    irc.command('np', function (event) {
+    scriptLoader.registerCommand('np', function (event) {
         if (event.params.length === 0) {
             irc.brain.hget('last.fm', event.user.getNick(), function (err, name) {
                 if (name === null) {

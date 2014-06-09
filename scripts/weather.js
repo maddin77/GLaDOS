@@ -2,8 +2,8 @@
 var request = require('request');
 var debug = require('debug')('GLaDOS:script:weather');
 
-module.exports = function (irc) {
-    irc.command(['w', 'weather'], function (event) {
+module.exports = function (scriptLoader, irc) {
+    scriptLoader.registerCommand(['w', 'weather'], function (event) {
         if (event.params.length > 0) {
             request({
                 "uri": 'http://api.openweathermap.org/data/2.5/weather?q=' + encodeURIComponent(event.text) + '&units=metric',

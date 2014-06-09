@@ -2,8 +2,8 @@
 var google = require('google');
 var debug = require('debug')('GLaDOS:script:google');
 
-module.exports = function (irc) {
-    irc.command(['g', 'google'], function (event) {
+module.exports = function (scriptLoader, irc) {
+    scriptLoader.registerCommand(['g', 'google'], function (event) {
         if (event.params.length > 0) {
             google(event.text, function (error, next, links) {
                 if (!error) {

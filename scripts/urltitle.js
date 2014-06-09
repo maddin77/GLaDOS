@@ -7,7 +7,7 @@ var Entities = require('html-entities').AllHtmlEntities;
 var debug = require('debug')('GLaDOS:script:urltitle');
 var cheerio = require('cheerio');
 
-module.exports = function (irc) {
+module.exports = function (scriptLoader, irc) {
     var entities, getTitle, getYoutubeTitle, getImgurTitle, getRedditTitle, getVimeoTitle, getGithubTitle, get4chanTitle, getSoundcloudTitle, getBreadfishTitle, getTiwtterTitle;
 
     entities = new Entities();
@@ -386,7 +386,7 @@ module.exports = function (irc) {
         }
     };
 
-    irc.on('message', function (event) {
+    scriptLoader.registerEvent('message', function (event) {
         var URL, match;
         if ((match = event.message.match(/(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?\^=%&amp;:\/~\+#]*[\w\-\@?\^=%&amp;\/~\+#])?/i)) !== null) {
             URL = url.parse(match[0], true, true);

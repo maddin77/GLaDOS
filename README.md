@@ -1,30 +1,5 @@
-DEFAULT CONFIG
-=======
-Uses [config-node](https://github.com/flesler/config-node) JSON files.
-```js 
-{
-    "debug": "glados*",
-    "admin": [],
-    "irc": {
-        "ssl": true,
-        "host": "127.0.0.1",
-        "port": 6667,
-        "nick": "nick",
-        "user": ["username", "realname"],
-        "pass": "password",
-        "channel": ["#defaultchannel"]
-    },
-    "userAgent": "DEFAULT_USERAGENT",
-    "wolframAlphaKey": "WOLFRAMALPHA_API_KEY",
-    "imgurKey": "IMGUR_API_KEY",
-    "lastfmKey": "LAST.FM_API_KEY",
-    "redis": {
-        "host": "127.0.0.1",
-        "port": 6379,
-        "pass": ""
-    }
-}
-```
+See [Wiki](https://github.com/maddin77/GLaDOS/wiki/) for more informations on configuration and writing scripts.
+
 
 LICENSE
 =======

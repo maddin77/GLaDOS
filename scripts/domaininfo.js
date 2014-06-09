@@ -4,9 +4,9 @@ var cheerio = require('cheerio');
 var net = require('net');
 var _ = require('underscore');
 var debug = require('debug')('GLaDOS:script:domaininfo');
-var Table = require('cli-table');
+var Table = require('easy-table');
 
-module.exports = function (irc) {
+module.exports = function (scriptLoader, irc) {
     var formatTitle, formatBlock, sprunge;
 
     formatTitle = function (str) {
@@ -14,37 +14,17 @@ module.exports = function (irc) {
     };
 
     formatBlock = function (block) {
-        var table = new Table({
-            chars: {
-                'top': '',
-                'top-mid': '',
-                'top-left': '',
-                'top-right': '',
-                'bottom': '',
-                'bottom-mid': '',
-                'bottom-left': '',
-                'bottom-right': '',
-                'left': '',
-                'left-mid': '',
-                'mid': '',
-                'mid-mid': '',
-                'right': '',
-                'right-mid': '',
-                'middle': ' '
-            },
-            style: {
-                'padding-left': 1,
-                'padding-right': 1,
-                head: [],
-                border: []
-            },
-            colAligns: ['right', 'left']
-        });
+        var t = new Table();
         block.forEach(function (row) {
-            row[1] = row[1].replace(/__NEWLINE__/gmi, '\n').replace(/^\s+|\s+$/g, '');
-            table.push(row);
+            t.cell('key', row[0]);
+            _.each(row[1].split(/__NEWLINE__/gmi), function (element, index, list) {
+                if (!_.isEmpty(element) || (list.length === 1 && _.isEmpty(element))) {
+                    t.cell('value', element.replace(/^\s+|\s+$/g, ''));
+                    t.newRow();
+                }
+            });
         });
-        return '\n' + table.toString();
+        return '\n' + t.print();
     };
 
     sprunge = function (string, fn) {
@@ -58,7 +38,7 @@ module.exports = function (irc) {
         });
     };
 
-    irc.command('domaininfo', function (event) {
+    scriptLoader.registerCommand('domaininfo', function (event) {
         if (event.params.length > 0) {
             request({
                 "uri": 'http://www.tcpiputils.com/inc/api.php?version=1.0&type=domaininfo&hostname=' + event.text + '&source=chromeext',
@@ -76,13 +56,16 @@ module.exports = function (irc) {
                             $(this).find('tr').each(function (i) {
                                 if ($(this).text().trim().length > 0) {
                                     if (i === 0) {
-                                        if ($(this).text() !== 'Graphs') {
+                                        if ($(this).text() !== 'Graphs' && $(this).text() !== 'DMOZ open directory') {
                                             string += formatTitle($(this).text());
+                                            block = [];
                                         }
-                                    } else {
+                                    } else if (block !== null) {
                                         if ($(this).find('td').length > 1) {
-                                            block = block || [];
-                                            block.push([$(this).find('td').first().text(), $(this).find('td').last().text().trim()]);
+                                            var key = $(this).find('td').first().text();
+                                            if (key !== 'HTML tools' && key !== 'Network tools (IPv4)' && key !== 'Network tools (IPv6)') {
+                                                block.push([key, $(this).find('td').last().text().trim()]);
+                                            }
                                         } else {
                                             if ($(this).find('td').attr('colspan') !== '2' || ($(this).find('td').attr('colspan') === '2' && $(this).find('td').attr('style') === "font-size: 80%;")) {
                                                 string += '\n' + $(this).text();

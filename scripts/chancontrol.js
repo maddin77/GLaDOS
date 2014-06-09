@@ -1,6 +1,6 @@
 'use strict';
-module.exports = function (irc) {
-    irc.command(['k', 'kick'], function (event) {
+module.exports = function (scriptLoader, irc) {
+    scriptLoader.registerCommand(['k', 'kick'], function (event) {
         if (event.channel.userHasMode(event.user, '!') || event.channel.userHasMode(event.user, '~') ||
                 event.channel.userHasMode(event.user, '&') || event.channel.userHasMode(event.user, '@') || event.channel.userHasMode(event.user, '%')) {
             if (event.channel.userHasMode(irc.me, '!') || event.channel.userHasMode(irc.me, '~') ||
@@ -23,7 +23,7 @@ module.exports = function (irc) {
             event.user.notice('You don\'t have the permissions to use this command.');
         }
     });
-    irc.command(['b', 'ban'], function (event) {
+    scriptLoader.registerCommand(['b', 'ban'], function (event) {
         if (event.channel.userHasMode(event.user, '!') || event.channel.userHasMode(event.user, '~') ||
                 event.channel.userHasMode(event.user, '&') || event.channel.userHasMode(event.user, '@') || event.channel.userHasMode(event.user, '%')) {
             if (event.channel.userHasMode(irc.me, '!') || event.channel.userHasMode(irc.me, '~') ||
@@ -52,7 +52,7 @@ module.exports = function (irc) {
             event.user.notice('You don\'t have the permissions to use this command.');
         }
     });
-    irc.command(['ub', 'unban'], function (event) {
+    scriptLoader.registerCommand(['ub', 'unban'], function (event) {
         if (event.channel.userHasMode(event.user, '!') || event.channel.userHasMode(event.user, '~') ||
                 event.channel.userHasMode(event.user, '&') || event.channel.userHasMode(event.user, '@') || event.channel.userHasMode(event.user, '%')) {
             if (event.channel.userHasMode(irc.me, '!') || event.channel.userHasMode(irc.me, '~') ||
@@ -69,7 +69,7 @@ module.exports = function (irc) {
             event.user.notice('You don\'t have the permissions to use this command.');
         }
     });
-    irc.command(['kb', 'kickban'], function (event) {
+    scriptLoader.registerCommand(['kb', 'kickban'], function (event) {
         if (event.channel.userHasMode(event.user, '!') || event.channel.userHasMode(event.user, '~') ||
                 event.channel.userHasMode(event.user, '&') || event.channel.userHasMode(event.user, '@') || event.channel.userHasMode(event.user, '%')) {
             if (event.channel.userHasMode(irc.me, '!') || event.channel.userHasMode(irc.me, '~') ||
