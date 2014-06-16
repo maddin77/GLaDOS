@@ -85,7 +85,7 @@ module.exports = function (scriptLoader, irc) {
         }
     };
     getImgurTitle = function (URL, fn) {
-        var imgurID = null;
+        /*var imgurID = null;
         if (URL.hostname === 'i.imgur.com' || URL.hostname === 'www.i.imgur.com') {
             imgurID = URL.pathname.substr(1).split('.')[0];
         } else if (URL.hostname === 'imgur.com' || URL.hostname === 'www.imgur.com') {
@@ -110,7 +110,47 @@ module.exports = function (scriptLoader, irc) {
                 debug('[urltitle/imgur] %s', error, data);
                 getTitle(URL, fn);
             }
-        });
+        });*/
+        var match;
+        if ((match = URL.href.match(/^(?:http|https):\/\/(?:i\.)?imgur\.com\/([A-Za-z0-9]{2,})/i)) !== null) {
+            request({
+                "url": 'https://api.imgur.com/3/image/' + match[1],
+                "json": true,
+                "headers": {
+                    "User-Agent": irc.config.userAgent,
+                    "Authorization": 'Client-ID ' + irc.config.imgurKey
+                }
+            }, function (error, response, data) {
+                if (!error && response.statusCode === 200) {
+                    data = data.data;
+                    var title = data.title || 'null',
+                        nsfw = data.nsfw ? ', NSFW' : '';
+                    fn(true, 'Imgur: ' + title + ' [' + data.width + 'x' + data.height + ', ' + utils.readableNumber(data.size) + nsfw + ']');
+                } else {
+                    debug('[urltitle/imgur/image] %s', error, data);
+                    getTitle(URL, fn);
+                }
+            });
+        } else if ((match = URL.href.match(/^(?:http|https):\/\/imgur\.com\/a\/([A-Za-z0-9]+)/i)) !== null) {
+            request({
+                "url": 'https://api.imgur.com/3/album/' + match[1],
+                "json": true,
+                "headers": {
+                    "User-Agent": irc.config.userAgent,
+                    "Authorization": 'Client-ID ' + irc.config.imgurKey
+                }
+            }, function (error, response, data) {
+                if (!error && response.statusCode === 200) {
+                    data = data.data;
+                    var title = data.title || 'null',
+                        nsfw = data.nsfw ? ', NSFW' : '';
+                    fn(true, 'Imgur Album: ' + title + ' [' + data.images_count + ' images' + nsfw + ']');
+                } else {
+                    debug('[urltitle/imgur/image] %s', error, data);
+                    getTitle(URL, fn);
+                }
+            });
+        }
     };
     getVimeoTitle = function (URL, fn) {
         var videoId = URL.pathname.substr(1);
