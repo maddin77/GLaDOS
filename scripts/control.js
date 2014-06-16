@@ -82,7 +82,7 @@ module.exports = function (scriptLoader, irc) {
     });
     scriptLoader.registerCommand(['say', 'msg'], function (event) {
         if (irc.config.admin.indexOf(event.user.getNick()) > -1) {
-            if (event.params.length > 0) {
+            if (event.params.length > 1) {
                 var parts = event.params;
                 irc.send(parts.shift(), parts.join(' '));
             } else {
