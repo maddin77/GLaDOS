@@ -50,8 +50,9 @@ module.exports = function (scriptLoader, irc) {
     };
 
     fetchNewEntries = function (url, fn) {
+        debug('Fetching entries from %s.', url);
         request({
-            "uri": 'http://ajax.googleapis.com/ajax/services/feed/load?v=1.0&num=20&q=' + url,
+            "uri": 'http://ajax.googleapis.com/ajax/services/feed/load?v=1.0&num=20&q=' + encodeURIComponent(url),
             "headers": {
                 "User-Agent": irc.config.userAgent
             },
@@ -86,6 +87,7 @@ module.exports = function (scriptLoader, irc) {
             _.each(subscriptions, function (users, url) {
                 fetchNewEntries(url, function (title, entries) {
                     if (notice) {
+                        debug('Checking for new entries in %s: Found %s.', title, entries.length, entries);
                         _.each(entries, function (entry) {
                             shortLink(entry.link, function (shortLink) {
                                 _.each(users, function (user) {
@@ -114,7 +116,7 @@ module.exports = function (scriptLoader, irc) {
 
     checkFeed = function (url, fn) {
         request({
-            "uri": 'http://ajax.googleapis.com/ajax/services/feed/load?v=1.0&num=20&q=' + url,
+            "uri": 'http://ajax.googleapis.com/ajax/services/feed/load?v=1.0&num=20&q=' + encodeURIComponent(url),
             "headers": {
                 "User-Agent": irc.config.userAgent
             },
@@ -209,6 +211,59 @@ module.exports = function (scriptLoader, irc) {
             }
         } else {
             event.user.notice('Use: !rss <subscribe/unsubscribe/list> [feed url]');
+        }
+    });
+    scriptLoader.registerCommand('chanrss', function (event) {
+        if (event.channel.userHasMode(event.user, '!') || event.channel.userHasMode(event.user, '~') ||
+                event.channel.userHasMode(event.user, '&') || event.channel.userHasMode(event.user, '@') || event.channel.userHasMode(event.user, '%')) {
+            if (event.params.length > 0) {
+                var feedUrl;
+                if (event.params[0].toUpperCase() === 'SUBSCRIBE') {
+                    if (event.params.length > 1) {
+                        feedUrl = event.params[1];
+                        checkFeed(feedUrl, function (title) {
+                            if (title !== null) {
+                                fetchNewEntries(feedUrl);//Set cache so we dont get the first X messages.
+                                event.user.notice('You successfully subscribed ' + event.channel.getName() + ' to the "' + title + '" rss feed. I\'ll send a notice to the channel every time i find a new entry.');
+                                event.user.notice('To unsubscribe, use "!chanrss UNSUBSCRIBE ' + feedUrl + '".');
+                                subscribe(event.channel.getName(), feedUrl);
+                            } else {
+                                event.user.notice('The URL seems to be an invalid rss feed.');
+                            }
+                        });
+                    } else {
+                        event.user.notice('Use: !chanrss SUBSCRIBE <feed url>');
+                    }
+                } else if (event.params[0].toUpperCase() === 'UNSUBSCRIBE') {
+                    if (event.params.length > 1) {
+                        feedUrl = event.params[1];
+                        isSubscribed(event.user.getNick(), feedUrl, function (subscribed) {
+                            if (subscribed) {
+                                event.user.notice('You successfully unsubscribed ' + event.channel.getName() + ' from the rss feed.');
+                                unsubscribe(event.user.getNick(), feedUrl);
+                            } else {
+                                event.user.notice(event.channel.getName() + ' isn\'t subscribed to this rss feed.');
+                            }
+                        });
+                    } else {
+                        event.user.notice('Use: !chanrss UNSUBSCRIBE <feed url>');
+                    }
+                } else if (event.params[0].toUpperCase() === 'LIST') {
+                    listSubscriptions(event.user.getNick(), function (feeds) {
+                        if (feeds.length > 0) {
+                            event.user.notice(event.channel.getName() + ' is subscribed to the following rss feeds: ' + feeds.join(', '));
+                        } else {
+                            event.user.notice(event.channel.getName() + ' hasn\'t subscribed to any rss feeds yet.');
+                        }
+                    });
+                } else {
+                    event.user.notice('Use: !chanrss <subscribe/unsubscribe/list> [feed url]');
+                }
+            } else {
+                event.user.notice('Use: !chanrss <subscribe/unsubscribe/list> [feed url]');
+            }
+        } else {
+            event.user.notice('You don\'t have the permissions to use this command.');
         }
     });
 };
