@@ -296,7 +296,7 @@ Quiz.prototype.delayNewQuestion = function (time) {
     var self = this;
     self.waitTimer = setTimeout(function () {
         self.getNewQuestion(function (question, counter, questionString) {
-            debug('%j', question, question);
+            debug('%j', question);
             self.channel.say(self.irc.clrs('[{B}QUIZ{R}] The question no. {B}' + counter + '{R} is:'));
             self.channel.say(self.irc.clrs('[{B}QUIZ{R}] ' + questionString));
             self.startHints();
