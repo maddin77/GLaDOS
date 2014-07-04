@@ -85,32 +85,6 @@ module.exports = function (scriptLoader, irc) {
         }
     };
     getImgurTitle = function (URL, fn) {
-        /*var imgurID = null;
-        if (URL.hostname === 'i.imgur.com' || URL.hostname === 'www.i.imgur.com') {
-            imgurID = URL.pathname.substr(1).split('.')[0];
-        } else if (URL.hostname === 'imgur.com' || URL.hostname === 'www.imgur.com') {
-            imgurID = URL.pathname.substr(1);
-        }
-        request({
-            "url": 'https://api.imgur.com/3/image/' + imgurID,
-            "json": true,
-            "headers": {
-                "User-Agent": irc.config.userAgent,
-                "Authorization": 'Client-ID ' + irc.config.imgurKey
-            }
-        }, function (error, response, data) {
-            if (!error && response.statusCode === 200) {
-                var title = data.data.title || 'null',
-                    width = data.data.width,
-                    height = data.data.height,
-                    size = data.data.size,
-                    nsfw = data.data.nsfw ? ', NSFW' : '';
-                fn(true, 'Imgur: ' + title + ' [' + width + 'x' + height + ', ' + utils.readableNumber(size) + nsfw + ']');
-            } else {
-                debug('[urltitle/imgur] %s', error, data);
-                getTitle(URL, fn);
-            }
-        });*/
         var match;
         if ((match = URL.href.match(/^(?:http|https):\/\/(?:i\.)?imgur\.com\/([A-Za-z0-9]{2,})/i)) !== null) {
             request({
