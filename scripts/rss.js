@@ -84,14 +84,14 @@ module.exports = function (scriptLoader, irc) {
 
     checkEntries = function (notice) {
         sortSubscriptions(function (subscriptions) {
-            _.each(subscriptions, function (users, url) {
+            _.each(subscriptions, function (targets, url) {
                 fetchNewEntries(url, function (title, entries) {
                     if (notice) {
                         debug('Checking for new entries in %s: Found %s.', title, entries.length, entries);
                         _.each(entries, function (entry) {
                             shortLink(entry.link, function (shortLink) {
-                                _.each(users, function (user) {
-                                    irc.notice(user, irc.clrs('[' + title + '] {B}' + entry.title + '{R} (' + shortLink + ')'));
+                                _.each(targets, function (target) {
+                                    irc.notice(target, irc.clrs('[' + title + '] {B}' + entry.title + '{R} (' + shortLink + ')'));
                                 });
                             });
                         });
@@ -135,16 +135,16 @@ module.exports = function (scriptLoader, irc) {
         });
     };
 
-    subscribe = function (nick, url) {
-        irc.brain.sadd('rss:' + nick, url);
+    subscribe = function (target, url) {
+        irc.brain.sadd('rss:' + target, url);
     };
 
-    unsubscribe = function (nick, url) {
-        irc.brain.srem('rss:' + nick, url);
+    unsubscribe = function (target, url) {
+        irc.brain.srem('rss:' + target, url);
     };
 
-    isSubscribed = function (nick, url, fn) {
-        irc.brain.sismember('rss:' + nick, url, function (error, isMember) {
+    isSubscribed = function (target, url, fn) {
+        irc.brain.sismember('rss:' + target, url, function (error, isMember) {
             if (error) {
                 debug(error);
                 fn(false);
@@ -154,8 +154,8 @@ module.exports = function (scriptLoader, irc) {
         });
     };
 
-    listSubscriptions = function (nick, fn) {
-        irc.brain.smembers('rss:' + nick, function (error, feedUrls) {
+    listSubscriptions = function (target, fn) {
+        irc.brain.smembers('rss:' + target, function (error, feedUrls) {
             if (error) {
                 debug(error);
                 fn([]);
@@ -237,10 +237,10 @@ module.exports = function (scriptLoader, irc) {
                 } else if (event.params[0].toUpperCase() === 'UNSUBSCRIBE') {
                     if (event.params.length > 1) {
                         feedUrl = event.params[1];
-                        isSubscribed(event.user.getNick(), feedUrl, function (subscribed) {
+                        isSubscribed(event.channel.getName(), feedUrl, function (subscribed) {
                             if (subscribed) {
                                 event.user.notice('You successfully unsubscribed ' + event.channel.getName() + ' from the rss feed.');
-                                unsubscribe(event.user.getNick(), feedUrl);
+                                unsubscribe(event.channel.getName(), feedUrl);
                             } else {
                                 event.user.notice(event.channel.getName() + ' isn\'t subscribed to this rss feed.');
                             }
@@ -249,7 +249,7 @@ module.exports = function (scriptLoader, irc) {
                         event.user.notice('Use: !chanrss UNSUBSCRIBE <feed url>');
                     }
                 } else if (event.params[0].toUpperCase() === 'LIST') {
-                    listSubscriptions(event.user.getNick(), function (feeds) {
+                    listSubscriptions(event.channel.getName(), function (feeds) {
                         if (feeds.length > 0) {
                             event.user.notice(event.channel.getName() + ' is subscribed to the following rss feeds: ' + feeds.join(', '));
                         } else {
