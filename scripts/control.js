@@ -159,11 +159,11 @@ module.exports = function (scriptLoader, irc) {
         }
     });
 
-    scriptLoader.registerEvent('message', function (event) {
+    scriptLoader.registerEvent('privatemessage', function (event) {
         if (irc.config.admin.indexOf(event.user.getNick()) > -1 && !event.isAction) {
             var params = event.message.split(' ');
             if (params[0] === 'RAW') {
-                irc.write(event.message.substr(params[0] + 1));
+                irc.write(event.message.substr(params[0].length + 1));
             }
         }
     });
