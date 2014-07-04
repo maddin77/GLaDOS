@@ -299,7 +299,7 @@ module.exports = function (scriptLoader, irc) {
                 }
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
-                    fn(true, 'GitHub Repository: ' + data.full_name + ' - ' + data.description + ' (' + data.stargazers_count + ' Stargazers, ' + data.watchers_count + ' Watchers, ' + data.forks_count + ' Forks)');
+                    fn(true, 'GitHub Repository: ' + data.full_name + ' - ' + data.description + ' (' + data.subscribers_count + ' Watchers, ' + data.stargazers_count + ' Stargazers, ' + data.forks_count + ' Forks)');
                 } else {
                     debug('[urltitle/github/repos] %s', error);
                     getTitle(URL, fn);
