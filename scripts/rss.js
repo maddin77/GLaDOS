@@ -26,7 +26,14 @@ module.exports = function (scriptLoader, irc) {
                 if (err) {
                     debug(err);
                 } else {
-                    fn(subscriptions);
+                    var tmpArr = [];
+                    _.each(subscriptions, function (value, key) {
+                        tmpArr.push({
+                            url: key,
+                            subscribers: value
+                        });
+                    });
+                    fn(tmpArr);
                 }
             });
         });
@@ -64,19 +71,31 @@ module.exports = function (scriptLoader, irc) {
                         var newEntries = [];
                         _.each(data.responseData.feed.entries, function (entry) {
                             if (!_.contains(checkedCache, entry.link)) {
+                                debug('added %s to cache', entry.link);
                                 checkedCache.push(entry.link);
                                 newEntries.push(entry);
                             }
                         });
                         if (fn) {
-                            fn(data.responseData.feed.title, newEntries);
+                            async.map(newEntries, function (entry, callback) {
+                                debug('%s is new => ship', entry.link);
+                                shortLink(entry.link, function (surl) {
+                                    entry.shortlink = surl;
+                                    callback(null, entry);
+                                });
+                            }, function (err, results) {
+                                fn(null, {
+                                    title: data.responseData.feed.title,
+                                    entries: results
+                                });
+                            });
                         }
                     }
                 }
             } else {
                 debug(err);
                 if (fn) {
-                    fn(null, []);
+                    fn(err, null);
                 }
             }
         });
@@ -84,20 +103,33 @@ module.exports = function (scriptLoader, irc) {
 
     checkEntries = function (notice) {
         sortSubscriptions(function (subscriptions) {
-            _.each(subscriptions, function (targets, url) {
-                fetchNewEntries(url, function (title, entries) {
-                    if (notice) {
-                        debug('Checking for new entries in %s: Found %s.', title, entries.length, entries);
-                        _.each(entries, function (entry) {
-                            shortLink(entry.link, function (shortLink) {
-                                _.each(targets, function (target) {
-                                    irc.notice(target, irc.clrs('[' + title + '] {B}' + entry.title + '{R} (' + shortLink + ')'));
-                                });
-                            });
-                        });
-                    }
+            if (!notice) {
+                _.each(subscriptions, function (subscription) {
+                    fetchNewEntries(subscription.url);
                 });
-            });
+            } else {
+                async.map(subscriptions, function (sub, callback) {
+                    fetchNewEntries(sub.url, function (err, data) {
+                        if (err) {
+                            callback(err, null);
+                        } else {
+                            sub.title = data.title;
+                            sub.entries = data.entries;
+                            callback(err, sub);
+                        }
+                    });
+                }, function (err, results) {
+                    _.each(results, function (feed) {
+                        if (feed.entries.length > 0) {
+                            _.each(feed.subscribers, function (subscriber) {
+                                irc.notice(subscriber, '[' + feed.title + '] ' + _.map(feed.entries, function (entry) {
+                                    return irc.clrs('{B}' + entry.title + '{R} (' + entry.shortlink + ')');
+                                }).join(', '));
+                            });
+                        }
+                    });
+                });
+            }
         });
     };
     checkEntries(false);
