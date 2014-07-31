@@ -7,3 +7,4 @@ config/*
 *.sublime-project
 *.sublime-workspace
 test.*
+ignore_me

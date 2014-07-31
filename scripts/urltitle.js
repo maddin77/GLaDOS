@@ -95,6 +95,7 @@ module.exports = function (scriptLoader, irc) {
                     "Authorization": 'Client-ID ' + irc.config.imgurKey
                 }
             }, function (error, response, data) {
+                //console.log(error, data);
                 if (!error && response.statusCode === 200) {
                     data = data.data;
                     var title = data.title || 'null',
