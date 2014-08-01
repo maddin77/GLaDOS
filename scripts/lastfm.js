@@ -6,7 +6,7 @@ var LastFmNode = require('lastfm').LastFmNode;
 module.exports = function (scriptLoader, irc) {
     var lastfm, getRecentTrackInfo, getComparison, lstfmdb;
 
-    lstfmdb = irc.database('lastfm');
+    lstfmdb             = irc.database('lastfm');
     lstfmdb.key         = lstfmdb.key || "";
     lstfmdb.useragent   = lstfmdb.useragent || irc.config.userAgent;
     lstfmdb.alias       = lstfmdb.alias || {};
