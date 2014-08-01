@@ -6,6 +6,12 @@ var _ = require('underscore');
 var debug = require('debug')('GLaDOS:script:wolframalpha');
 
 module.exports = function (scriptLoader, irc) {
+
+    var wadb        = irc.database('wolframalpha');
+    wadb.key        = wadb.key || '';
+    wadb.useragent  = wadb.useragent || irc.config.userAgent;
+    wadb.save();
+
     scriptLoader.registerCommand(['wa', 'wolfram', 'wolframalpha'], function (event) {
         if (event.params.length > 0) {
             var uri = 'http://api.wolframalpha.com/v2/query?' + querystring.stringify({
@@ -13,12 +19,12 @@ module.exports = function (scriptLoader, irc) {
                 "units": 'metric',
                 "format": "plaintext",
                 "primary": true,
-                "appid": irc.config.wolframAlphaKey
+                "appid": wadb.key
             });
             request({
                 "uri": uri,
                 "headers": {
-                    "User-Agent": irc.config.userAgent
+                    "User-Agent": wadb.useragent
                 }
             }, function (error, response, body) {
                 if (!error && response.statusCode === 200) {

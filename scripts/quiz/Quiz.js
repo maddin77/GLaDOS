@@ -24,6 +24,10 @@ moment.lang('precise-en');
 
 
 var Quiz = function (irc) {
+    this.database = irc.database('quiz');
+    this.database.score = this.database.score || {};
+    this.database.save();
+
     this.quizdata = require(__dirname + '/quizdata.json');
     this.irc = irc;
     this.rules = [
@@ -65,71 +69,42 @@ Quiz.prototype.isRunning = function () {
 Quiz.prototype.isHalted = function () {
     return this.halted;
 };
-Quiz.prototype.isQuizOp = function (nick, fn) {
-    this.irc.brain.sismember('quiz:ops', nick, function (error, isMember) {
-        if (error) {
-            debug('isQuizOp:%s -> %s', nick, error);
-            fn(false);
-        } else {
-            fn(isMember === 1);
-        }
-    });
+Quiz.prototype.getScore = function (nick) {
+    return parseInt(this.database.score[nick] || 0, 10);
 };
-Quiz.prototype.opNick = function (nick, cb) {
-    var self = this;
-    this.isQuizOp(nick, function (isop) {
-        if (isop) {
-            self.irc.brain.srem('quiz:ops', nick);
-        } else {
-            self.irc.brain.sadd('quiz:ops', nick);
-        }
-        cb(!isop);
-    });
-};
-Quiz.prototype.getScore = function (nick, cb) {
-    this.irc.brain.hget('quiz:score', nick, function (err, obj) {
-        cb(parseInt(obj || 0, 10));
-    });
-};
-Quiz.prototype.addScore = function (nick, score, cb) {
-    var self = this;
-    this.getScore(nick, function (oldscore) {
-        self.irc.brain.hset('quiz:score', nick, oldscore + score);
-        if (cb) {
-            cb(oldscore + score);
-        }
-    });
+Quiz.prototype.addScore = function (nick, score) {
+    var _score = this.getScore(nick),
+        newScore = this.database.score[nick] = _score + score;
+    this.database.save();
+    return newScore;
 };
 Quiz.prototype.setScore = function (nick, score) {
-    this.irc.brain.hset('quiz:score', nick, score);
+    this.database.score[nick] = score;
+    this.database.save();
 };
-Quiz.prototype.getToplist = function (cb) {
-    this.irc.brain.hgetall('quiz:score', function (err, obj) {
-        var _scores = obj || {},
-            scores = [];
-        Object.keys(_scores).forEach(function (nick) {
-            var score = _scores[nick];
-            scores.push({
-                "nick": nick,
-                "score": score
-            });
+Quiz.prototype.getToplist = function () {
+    var _scores = this.database.score,
+        scores = [];
+    Object.keys(_scores).forEach(function (nick) {
+        var score = _scores[nick];
+        scores.push({
+            "nick": nick,
+            "score": score
         });
-        scores.sort(function (a, b) {
-            return b.score - a.score;
-        });
-        return cb(scores);
     });
+    scores.sort(function (a, b) {
+        return b.score - a.score;
+    });
+    return scores;
 };
-Quiz.prototype.getRank = function (nick, cb) {
-    this.getToplist(function (scores) {
-        var i;
-        for (i = 0; i < scores.length; i += 1) {
-            if (scores[i].nick === nick) {
-                return cb(i + 1);
-            }
+Quiz.prototype.getRank = function (nick) {
+    var scores = this.getToplist(), i;
+    for (i = 0; i < scores.length; i += 1) {
+        if (scores[i].nick === nick) {
+            return i + 1;
         }
-        return cb(scores.length + 1);
-    });
+    }
+    return scores.length + 1;
 };
 Quiz.prototype.start = function (lang, channel) {
     this.lang = lang;

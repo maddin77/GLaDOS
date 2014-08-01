@@ -1,7 +1,7 @@
 'use strict';
-var utils = require(__dirname + '/../lib/utils');
-var debug = require('debug')('GLaDOS:script:control');
-var _ = require('underscore');
+var utils   = require(__dirname + '/../lib/utils');
+var debug   = require('debug')('GLaDOS:script:control');
+var _       = require('underscore');
 
 module.exports = function (scriptLoader, irc) {
     scriptLoader.registerCommand(['mem', 'memory'], function (event) {
@@ -16,18 +16,11 @@ module.exports = function (scriptLoader, irc) {
         if (irc.config.admin.indexOf(event.user.getNick()) > -1) {
             if (event.params.length > 0) {
                 var channelName = event.params[0];
-                irc.brain.sismember('autojoin', channelName, function (error, isMember) {
-                    if (!error) {
-                        if (isMember === 0) {
-                            irc.brain.sadd('autojoin', channelName);
-                            irc.join(channelName);
-                        } else {
-                            event.user.notice('I\'m already in this channel.');
-                        }
-                    } else {
-                        debug('[join/ismember] %s', error);
-                    }
-                });
+                irc.join(channelName);
+                if (irc.config.irc.channel.indexOf(channelName) === -1) {
+                    irc.config.irc.channel.push(channelName);
+                    irc.config.save();
+                }
             } else {
                 event.user.notice('Use: !join <#channel>');
             }
@@ -48,22 +41,32 @@ module.exports = function (scriptLoader, irc) {
                 }
             } else {
                 channelName = event.channel.getName();
-                msg = null;
+                msg = '';
             }
-            irc.brain.sismember('autojoin', channelName, function (error, isMember) {
-                if (!error) {
-                    if (isMember === 1) {
-                        irc.brain.srem('autojoin', channelName);
-                        irc.part(channelName, msg);
-                    } else {
-                        event.user.notice('I\'m not in this channel.');
-                    }
-                } else {
-                    debug('[part/ismember] %s', error);
-                }
-            });
+            irc.part(channelName, msg);
+            irc.config.irc.channel = _.without(irc.config.irc.channel, channelName);
+            irc.config.save();
         } else {
             event.user.notice('You don\'t have the permissions to use this command.');
+        }
+    });
+    scriptLoader.registerCommand('cycle', function (event) {
+        if (irc.config.admin.indexOf(event.user.getNick()) > -1) {
+            var channelName, msg;
+            if (event.params.length > 0) {
+                if (event.params[0][0] === '#') {
+                    channelName = event.params[0];
+                    msg = event.text.substr(channelName.length + 1);
+                } else {
+                    channelName = event.channel.getName();
+                    msg = event.text;
+                }
+            } else {
+                channelName = event.channel.getName();
+                msg = '';
+            }
+            irc.part(channelName, msg);
+            irc.join(channelName);
         }
     });
     scriptLoader.registerCommand('raw', function (event) {
@@ -128,7 +131,7 @@ module.exports = function (scriptLoader, irc) {
                             event.user.notice(event.params[1] + ' is already admin.');
                         } else {
                             irc.config.admin.push(event.params[1]);
-                            irc.saveConfig();
+                            irc.config.save();
                             event.user.notice(event.params[1] + ' is now admin.');
                         }
                     } else {
@@ -140,7 +143,7 @@ module.exports = function (scriptLoader, irc) {
                             event.user.notice('There is no admin called "' + event.params[1] + '".');
                         } else {
                             irc.config.admin = _.without(irc.config.admin, event.params[1]);
-                            irc.saveConfig();
+                            irc.config.save();
                             event.user.notice('Admin ' + event.params[1] + ' has been removed.');
                         }
                     } else {

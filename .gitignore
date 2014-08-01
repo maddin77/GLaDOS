@@ -3,7 +3,8 @@
 node_modules
 *.txt
 _OLD_VERSIONS_
-config/*
+data/*
+!data/default.json
 *.sublime-project
 *.sublime-workspace
 test.*

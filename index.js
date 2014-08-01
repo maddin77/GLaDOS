@@ -1,9 +1,6 @@
 'use strict';
 /* Load Config */
-var config = require('config-node')({
-    dir: 'config',
-    ext: 'json'
-});
+var config = require('./lib/database')();
 
 /* Set DEBUG env */
 process.env.DEBUG = config.debug;
@@ -11,8 +8,5 @@ process.env.DEBUG = config.debug;
 /* Load coffea */
 var coffea = require('coffea');
 
-/* load brain */
-var brain = require('./lib/brain')(config.redis);
-
 /* Load GLaDOS */
-var GLaDOS = require('./lib/GLaDOS')(config, coffea, brain);
+var GLaDOS = require('./lib/GLaDOS')(config, coffea);

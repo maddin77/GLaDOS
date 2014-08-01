@@ -27,27 +27,6 @@ module.exports = function (scriptLoader, irc) {
     var quiz = new Quiz(irc),
         quizChannelName = '#quiz';
 
-    scriptLoader.registerCommand('quizop', function (event) {
-        if (irc.config.admin.indexOf(event.user.getNick()) > -1) {
-            var nick = event.params.length > 0 ? event.params[0] : event.user.getNick();
-            quiz.opNick(nick, function (isOp) {
-                if (isOp) {
-                    irc.brain.sadd('quiz:ops', nick);
-                    event.channel.reply(event.user, nick + ' is now quizop.');
-                    if (event.channel.isUserInChannel(nick)) {
-                        irc.mode(quizChannelName, '+h', nick);
-                    }
-                } else {
-                    event.channel.reply(event.user, nick + ' is no longer quizop.');
-                    if (event.channel.isUserInChannel(nick)) {
-                        irc.mode(quizChannelName, '-h', nick);
-                    }
-                }
-            });
-        } else {
-            event.user.notice('You don\'t have the permissions to use this command.');
-        }
-    });
     scriptLoader.registerCommand('setscore', function (event) {
         if (irc.config.admin.indexOf(event.user.getNick()) > -1) {
             if (event.params.length > 0) {
@@ -75,63 +54,61 @@ module.exports = function (scriptLoader, irc) {
         }
     });
     scriptLoader.registerCommand('quiz', function (event) {
-        quiz.isQuizOp(event.user.getNick(), function (isop) {
-            if (isop) {
-                if (event.channel.getName() === quizChannelName) {
-                    if (event.params.length > 0) {
-                        if (event.params[0].toUpperCase() === 'START') {
-                            if (!quiz.isRunning()) {
-                                if (event.params.length > 1) {
-                                    var lang = event.params[1];
-                                    if (quiz.quizdata.hasOwnProperty(lang)) {
-                                        quiz.start(lang, event.channel);
-                                        event.channel.say(irc.clrs('[{B}QUIZ{R}] {U}' + event.user.getNick() + '{R} started the quiz: {B}' + quiz.getTotalQuestionCount() + '{R} questions in database "' + lang + '" (' + quiz.getQuizdataCreationDate() + ').'));
-                                        quiz.delayNewQuestion(0);
-                                        quiz.resetHaltTimer();
-                                    } else {
-                                        event.user.notice('I don\'t have any questions in this language.');
-                                    }
+        if (event.channel.userHasMode(event.user, '%') || event.channel.userHasMode(event.user, '@') || event.channel.userHasMode(event.user, '&') || event.channel.userHasMode(event.user, '~')) {
+            if (event.channel.getName() === quizChannelName) {
+                if (event.params.length > 0) {
+                    if (event.params[0].toUpperCase() === 'START') {
+                        if (!quiz.isRunning()) {
+                            if (event.params.length > 1) {
+                                var lang = event.params[1];
+                                if (quiz.quizdata.hasOwnProperty(lang)) {
+                                    quiz.start(lang, event.channel);
+                                    event.channel.say(irc.clrs('[{B}QUIZ{R}] {U}' + event.user.getNick() + '{R} started the quiz: {B}' + quiz.getTotalQuestionCount() + '{R} questions in database "' + lang + '" (' + quiz.getQuizdataCreationDate() + ').'));
+                                    quiz.delayNewQuestion(0);
+                                    quiz.resetHaltTimer();
                                 } else {
-                                    event.user.notice('Use: !quiz START <lang>');
+                                    event.user.notice('I don\'t have any questions in this language.');
                                 }
                             } else {
-                                event.user.notice('The quiz is already running.');
-                            }
-                        } else if (event.params[0].toUpperCase() === 'STOP') {
-                            if (quiz.isRunning()) {
-                                quiz.stop();
-                                event.channel.say(irc.clrs('[{B}QUIZ{R}] Quiz stopped.'));
-                            } else {
-                                event.user.notice('The quiz is not running.');
-                            }
-                        } else if (event.params[0].toUpperCase() === 'HALT') {
-                            if (quiz.isRunning()) {
-                                quiz.halt();
-                                event.channel.say(irc.clrs('[{B}QUIZ{R}] Quiz halted. Say "!ask" for new questions.'));
-                            } else {
-                                event.user.notice('The quiz is not running.');
-                            }
-                        } else if (event.params[0].toUpperCase() === 'NEXT') {
-                            if (quiz.isRunning()) {
-                                event.channel.say(irc.clrs('[{B}QUIZ{R}] Manually solved after ' + moment.duration(quiz.getQuestionTime().diff(moment()), 'milliseconds').humanize() + ' by ' + event.user.getNick() + '.'));
-                                event.channel.say(irc.clrs('[{B}QUIZ{R}] The answer is: {B}' + quiz.getAnswer()));
-                                quiz.delayNewQuestion();
-                            } else {
-                                event.user.notice('The quiz is not running.');
+                                event.user.notice('Use: !quiz START <lang>');
                             }
                         } else {
-                            event.user.notice('Use: !quiz <START|STOP|HALT|NEXT>');
+                            event.user.notice('The quiz is already running.');
+                        }
+                    } else if (event.params[0].toUpperCase() === 'STOP') {
+                        if (quiz.isRunning()) {
+                            quiz.stop();
+                            event.channel.say(irc.clrs('[{B}QUIZ{R}] Quiz stopped.'));
+                        } else {
+                            event.user.notice('The quiz is not running.');
+                        }
+                    } else if (event.params[0].toUpperCase() === 'HALT') {
+                        if (quiz.isRunning()) {
+                            quiz.halt();
+                            event.channel.say(irc.clrs('[{B}QUIZ{R}] Quiz halted. Say "!ask" for new questions.'));
+                        } else {
+                            event.user.notice('The quiz is not running.');
+                        }
+                    } else if (event.params[0].toUpperCase() === 'NEXT') {
+                        if (quiz.isRunning()) {
+                            event.channel.say(irc.clrs('[{B}QUIZ{R}] Manually solved after ' + moment.duration(quiz.getQuestionTime().diff(moment()), 'milliseconds').humanize() + ' by ' + event.user.getNick() + '.'));
+                            event.channel.say(irc.clrs('[{B}QUIZ{R}] The answer is: {B}' + quiz.getAnswer()));
+                            quiz.delayNewQuestion();
+                        } else {
+                            event.user.notice('The quiz is not running.');
                         }
                     } else {
                         event.user.notice('Use: !quiz <START|STOP|HALT|NEXT>');
                     }
                 } else {
-                    event.user.notice('This only works in ' + quizChannelName + '.');
+                    event.user.notice('Use: !quiz <START|STOP|HALT|NEXT>');
                 }
             } else {
-                event.user.notice('You don\'t have the permissions to use this command.');
+                event.user.notice('This only works in ' + quizChannelName + '.');
             }
-        });
+        } else {
+            event.user.notice('You don\'t have the permissions to use this command.');
+        }
     });
     scriptLoader.registerCommand('ask', function (event) {
         if (event.channel.getName() === quizChannelName) {
@@ -160,38 +137,38 @@ module.exports = function (scriptLoader, irc) {
     });
     scriptLoader.registerCommand('rank', function (event) {
         if (event.channel.getName() === quizChannelName) {
-            quiz.getToplist(function (scores) {
-                var userscore = {
+            var scores = quiz.getToplist(),
+                userscore = {
                     "nick": event.user.getNick(),
                     "score": -1,
                     "index": -1
-                }, index;
-                for (index = 0; index < scores.length; index += 1) {
-                    if (index < 5) {
-                        if (scores[index].nick === event.user.getNick()) {
-                            userscore.score = 0;
-                            event.user.notice(irc.clrs('[' + (index + 1) + '] {B}' + scores[index].nick + '{R} - ' + scores[index].score + 'pt'));
-                        } else {
-                            event.user.notice('[' + (index + 1) + '] ' + scores[index].nick + ' - ' + scores[index].score + 'pt');
-                        }
+                },
+                index;
+            for (index = 0; index < scores.length; index += 1) {
+                if (index < 5) {
+                    if (scores[index].nick === event.user.getNick()) {
+                        userscore.score = 0;
+                        event.user.notice(irc.clrs('[' + (index + 1) + '] {B}' + scores[index].nick + '{R} - ' + scores[index].score + 'pt'));
                     } else {
-                        if (scores[index].nick === event.user.getNick()) {
-                            userscore.score = scores[index].score;
-                            userscore.index = index + 1;
-                        }
+                        event.user.notice('[' + (index + 1) + '] ' + scores[index].nick + ' - ' + scores[index].score + 'pt');
+                    }
+                } else {
+                    if (scores[index].nick === event.user.getNick()) {
+                        userscore.score = scores[index].score;
+                        userscore.index = index + 1;
                     }
                 }
-                if (userscore.score !== 0) {
-                    if (scores.length > 5 && userscore.index !== 6) {
-                        event.user.notice('...');
-                    }
-                    if (userscore.score === -1) {
-                        event.user.notice(irc.clrs('[' + (scores.length + 1) + '] {B}' + userscore.nick + '{R} - 0pt'));
-                    } else {
-                        event.user.notice(irc.clrs('[' + userscore.index + '] {B}' + userscore.nick + '{R} - ' + userscore.score + 'pt'));
-                    }
+            }
+            if (userscore.score !== 0) {
+                if (scores.length > 5 && userscore.index !== 6) {
+                    event.user.notice('...');
                 }
-            });
+                if (userscore.score === -1) {
+                    event.user.notice(irc.clrs('[' + (scores.length + 1) + '] {B}' + userscore.nick + '{R} - 0pt'));
+                } else {
+                    event.user.notice(irc.clrs('[' + userscore.index + '] {B}' + userscore.nick + '{R} - ' + userscore.score + 'pt'));
+                }
+            }
         } else {
             event.user.notice('This only works in ' + quizChannelName + '.');
         }
@@ -203,26 +180,15 @@ module.exports = function (scriptLoader, irc) {
                 var question = quiz.getQuestion(),
                     nick = event.user.getNick(),
                     time = moment.duration(quiz.getQuestionTime().diff(moment()), 'milliseconds').humanize(),
-                    points = question.score || 1;
+                    points = question.score || 1,
+                    score = quiz.addScore(nick, points),
+                    rank = quiz.getRank(nick);
                 question.solved = true;
-                quiz.addScore(nick, points, function (score) {
-                    quiz.getRank(nick, function (rank) {
-                        event.channel.say(irc.clrs('[{B}QUIZ{R}] {B}' + nick + '{R} solved after {B}' + time + '{R} and now has <{B}' + score + '{R}> points ({B}+' + points + '{R}) on rank {B}' + rank + '{R}.'));
-                        event.channel.say(irc.clrs('[{B}QUIZ{R}] The answer was: {B}' + quiz.getAnswer()));
-                    });
-                });
+                event.channel.say(irc.clrs('[{B}QUIZ{R}] {B}' + nick + '{R} solved after {B}' + time + '{R} and now has <{B}' + score + '{R}> points ({B}+' + points + '{R}) on rank {B}' + rank + '{R}.'));
+                event.channel.say(irc.clrs('[{B}QUIZ{R}] The answer was: {B}' + quiz.getAnswer()));
                 quiz.delayNewQuestion();
             }
             quiz.resetHaltTimer();
-        }
-    });
-    scriptLoader.registerEvent('join', function (event) {
-        if (event.channel.getName() === quizChannelName) {
-            quiz.isQuizOp(event.user.getNick(), function (isOp) {
-                if (isOp) {
-                    irc.mode(quizChannelName, '+h', event.user.getNick());
-                }
-            });
         }
     });
 };

@@ -7,36 +7,32 @@ var _ = require('underscore');
 
 module.exports = function (scriptLoader, irc) {
 
-    var cronJob, checkFeed, shortLink, subscribe, unsubscribe, isSubscribed, listSubscriptions, sortSubscriptions, checkedCache, checkEntries, fetchNewEntries;
+    var cronJob, checkFeed, shortLink, subscribe, unsubscribe, isSubscribed, listSubscriptions, sortSubscriptions, checkedCache, checkEntries, fetchNewEntries, rssdb;
+
+    rssdb               = irc.database('rss');
+    rssdb.useragent     = rssdb.useragent || irc.config.userAgent;
+    rssdb.subscriptions = rssdb.subscriptions || {};
+    rssdb.save();
 
     checkedCache = [];
 
-    sortSubscriptions = function (fn) {
-        var subscriptions = {};
-        irc.brain.keys('rss:*', function (err, keys) {
-            async.each(keys, function (key, callback) {
-                irc.brain.smembers(key, function (err, urls) {
-                    urls.forEach(function (url) {
-                        subscriptions[url] = subscriptions[url] || [];
-                        subscriptions[url].push(key.substr(4));
-                    });
-                    callback(err);
-                });
-            }, function (err) {
-                if (err) {
-                    debug(err);
-                } else {
-                    var tmpArr = [];
-                    _.each(subscriptions, function (value, key) {
-                        tmpArr.push({
-                            url: key,
-                            subscribers: value
-                        });
-                    });
-                    fn(tmpArr);
-                }
+    sortSubscriptions = function () {
+        var subscriptions = {}, tmpArr = [];
+        _.each(rssdb.subscriptions, function (array, name) {
+            _.each(array, function (url) {
+                subscriptions[url] = subscriptions[url] || [];
+                subscriptions[url].push(name);
             });
         });
+        debug(subscriptions);
+        _.each(subscriptions, function (value, key) {
+            tmpArr.push({
+                url: key,
+                subscribers: value
+            });
+        });
+        debug(tmpArr);
+        return tmpArr;
     };
 
     shortLink = function (url, fn) {
@@ -61,7 +57,7 @@ module.exports = function (scriptLoader, irc) {
         request({
             "uri": 'http://ajax.googleapis.com/ajax/services/feed/load?v=1.0&num=20&q=' + encodeURIComponent(url),
             "headers": {
-                "User-Agent": irc.config.userAgent
+                "User-Agent": rssdb.useragent
             },
             "json": true
         }, function (err, res, data) {
@@ -102,35 +98,34 @@ module.exports = function (scriptLoader, irc) {
     };
 
     checkEntries = function (notice) {
-        sortSubscriptions(function (subscriptions) {
-            if (!notice) {
-                _.each(subscriptions, function (subscription) {
-                    fetchNewEntries(subscription.url);
+        var subscriptions = sortSubscriptions();
+        if (!notice) {
+            _.each(subscriptions, function (subscription) {
+                fetchNewEntries(subscription.url);
+            });
+        } else {
+            async.map(subscriptions, function (sub, callback) {
+                fetchNewEntries(sub.url, function (err, data) {
+                    if (err) {
+                        callback(err, null);
+                    } else {
+                        sub.title = data.title;
+                        sub.entries = data.entries;
+                        callback(err, sub);
+                    }
                 });
-            } else {
-                async.map(subscriptions, function (sub, callback) {
-                    fetchNewEntries(sub.url, function (err, data) {
-                        if (err) {
-                            callback(err, null);
-                        } else {
-                            sub.title = data.title;
-                            sub.entries = data.entries;
-                            callback(err, sub);
-                        }
-                    });
-                }, function (err, results) {
-                    _.each(results, function (feed) {
-                        if (feed.entries.length > 0) {
-                            _.each(feed.subscribers, function (subscriber) {
-                                irc.notice(subscriber, '[' + feed.title + '] ' + _.map(feed.entries, function (entry) {
-                                    return irc.clrs('{B}' + entry.title + '{R} (' + entry.shortlink + ')');
-                                }).join(', '));
-                            });
-                        }
-                    });
+            }, function (err, results) {
+                _.each(results, function (feed) {
+                    if (feed.entries.length > 0) {
+                        _.each(feed.subscribers, function (subscriber) {
+                            irc.send(subscriber, '[' + feed.title + '] ' + _.map(feed.entries, function (entry) {
+                                return irc.clrs('{B}' + entry.title + '{R} (' + entry.shortlink + ')');
+                            }).join(', '));
+                        });
+                    }
                 });
-            }
-        });
+            });
+        }
     };
     checkEntries(false);
 
@@ -150,7 +145,7 @@ module.exports = function (scriptLoader, irc) {
         request({
             "uri": 'http://ajax.googleapis.com/ajax/services/feed/load?v=1.0&num=20&q=' + encodeURIComponent(url),
             "headers": {
-                "User-Agent": irc.config.userAgent
+                "User-Agent": rssdb.useragent
             },
             "json": true
         }, function (err, res, data) {
@@ -168,38 +163,30 @@ module.exports = function (scriptLoader, irc) {
     };
 
     subscribe = function (target, url) {
-        irc.brain.sadd('rss:' + target, url);
+        rssdb.subscriptions[target] = rssdb.subscriptions[target] || [];
+        rssdb.subscriptions[target].push(url);
+        rssdb.subscriptions[target] = _.uniq(rssdb.subscriptions[target]);
+        rssdb.save();
     };
 
     unsubscribe = function (target, url) {
-        irc.brain.srem('rss:' + target, url);
+        rssdb.subscriptions[target] = rssdb.subscriptions[target] || [];
+        rssdb.subscriptions[target] = _.without(rssdb.subscriptions[target], url);
+        rssdb.save();
     };
 
-    isSubscribed = function (target, url, fn) {
-        irc.brain.sismember('rss:' + target, url, function (error, isMember) {
-            if (error) {
-                debug(error);
-                fn(false);
-            } else {
-                fn(isMember);
-            }
-        });
+    isSubscribed = function (target, url) {
+        rssdb.subscriptions[target] = rssdb.subscriptions[target] || [];
+        return rssdb[target].indexOf(url) > -1;
     };
 
-    listSubscriptions = function (target, fn) {
-        irc.brain.smembers('rss:' + target, function (error, feedUrls) {
-            if (error) {
-                debug(error);
-                fn([]);
-            } else {
-                fn(feedUrls);
-            }
-        });
+    listSubscriptions = function (target) {
+        return rssdb.subscriptions[target] || [];
     };
 
     scriptLoader.registerCommand('rss', function (event) {
         if (event.params.length > 0) {
-            var feedUrl;
+            var feedUrl, feeds;
             if (event.params[0].toUpperCase() === 'SUBSCRIBE') {
                 if (event.params.length > 1) {
                     feedUrl = event.params[1];
@@ -219,25 +206,22 @@ module.exports = function (scriptLoader, irc) {
             } else if (event.params[0].toUpperCase() === 'UNSUBSCRIBE') {
                 if (event.params.length > 1) {
                     feedUrl = event.params[1];
-                    isSubscribed(event.user.getNick(), feedUrl, function (subscribed) {
-                        if (subscribed) {
-                            event.user.notice('You successfully unsubscribed from the rss feed.');
-                            unsubscribe(event.user.getNick(), feedUrl);
-                        } else {
-                            event.user.notice('You\'re not subscribed to this rss feed.');
-                        }
-                    });
+                    if (isSubscribed(event.user.getNick(), feedUrl)) {
+                        event.user.notice('You successfully unsubscribed from the rss feed.');
+                        unsubscribe(event.user.getNick(), feedUrl);
+                    } else {
+                        event.user.notice('You\'re not subscribed to this rss feed.');
+                    }
                 } else {
                     event.user.notice('Use: !rss UNSUBSCRIBE <feed url>');
                 }
             } else if (event.params[0].toUpperCase() === 'LIST') {
-                listSubscriptions(event.user.getNick(), function (feeds) {
-                    if (feeds.length > 0) {
-                        event.user.notice('You\'re subscribed to the following rss feeds: ' + feeds.join(', '));
-                    } else {
-                        event.user.notice('You haven\'t subscribed to any rss feeds yet.');
-                    }
-                });
+                feeds = listSubscriptions(event.user.getNick());
+                if (feeds.length > 0) {
+                    event.user.notice('You\'re subscribed to the following rss feeds: ' + feeds.join(', '));
+                } else {
+                    event.user.notice('You haven\'t subscribed to any rss feeds yet.');
+                }
             } else {
                 event.user.notice('Use: !rss <subscribe/unsubscribe/list> [feed url]');
             }
@@ -249,7 +233,7 @@ module.exports = function (scriptLoader, irc) {
         if (event.channel.userHasMode(event.user, '!') || event.channel.userHasMode(event.user, '~') ||
                 event.channel.userHasMode(event.user, '&') || event.channel.userHasMode(event.user, '@') || event.channel.userHasMode(event.user, '%')) {
             if (event.params.length > 0) {
-                var feedUrl;
+                var feedUrl, feeds;
                 if (event.params[0].toUpperCase() === 'SUBSCRIBE') {
                     if (event.params.length > 1) {
                         feedUrl = event.params[1];
@@ -269,25 +253,22 @@ module.exports = function (scriptLoader, irc) {
                 } else if (event.params[0].toUpperCase() === 'UNSUBSCRIBE') {
                     if (event.params.length > 1) {
                         feedUrl = event.params[1];
-                        isSubscribed(event.channel.getName(), feedUrl, function (subscribed) {
-                            if (subscribed) {
-                                event.user.notice('You successfully unsubscribed ' + event.channel.getName() + ' from the rss feed.');
-                                unsubscribe(event.channel.getName(), feedUrl);
-                            } else {
-                                event.user.notice(event.channel.getName() + ' isn\'t subscribed to this rss feed.');
-                            }
-                        });
+                        if (isSubscribed(event.channel.getName(), feedUrl)) {
+                            event.user.notice('You successfully unsubscribed ' + event.channel.getName() + ' from the rss feed.');
+                            unsubscribe(event.channel.getName(), feedUrl);
+                        } else {
+                            event.user.notice(event.channel.getName() + ' isn\'t subscribed to this rss feed.');
+                        }
                     } else {
                         event.user.notice('Use: !chanrss UNSUBSCRIBE <feed url>');
                     }
                 } else if (event.params[0].toUpperCase() === 'LIST') {
-                    listSubscriptions(event.channel.getName(), function (feeds) {
-                        if (feeds.length > 0) {
-                            event.user.notice(event.channel.getName() + ' is subscribed to the following rss feeds: ' + feeds.join(', '));
-                        } else {
-                            event.user.notice(event.channel.getName() + ' hasn\'t subscribed to any rss feeds yet.');
-                        }
-                    });
+                    feeds = listSubscriptions(event.channel.getName());
+                    if (feeds.length > 0) {
+                        event.user.notice(event.channel.getName() + ' is subscribed to the following rss feeds: ' + feeds.join(', '));
+                    } else {
+                        event.user.notice(event.channel.getName() + ' hasn\'t subscribed to any rss feeds yet.');
+                    }
                 } else {
                     event.user.notice('Use: !chanrss <subscribe/unsubscribe/list> [feed url]');
                 }

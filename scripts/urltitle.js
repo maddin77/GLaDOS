@@ -8,15 +8,21 @@ var debug = require('debug')('GLaDOS:script:urltitle');
 var cheerio = require('cheerio');
 
 module.exports = function (scriptLoader, irc) {
-    var entities, getTitle, getYoutubeTitle, getImgurTitle, getRedditTitle, getVimeoTitle, getGithubTitle, get4chanTitle, getSoundcloudTitle, getBreadfishTitle, getTiwtterTitle;
+    var database, entities, getTitle, getYoutubeTitle, getImgurTitle, getRedditTitle, getVimeoTitle, getGithubTitle, get4chanTitle, getSoundcloudTitle, getBreadfishTitle, getTiwtterTitle;
 
     entities = new Entities();
+
+    database                = irc.database('urltitle');
+    database.imgurkey       = database.imgurkey || '';
+    database.soundcloudkey  = database.soundcloudkey || '';
+    database.useragent      = database.useragent || irc.config.userAgent;
+    database.save();
 
     getTitle = function (URL, fn) {
         request.head({
             "uri": URL.href,
             "headers": {
-                "User-Agent": irc.config.userAgent
+                "User-Agent": database.useragent
             }
         }, function (error, res, body) {
             if (!error) {
@@ -25,7 +31,7 @@ module.exports = function (scriptLoader, irc) {
                         request({
                             "uri": URL.href,
                             "headers": {
-                                "User-Agent": irc.config.userAgent
+                                "User-Agent": database.useragent
                             }
                         }, function (error, res, body) {
                             if (!error) {
@@ -67,7 +73,7 @@ module.exports = function (scriptLoader, irc) {
                 "url": 'http://gdata.youtube.com/feeds/api/videos/' + videoID + '?v=2&alt=json',
                 "json": true,
                 "headers": {
-                    "User-Agent": irc.config.userAgent
+                    "User-Agent": database.useragent
                 }
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
@@ -91,8 +97,8 @@ module.exports = function (scriptLoader, irc) {
                 "url": 'https://api.imgur.com/3/image/' + match[1],
                 "json": true,
                 "headers": {
-                    "User-Agent": irc.config.userAgent,
-                    "Authorization": 'Client-ID ' + irc.config.imgurKey
+                    "User-Agent": database.useragent,
+                    "Authorization": 'Client-ID ' + database.imgurkey
                 }
             }, function (error, response, data) {
                 //console.log(error, data);
@@ -111,8 +117,8 @@ module.exports = function (scriptLoader, irc) {
                 "url": 'https://api.imgur.com/3/album/' + match[1],
                 "json": true,
                 "headers": {
-                    "User-Agent": irc.config.userAgent,
-                    "Authorization": 'Client-ID ' + irc.config.imgurKey
+                    "User-Agent": database.useragent,
+                    "Authorization": 'Client-ID ' + database.imgurkey
                 }
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
@@ -133,7 +139,7 @@ module.exports = function (scriptLoader, irc) {
             "url": 'http://vimeo.com/api/v2/video/' + videoId + '.json',
             "json": true,
             "headers": {
-                "User-Agent": irc.config.userAgent
+                "User-Agent": database.useragent
             }
         }, function (error, response, data) {
             if (!error && response.statusCode === 200) {
@@ -158,7 +164,7 @@ module.exports = function (scriptLoader, irc) {
                 "uri": 'http://www.reddit.com/comments/' + id + '.json',
                 "json": true,
                 "headers": {
-                    "User-Agent": irc.config.userAgent
+                    "User-Agent": database.useragent
                 }
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
@@ -178,7 +184,7 @@ module.exports = function (scriptLoader, irc) {
                 "uri": 'http://www.reddit.com/r/' + id + '/about.json',
                 "json": true,
                 "headers": {
-                    "User-Agent": irc.config.userAgent
+                    "User-Agent": database.useragent
                 }
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
@@ -203,7 +209,7 @@ module.exports = function (scriptLoader, irc) {
                 "uri": 'http://www.reddit.com/user/' + id + '/about.json',
                 "json": true,
                 "headers": {
-                    "User-Agent": irc.config.userAgent
+                    "User-Agent": database.useragent
                 }
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
@@ -225,7 +231,7 @@ module.exports = function (scriptLoader, irc) {
                 "uri": 'https://api.github.com/gists/' + match[1],
                 "json": true,
                 "headers": {
-                    "User-Agent": irc.config.userAgent
+                    "User-Agent": database.useragent
                 }
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
@@ -240,7 +246,7 @@ module.exports = function (scriptLoader, irc) {
                 "uri": 'https://api.github.com/repos/' + match[1] + '/' + match[2] + '/issues/' + match[3],
                 "json": true,
                 "headers": {
-                    "User-Agent": irc.config.userAgent
+                    "User-Agent": database.useragent
                 }
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
@@ -255,7 +261,7 @@ module.exports = function (scriptLoader, irc) {
                 "uri": 'https://api.github.com/repos/' + match[1] + '/' + match[2] + '/pulls/' + match[3],
                 "json": true,
                 "headers": {
-                    "User-Agent": irc.config.userAgent
+                    "User-Agent": database.useragent
                 }
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
@@ -270,7 +276,7 @@ module.exports = function (scriptLoader, irc) {
                 "uri": 'https://api.github.com/repos/' + match[1] + '/' + match[2],
                 "json": true,
                 "headers": {
-                    "User-Agent": irc.config.userAgent
+                    "User-Agent": database.useragent
                 }
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
@@ -285,7 +291,7 @@ module.exports = function (scriptLoader, irc) {
                 "uri": 'https://api.github.com/users/' + match[1],
                 "json": true,
                 "headers": {
-                    "User-Agent": irc.config.userAgent
+                    "User-Agent": database.useragent
                 }
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
@@ -310,7 +316,7 @@ module.exports = function (scriptLoader, irc) {
                 "uri": 'https://a.4cdn.org/' + match[1] + '/res/' + match[2] + '.json',
                 "json": true,
                 "headers": {
-                    "User-Agent": irc.config.userAgent
+                    "User-Agent": database.useragent
                 }
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
@@ -333,10 +339,10 @@ module.exports = function (scriptLoader, irc) {
     getSoundcloudTitle = function (URL, fn) {
         var match = URL.href.match(/(https?:\/\/(www\.)?soundcloud\.com\/)([\d\w\-\/]+)/i);
         request({
-            "uri": 'http://api.soundcloud.com/resolve.json?client_id=' + irc.config.soundcloudKey + '&url=' + match[0],
+            "uri": 'http://api.soundcloud.com/resolve.json?client_id=' + database.soundcloudkey + '&url=' + match[0],
             "json": true,
             "headers": {
-                "User-Agent": irc.config.userAgent
+                "User-Agent": database.useragent
             }
         }, function (error, response, data) {
             if (!error && response.statusCode === 200) {
@@ -358,7 +364,7 @@ module.exports = function (scriptLoader, irc) {
         request({
             "uri": URL.href,
             "headers": {
-                "User-Agent": irc.config.userAgent
+                "User-Agent": database.useragent
             }
         }, function (error, res, body) {
             if (!error) {
@@ -388,7 +394,7 @@ module.exports = function (scriptLoader, irc) {
                 "uri": 'http://noauth.jit.su/1/statuses/show.json?id=' + match[1],
                 "json": true,
                 "headers": {
-                    "User-Agent": irc.config.userAgent
+                    "User-Agent": database.useragent
                 }
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
@@ -473,7 +479,7 @@ module.exports = function (scriptLoader, irc) {
                     "url": 'http://ws.spotify.com/lookup/1/.json?uri=spotify:artist:' + match[2] + '&extras=album',
                     "json": true,
                     "headers": {
-                        "User-Agent": irc.config.userAgent
+                        "User-Agent": database.useragent
                     }
                 }, function (error, response, data) {
                     if (!error && response.statusCode === 200) {
@@ -487,7 +493,7 @@ module.exports = function (scriptLoader, irc) {
                     "url": 'http://ws.spotify.com/lookup/1/.json?uri=spotify:album:' + match[2] + '&extras=track',
                     "json": true,
                     "headers": {
-                        "User-Agent": irc.config.userAgent
+                        "User-Agent": database.useragent
                     }
                 }, function (error, response, data) {
                     if (!error && response.statusCode === 200) {
@@ -501,7 +507,7 @@ module.exports = function (scriptLoader, irc) {
                     "url": 'http://ws.spotify.com/lookup/1/.json?uri=spotify:track:' + match[2],
                     "json": true,
                     "headers": {
-                        "User-Agent": irc.config.userAgent
+                        "User-Agent": database.useragent
                     }
                 }, function (error, response, data) {
                     if (!error && response.statusCode === 200) {

@@ -3,7 +3,15 @@ var _ = require('underscore');
 var debug = require('debug')('GLaDOS:script:stats');
 
 module.exports = function (scriptLoader, irc) {
-    var smileys, smileyRegexp, countSmileys;
+    var smileys, smileyRegexp, countSmileys, statsdb, statsAdd;
+
+    statsdb = irc.database('stats');
+
+    statsAdd = function (namespace, key, ammount) {
+        statsdb[namespace] = statsdb[namespace] || {};
+        statsdb[namespace][key] = (statsdb[namespace][key] || 0) + ammount;
+        statsdb.save();
+    };
 
     smileys = [
         ':-)', ':)', '=)', ':^)',
@@ -38,111 +46,103 @@ module.exports = function (scriptLoader, irc) {
     };
 
     scriptLoader.registerEvent('message', function (event) {
-        irc.brain.hincrby('stats:' + event.channel.getName(), 'messages', 1);
-        irc.brain.hincrby('stats:' + event.channel.getName(), 'characters', event.message.length);
-        irc.brain.hincrby('stats:' + event.channel.getName(), 'words', event.message.split(' ').length);
-        irc.brain.hincrby('stats:' + event.channel.getName(), 'smileys', countSmileys(event.message));
+        statsAdd(event.channel.getName(), 'messages', 1);
+        statsAdd(event.channel.getName(), 'characters', event.message.length);
+        statsAdd(event.channel.getName(), 'words', event.message.split(' ').length);
+        statsAdd(event.channel.getName(), 'smileys', countSmileys(event.message));
         if (event.isAction) {
-            irc.brain.hincrby('stats:' + event.channel.getName(), 'actions', 1);
+            statsAdd(event.channel.getName(), 'actions', 1);
         }
         if (event.message.match(/(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?\^=%&amp;:\/~\+#]*[\w\-\@?\^=%&amp;\/~\+#])?/i)) {
-            irc.brain.hincrby('stats:' + event.channel.getName(), 'urls', 1);
+            statsAdd(event.channel.getName(), 'urls', 1);
         }
         if (event.message.toUpperCase() === event.message) {
-            irc.brain.hincrby('stats:' + event.channel.getName(), 'allcaps', 1);
+            statsAdd(event.channel.getName(), 'allcaps', 1);
         }
         if (event.message.slice(-1) === '?') {
-            irc.brain.hincrby('stats:' + event.channel.getName(), 'questions', 1);
+            statsAdd(event.channel.getName(), 'questions', 1);
         }
     });
     scriptLoader.registerEvent('command', function (event) {
-        irc.brain.hincrby('stats:' + event.channel.getName(), 'commands', 1);
+        statsAdd(event.channel.getName(), 'commands', 1);
     });
     scriptLoader.registerEvent('join', function (event) {
-        if (event.user.getNick() === irc.config.irc.nick) {
-            irc.brain.hexists('stats:' + event.channel.getName(), 'start', function (error, value) {
-                if (!error) {
-                    if (value === 0) {
-                        irc.brain.hset('stats:' + event.channel.getName(), 'start', Date.now());
-                    }
-                } else {
-                    debug('[join/hexists] %s', error);
-                }
-            });
+        statsdb[event.channel.getName()] = statsdb[event.channel.getName()] || {};
+
+        if (event.user.getNick() === irc.config.irc.nick && !_.has(statsdb[event.channel.getName()], 'start')) {
+            statsdb[event.channel.getName()].start = Date.now();
+            statsdb.save();
         }
-        irc.brain.hincrby('stats:' + event.channel.getName(), 'joins', 1);
-        irc.brain.hget('stats:' + event.channel.getName(), 'peak', function (error, peak) {
-            var count = Object.keys(event.channel.getNames()).length;
-            peak = peak || 0;
-            if (!error) {
-                if (count > peak) {
-                    irc.brain.hset('stats:' + event.channel.getName(), 'peak', count + ',' + Date.now());
-                }
-            } else {
-                debug('[join/hget] %s', error);
-            }
-        });
+
+        statsAdd(event.channel.getName(), 'joins', 1);
+
+        var count = Object.keys(event.channel.getNames()).length;
+        if (!_.has(statsdb[event.channel.getName()], 'peak') || count > statsdb[event.channel.getName()].peak.users) {
+            statsdb[event.channel.getName()].peak = {
+                "users": count,
+                "timestamp": Date.now()
+            };
+            statsdb.save();
+        }
     });
     scriptLoader.registerEvent('names', function (event) {
-        irc.brain.hget('stats:' + event.channel.getName(), 'peak', function (error, peak) {
-            var count = Object.keys(event.names).length;
-            peak = peak || 0;
-            if (!error) {
-                if (count > peak) {
-                    irc.brain.hset('stats:' + event.channel.getName(), 'peak', count + ',' + Date.now());
-                }
-            } else {
-                debug('[names] %s', error);
-            }
-        });
+        var count = Object.keys(event.channel.getNames()).length;
+        if (!_.has(statsdb[event.channel.getName()], 'peak') || count > statsdb[event.channel.getName()].peak.users) {
+            statsdb[event.channel.getName()].peak = {
+                "users": count,
+                "timestamp": Date.now()
+            };
+            statsdb.save();
+        }
     });
     scriptLoader.registerEvent('part', function (event) {
-		event.channels.forEach(function (channel) {
-			irc.brain.hincrby('stats:' + channel.getName(), 'parts', 1);
-		});
+        event.channels.forEach(function (channel) {
+            statsAdd(channel.getName(), 'parts', 1);
+        });
     });
     scriptLoader.registerEvent('kick', function (event) {
-        irc.brain.hincrby('stats:' + event.channel.getName(), 'kicks', 1);
+        statsAdd(event.channel.getName(), 'kicks', 1);
     });
     scriptLoader.registerEvent('mode', function (event) {
         if (event.channel !== null) {
-            irc.brain.hincrby('stats:' + event.channel.getName(), 'modes', 1);
+            statsAdd(event.channel.getName(), 'modes', 1);
             if (event.mode === 'b') {
-                irc.brain.hincrby('stats:' + event.channel.getName(), 'bans', 1);
+                statsAdd(event.channel.getName(), 'bans', 1);
             }
         }
     });
     scriptLoader.registerEvent('topic', function (event) {
         if (event.topicChanged) {
-            irc.brain.hincrby('stats:' + event.channel.getName(), 'topicchanges', 1);
+            statsAdd(event.channel.getName(), 'topicchanges', 1);
         }
     });
     scriptLoader.registerCommand('stats', function (event) {
-        irc.brain.hgetall('stats:' + event.channel.getName(), function (err, obj) {
-            var stats = _.defaults(obj || {}, {
-                "joins": "0",
-                "start": "1395000994802",
-                "peak": "0,1395000994803",
-                "messages": "0",
-                "characters": "0",
-                "words": "0",
-                "smileys": "0",
-                "questions": "0",
-                "allcaps": "0",
-                "modes": "0",
-                "commands": "0",
-                "kicks": "0",
-                "urls": "0",
-                "actions": "0",
-                "bans": "0",
-                "parts": "0",
-                "quits": "0",
-                "topicchanges": "0"
-            });
-            event.channel.say('On ' + event.channel.getName() + ' there have been ' + stats.messages + ' messages, containing ' + stats.characters + ' characters, ' + stats.words + ' words and ' + stats.smileys + ' smileys; ' + stats.actions + ' of those messages were ACTIONs.');
-            event.channel.say('There have been ' + stats.joins + ' joins, ' + stats.parts + ' parts, ' + stats.quits + ' quits, ' + stats.kicks + ' kicks, ' + stats.modes + ' mode changes, and ' + stats.topicchanges + ' topic changes.');
-            event.channel.say('There are currently ' + Object.keys(event.channel.getNames()).length + ' users and the channel has peaked at ' + stats.peak.split(',')[0] + ' users.');
+        var stats = _.defaults(statsdb[event.channel.getName()] || {}, {
+            "joins": "0",
+            "start": "1395000994802",
+            "peak": {
+                "users": 0,
+                "timestamp": Date.now()
+            },
+            "messages": "0",
+            "characters": "0",
+            "words": "0",
+            "smileys": "0",
+            "questions": "0",
+            "allcaps": "0",
+            "modes": "0",
+            "commands": "0",
+            "kicks": "0",
+            "urls": "0",
+            "actions": "0",
+            "bans": "0",
+            "parts": "0",
+            "quits": "0",
+            "topicchanges": "0"
         });
+        event.channel.say('On ' + event.channel.getName() + ' there have been ' + stats.messages + ' messages, containing ' + stats.characters + ' characters, ' + stats.words + ' words and ' + stats.smileys + ' smileys; ' + stats.actions + ' of those messages were ACTIONs.');
+        event.channel.say('There have been ' + stats.joins + ' joins, ' + stats.parts + ' parts, ' + stats.quits + ' quits, ' + stats.kicks + ' kicks, ' + stats.modes + ' mode changes, and ' + stats.topicchanges + ' topic changes.');
+        event.channel.say('There are currently ' + Object.keys(event.channel.getNames()).length + ' users and the channel has peaked at ' + stats.peak.split(',')[0] + ' users.');
     });
 };
 /*
