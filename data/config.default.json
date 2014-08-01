@@ -1,0 +1,19 @@
+{
+    "debug": "* -slate-irc-parser",
+    "admin": [],
+    "irc": {
+        "ssl": false,
+        "host": "localhost",
+        "port": 6667,
+        "nick": "GLaDOS",
+        "user": [
+            "GLaDOS",
+            "Genetic Lifeform and Disk Operating System"
+        ],
+        "pass": "",
+        "channel": []
+    },
+    "callsign": "!",
+    "scripts": [],
+    "userAgent": "GLaDOS IRC-Bot - https://github.com/maddin77/GLaDOS"
+}
