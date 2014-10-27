@@ -36,8 +36,8 @@ var chars = {
     '?' : '\u00BF',
     '\u00BF' : '?',
     '!' : '\u00A1',
-    "\'" : ',',
-    ',' : "\'",
+    '\'' : ',',
+    ',' : '\'',
     '.' : '\u02D9',
     '_' : '\u203E',
     ';' : '\u061B',
@@ -50,8 +50,8 @@ var chars = {
     '\\' : '/'
 };
 
-module.exports = function (scriptLoader, irc) {
-    scriptLoader.registerCommand(['flip', 'flipme'], function (event) {
+module.exports = function (scriptLoader) {
+    scriptLoader.on('command', ['flip', 'flipme'], function (event) {
         if (event.params.length > 0) {
             event.channel.reply(event.user, '(\u256F\u00B0\u25A1\u00B0\uFF09\u256F\uFE35 ' + event.text.toLowerCase().split('').map(function (c) {
                 return chars[c] || c;

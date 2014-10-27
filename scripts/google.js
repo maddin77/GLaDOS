@@ -1,9 +1,7 @@
-'use strict';
 var google = require('google');
-var debug = require('debug')('GLaDOS:script:google');
 
-module.exports = function (scriptLoader, irc) {
-    scriptLoader.registerCommand(['g', 'google'], function (event) {
+module.exports = function (scriptLoader) {
+    scriptLoader.on('command', ['g', 'google'], function (event) {
         if (event.params.length > 0) {
             google(event.text, function (error, next, links) {
                 if (!error) {
@@ -14,7 +12,7 @@ module.exports = function (scriptLoader, irc) {
                     }
                 } else {
                     event.channel.reply(event.user, 'Gratz. You broke it. (' + error + ') ');
-                    debug('%s', error);
+                    scriptLoader.debug('%s', error);
                 }
             });
         } else {

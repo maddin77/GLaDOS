@@ -1,30 +1,28 @@
-'use strict';
 var request = require('request');
-var dns = require('dns');
-var debug = require('debug')('GLaDOS:script:wikipedia');
+var dns     = require('dns');
 
-module.exports = function (scriptLoader, irc) {
-    scriptLoader.registerCommand(['wiki', 'wikipedia'], function (event) {
+module.exports = function (scriptLoader) {
+    scriptLoader.on('command', ['wiki', 'wikipedia'], function (event) {
         if (event.params.length > 0) {
-            dns.resolveTxt(event.params.join('_') + ".wp.dg.cx", function (error, txt) {
+            dns.resolveTxt(event.params.join('_') + '.wp.dg.cx', function (error, txt) {
                 if (!error) {
                     event.channel.reply(event.user, txt[0]);
                 } else {
                     event.channel.reply(event.user, 'There were no results matching the query.');
-                    debug('[wiki] %s', error);
+                    scriptLoader.debug('[wiki] %s', error);
                 }
             });
         } else {
             event.user.notice('Use: !wikipedia <term>');
         }
     });
-    scriptLoader.registerCommand(['syno', 'synonym'], function (event) {
+    scriptLoader.on('command', ['syno', 'synonym'], function (event) {
         if (event.params.length > 0) {
             request({
-                "uri": 'http://wikisynonyms.ipeirotis.com/api/' + event.text,
-                "json": true,
-                "headers": {
-                    "User-Agent": irc.config.userAgent
+                'uri': 'http://wikisynonyms.ipeirotis.com/api/' + event.text,
+                'json': true,
+                'headers': {
+                    'User-Agent': scriptLoader.connection.config.userAgent
                 }
             }, function (error, response, body) {
                 if (!error && response.statusCode === 200) {
@@ -45,7 +43,7 @@ module.exports = function (scriptLoader, irc) {
                     }
                 } else {
                     event.channel.reply(event.user, 'Gratz. You broke it. (' + error + ')');
-                    debug('[syno] %s', error);
+                    scriptLoader.debug('[syno] %s', error);
                 }
             });
         } else {

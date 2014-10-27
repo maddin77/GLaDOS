@@ -1,17 +1,14 @@
-'use strict';
-module.exports = function (scriptLoader, irc) {
-    scriptLoader.registerCommand(['k', 'kick'], function (event) {
-        if (event.channel.userHasMode(event.user, '!') || event.channel.userHasMode(event.user, '~') ||
-                event.channel.userHasMode(event.user, '&') || event.channel.userHasMode(event.user, '@') || event.channel.userHasMode(event.user, '%')) {
-            if (event.channel.userHasMode(irc.me, '!') || event.channel.userHasMode(irc.me, '~') ||
-                    event.channel.userHasMode(irc.me, '&') || event.channel.userHasMode(irc.me, '@') || event.channel.userHasMode(irc.me, '%')) {
+module.exports = function (scriptLoader) {
+    scriptLoader.on('command', ['k', 'kick'], function (event) {
+        if (event.channel.userHasMinMode(event.user, '%')) {
+            if (event.channel.userHasMinMode(scriptLoader.connection.me, '%')) {
                 if (event.params.length > 0) {
                     var nick = event.params[0],
                         reason = event.params.length > 1 ? event.text.substr(nick.length + 1) : '-';
                     if (event.channel.isUserInChannel(nick)) {
                         event.channel.kick(nick, '(' + event.user.getNick() + ') ' + reason);
                     } else {
-                        event.user.notice('Sorry, i can\'t find ' + nick + ' in ' + event.channel.getName());
+                        event.user.notice('Sorry, i can\'t find %s in %s.', event.user.getNick(), event.channel.getName());
                     }
                 } else {
                     event.user.notice('Use: !kick <nick> [reason]');
@@ -23,18 +20,19 @@ module.exports = function (scriptLoader, irc) {
             event.user.notice('You don\'t have the permissions to use this command.');
         }
     });
-    scriptLoader.registerCommand(['b', 'ban'], function (event) {
-        if (event.channel.userHasMode(event.user, '!') || event.channel.userHasMode(event.user, '~') ||
-                event.channel.userHasMode(event.user, '&') || event.channel.userHasMode(event.user, '@') || event.channel.userHasMode(event.user, '%')) {
-            if (event.channel.userHasMode(irc.me, '!') || event.channel.userHasMode(irc.me, '~') ||
-                    event.channel.userHasMode(irc.me, '&') || event.channel.userHasMode(irc.me, '@') || event.channel.userHasMode(irc.me, '%')) {
+    scriptLoader.on('command', ['b', 'ban'], function (event) {
+        if (event.channel.userHasMinMode(event.user, '%')) {
+            if (event.channel.userHasMinMode(scriptLoader.connection.me, '%')) {
                 if (event.params.length > 0) {
-                    var mask = event.params[0], user;
+                    var mask = event.params[0];
                     if (mask.indexOf('!') === -1 && mask.indexOf('@') === -1) {
                         if (event.channel.isUserInChannel(mask)) {
-                            user = irc._getUser(mask);
-                            user.whois(function (data) {
-                                event.channel.ban(data.nick + '!' + data.username + '@' + data.hostname);
+                            scriptLoader.connection.getUser(mask).whois(function (err, data) {
+                                if (err) {
+                                    event.user.notice('Sorry, i can\'t find %s in %s.', mask, event.channel.getName());
+                                } else {
+                                    event.channel.ban(data.nick + '!' + data.username + '@' + data.hostname);
+                                }
                             });
                         } else {
                             event.user.notice('Sorry, i can\'t find ' + mask + ' in ' + event.channel.getName());
@@ -52,11 +50,9 @@ module.exports = function (scriptLoader, irc) {
             event.user.notice('You don\'t have the permissions to use this command.');
         }
     });
-    scriptLoader.registerCommand(['ub', 'unban'], function (event) {
-        if (event.channel.userHasMode(event.user, '!') || event.channel.userHasMode(event.user, '~') ||
-                event.channel.userHasMode(event.user, '&') || event.channel.userHasMode(event.user, '@') || event.channel.userHasMode(event.user, '%')) {
-            if (event.channel.userHasMode(irc.me, '!') || event.channel.userHasMode(irc.me, '~') ||
-                    event.channel.userHasMode(irc.me, '&') || event.channel.userHasMode(irc.me, '@') || event.channel.userHasMode(irc.me, '%')) {
+    scriptLoader.on('command', ['ub', 'unban'], function (event) {
+        if (event.channel.userHasMinMode(event.user, '%')) {
+            if (event.channel.userHasMinMode(scriptLoader.connection.me, '%')) {
                 if (event.params.length > 0) {
                     event.channel.unban(event.text);
                 } else {
@@ -69,21 +65,19 @@ module.exports = function (scriptLoader, irc) {
             event.user.notice('You don\'t have the permissions to use this command.');
         }
     });
-    scriptLoader.registerCommand(['kb', 'kickban'], function (event) {
-        if (event.channel.userHasMode(event.user, '!') || event.channel.userHasMode(event.user, '~') ||
-                event.channel.userHasMode(event.user, '&') || event.channel.userHasMode(event.user, '@') || event.channel.userHasMode(event.user, '%')) {
-            if (event.channel.userHasMode(irc.me, '!') || event.channel.userHasMode(irc.me, '~') ||
-                    event.channel.userHasMode(irc.me, '&') || event.channel.userHasMode(irc.me, '@') || event.channel.userHasMode(irc.me, '%')) {
+    scriptLoader.on('command', ['kb', 'kickban'], function (event) {
+        if (event.channel.userHasMinMode(event.user, '%')) {
+            if (event.channel.userHasMinMode(scriptLoader.connection.me, '%')) {
                 if (event.params.length > 0) {
                     var nick = event.params[0],
                         reason = event.params.length > 1 ? event.text.substr(nick.length + 1) : '-';
                     if (event.channel.isUserInChannel(nick)) {
-                        irc._getUser(nick).whois(function (data) {
+                        scriptLoader.connection.getUser(nick).whois(function (data) {
                             event.channel.ban(data.nick + '!' + data.username + '@' + data.hostname);
                             event.channel.kick(nick, '(' + event.user.getNick() + ') ' + reason);
                         });
                     } else {
-                        event.user.notice('Sorry, i can\'t find ' + nick + ' in ' + event.channel.getName());
+                        event.user.notice('Sorry, i can\'t find %s in %s.', nick, event.channel.getName());
                     }
                 } else {
                     event.user.notice('Use: !kickban <nick> [reason]');

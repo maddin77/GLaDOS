@@ -1,41 +1,43 @@
-'use strict';
 var request = require('request');
-var _ = require('underscore');
-var moment = require('moment');
-var debug = require('debug')('GLaDOS:script:cryptocoin');
+var _       = require('underscore');
+var moment  = require('moment');
+var utils   = require('../lib/utils');
+var util    = require('util');
 
-module.exports = function (scriptLoader, irc) {
+module.exports = function (scriptLoader) {
 
-    moment.lang('precise-en', {
-        "relativeTime" : {
-            "future" : "in %s",
-            "past" : "%s ago",
-            "s" : "%d seconds",
-            "m" : "a minute",
-            "mm" : "%d minutes",
-            "h" : "an hour",
-            "hh" : "%d hours",
-            "d" : "a day",
-            "dd" : "%d days",
-            "M" : "a month",
-            "MM" : "%d months",
-            "y" : "a year",
-            "yy" : "%d years"
+    moment.locale('precise-en', {
+        'relativeTime' : {
+            'future' : 'in %s',
+            'past' : '%s ago',
+            's' : '%d seconds',
+            'm' : 'a minute',
+            'mm' : '%d minutes',
+            'h' : 'an hour',
+            'hh' : '%d hours',
+            'd' : 'a day',
+            'dd' : '%d days',
+            'M' : 'a month',
+            'MM' : '%d months',
+            'y' : 'a year',
+            'yy' : '%d years'
         }
     });
-    moment.lang('precise-en');
+    moment.locale('precise-en');
 
-    var getCoinData = function (coinName, fn) {
+    var getCoinData, formatReponse;
+
+    getCoinData = function (coinName, fn) {
         request({
-            "uri": 'http://coinmarketcap.northpole.ro/api/usd/all.json',
-            "json": true,
-            "headers": {
-                "User-Agent": irc.config.userAgent
+            'uri': 'http://coinmarketcap.northpole.ro/api/v5/all.json',
+            'json': true,
+            'headers': {
+                'User-Agent': scriptLoader.connection.config.userAgent
             }
         }, function (error, response, data) {
             if (!error && response.statusCode === 200) {
                 var coin = _.find(data.markets, function (c) {
-                    return c.name.toLowerCase() === coinName.toLowerCase() || c.id.toLowerCase() === coinName.toLowerCase();
+                    return c.name.toLowerCase() === coinName.toLowerCase() || c.symbol.toLowerCase() === coinName.toLowerCase();
                 });
                 if (!_.isUndefined(coin)) {
                     fn(null, coin);
@@ -44,110 +46,65 @@ module.exports = function (scriptLoader, irc) {
                 }
             } else {
                 fn('Gratz. You broke it. (' + error + ')', null);
-                debug('[coindata] %s', error);
+                scriptLoader.debug('[coindata] %s', error);
             }
         });
     };
-    scriptLoader.registerCommand(['crypto'], function (event) {
-        if (event.params.length > 0) {
-            getCoinData(event.text, function (error, coin) {
-                if (!error) {
-                    var str = coin.name + '.';
 
-                    if (coin.marketCap === '?') {
-                        str += ' Market Cap: Unknown.';
-                    } else {
-                        str += ' Market Cap: $ ' + coin.marketCap + '.';
-                    }
-
-                    if (coin.price.length === 0) {
-                        str += ' Price: Unknown.';
-                    } else {
-                        str += ' Price: $ ' + coin.price + '.';
-                    }
-
-                    if (coin.totalSupply[0] === '?') {
-                        str += ' Total Supply: Unknwon.';
-                    } else {
-                        str += ' Total Supply: ' + coin.totalSupply + '.';
-                    }
-
-                    if (coin.volume24.length === 0) {
-                        str += ' Volume (24h): Unknwon.';
-                    } else {
-                        str += ' Volume (24h): $ ' + coin.volume24 + ' (' + coin.change24 + ').';
-                    }
-
-                    str += ' Last Update: ' + moment.duration(moment.unix(coin.timestamp).diff(moment()), 'milliseconds').humanize() + ' ago.';
-
-                    event.channel.reply(event.user, str);
-                } else {
-                    event.channel.reply(event.user, error);
-                }
-            });
-        } else {
-            event.user.notice('Use: !crypto <coin>');
+    formatReponse = function (coinName, currency, callback) {
+        var availableCurrencies = ['usd', 'btc', 'eur', 'cny', 'gbp', 'cad', 'rub', 'hkd'];
+        if (!_.contains(availableCurrencies, currency)) {
+            return callback(util.format('Unknwon currency "%s". Available currencies are: %s', currency, availableCurrencies.join(', ')), null);
         }
-    });
-    scriptLoader.registerCommand(['btc', 'bitcoin'], function (event) {
-        var currency, quantity, param;
+        getCoinData(coinName, function (error, coin) {
+            if (error) {
+                return callback(error, null);
+            }
+            var marketCap = '', price = '';
+            if (currency === 'eur') {
+                marketCap = utils.formatMoney(coin.marketCap[currency], '€');
+            } else if (currency === 'usd') {
+                marketCap = utils.formatMoney(coin.marketCap[currency], '$');
+            } else {
+                marketCap = utils.formatMoney(coin.marketCap[currency]);
+            }
+            if (currency === 'eur') {
+                price = utils.formatMoney(coin.price[currency], '€');
+            } else if (currency === 'usd') {
+                price = utils.formatMoney(coin.price[currency], '$');
+            } else {
+                price = utils.formatMoney(coin.price[currency]);
+            }
+            callback(null, util.format('%s (%s). Price: %s. Market Cap: %s. Available Supply: %s %s.', coin.name, coin.symbol, price, marketCap, coin.availableSupply, coin.symbol));
+        });
+    };
+    scriptLoader.on('command', 'crypto', function (event) {
         if (event.params.length === 0) {
-            currency = 'EUR';
-            quantity = 1.0;
-        } else if (event.params.length === 1) {
-            param = event.params[0].toString().replace(/\,/g, '.');
-            if (isNaN(param)) {
-                currency = param.toUpperCase();
-                quantity = 1.0;
-            } else {
-                currency = 'EUR';
-                quantity = parseFloat(param);
-            }
-        } else if (event.params.length === 2) {
-            param = event.params[0].toString().replace(/\,/g, '.');
-            if (isNaN(param)) {
-                currency = param.toUpperCase();
-                quantity = parseFloat(event.params[1].toString().replace(/\,/g, '.'));
-            } else {
-                currency = event.params[1].toUpperCase();
-                quantity = parseFloat(param);
-            }
+            return event.user.notice('Use: !crypto <coin> [currency]');
         }
-        request({
-            "uri": 'https://blockchain.info/ticker',
-            "json": true,
-            "headers": {
-                "User-Agent": irc.config.userAgent
-            }
-        }, function (error, response, data) {
-            if (!error && response.statusCode === 200) {
-                if (data.hasOwnProperty(currency)) {
-                    event.channel.reply(event.user, 'Buy: ' + (data[currency].buy * quantity) + data[currency].symbol + ', Sell: ' + (data[currency].sell * quantity) + data[currency].symbol);
-                } else {
-                    event.channel.reply(event.user, 'Unknown currency "' + currency + '".');
-                }
+        formatReponse(event.params[0], event.params.length > 1 ? event.params[1] : 'eur', function (err, message) {
+            if (err) {
+                event.user.notice(err);
             } else {
-                event.channel.reply(event.user, 'Gratz. You broke it. (' + error + ')');
-                debug('[bitcoin] %s', error);
+                event.channel.say(message);
             }
         });
     });
-    scriptLoader.registerCommand(['doge', 'dogecoin'], function (event) {
-        var quantity = 1.0;
-        if (event.params.length > 0) {
-            quantity = parseFloat(event.params[0].toString().replace(/\,/g, '.'));
-        }
-        request({
-            "uri": 'https://www.dogeapi.com/wow/?a=get_current_price&convert_to=USD&amount_doge=' + quantity,
-            "headers": {
-                "User-Agent": irc.config.userAgent
-            }
-        }, function (error, response, body) {
-            if (!error && response.statusCode === 200) {
-                event.channel.reply(event.user, body + '$ / ' + quantity + 'Ð');
+    scriptLoader.on('command', ['btc', 'bitcoin'], function (event) {
+        formatReponse('bitcoin', event.params.length > 0 ? event.params[0] : 'eur', function (err, message) {
+            if (err) {
+                event.user.notice(err);
             } else {
-                event.channel.reply(event.user, 'Gratz. You broke it. (' + error + ')');
-                debug('[dogecoin] %s', error);
+                event.channel.say(message);
+            }
+        });
+    });
+    scriptLoader.on('command', ['doge', 'dogecoin'], function (event) {
+        formatReponse('dogecoin', event.params.length > 0 ? event.params[0] : 'eur', function (err, message) {
+            if (err) {
+                event.user.notice(err);
+            } else {
+                event.channel.say(message);
             }
         });
     });

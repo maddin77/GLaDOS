@@ -1,12 +1,10 @@
-'use strict';
 var request = require('request');
 var cheerio = require('cheerio');
-var net = require('net');
-var _ = require('underscore');
-var debug = require('debug')('GLaDOS:script:ipinfo');
-var Table = require('easy-table');
+var net     = require('net');
+var _       = require('underscore');
+var Table   = require('easy-table');
 
-module.exports = function (scriptLoader, irc) {
+module.exports = function (scriptLoader) {
     var formatTitle, formatBlock, sprunge;
 
     formatTitle = function (str) {
@@ -32,76 +30,68 @@ module.exports = function (scriptLoader, irc) {
             url: 'http://sprunge.us',
             form: {
                 sprunge: string.trim()
+            },
+            headers: {
+                'User-Agent': scriptLoader.connection.config.userAgent
             }
         }, function (error, response, body) {
             fn(error, body.trim());
         });
     };
 
-    scriptLoader.registerCommand('ipinfo', function (event) {
+    scriptLoader.on('command', 'ipinfo', function (event) {
         if (event.params.length > 0) {
-            var ip = event.text,
+            var ip = event.text.trim(),
                 ret = net.isIP(ip),
                 url = '';
             if (ret !== 0) {
-                if (ret === 4) {
-                    url = 'http://www.tcpiputils.com/inc/api.php?version=1.0&type=ipv4info&hostname=' + ip + '&source=chromeext';
-                } else if (ret === 6) {
+                if (ret === 6) {
                     url = 'http://www.tcpiputils.com/inc/api.php?version=1.0&type=ipv6info&hostname=' + ip + '&source=chromeext';
+                } else  {
+                    url = 'http://www.tcpiputils.com/inc/api.php?version=1.0&type=ipv4info&hostname=' + ip + '&source=chromeext';
                 }
                 request({
-                    "uri": url,
-                    "headers": {
-                        "User-Agent": irc.config.userAgent
+                    'uri': url,
+                    'headers': {
+                        'User-Agent': scriptLoader.connection.config.userAgent
                     }
                 }, function (error, response, body) {
                     if (!error && response.statusCode === 200) {
                         var $ = cheerio.load(body.replace(/<br \/>/gmi, '__NEWLINE__')), string = '';
-                        $('.result').each(function () {
-                            var block = null;
-                            $(this).find('tr').each(function (i) {
-                                var text, key, value;
-                                if ($(this).text().trim().length > 0) {
-                                    if (i === 0) {
-                                        string += formatTitle($(this).text());
-                                        block = [];
-                                    } else if (block !== null) {
-                                        if ($(this).find('td').length > 1) {
-                                            key = $(this).find('td').first().text();
-                                            value = $(this).find('td').last().text().trim();
-                                            if (key !== 'Network tools' && key !== 'Fresh lookup for more domains on this IP.') {
-                                                if (value === 'domain info') {
-                                                    value = '';
-                                                }
-                                                block.push([key, value]);
-                                            }
-                                        } else {
-                                            text = $(this).text();
-                                            if ($(this).find('td').attr('colspan') !== '2' && text !== 'Fresh lookup for more domains on this IP.') {
-                                                if (text.substr(text.split(String.fromCharCode(160))[0].length + 1) === 'domain info') {
-                                                    text = text.split(String.fromCharCode(160))[0];
-                                                }
-                                                string += '\n' + text;
-                                            }
+                        $('.row > div:not(.adboxcontentbrowse)').each(function () {
+                            var title = $(this).find('h2').text().trim(),
+                                block = [];
+                            if (title) {
+                                string += formatTitle(title);
+                                $(this).find('table tr').each(function () {
+                                    var key = $(this).find('td').first().text().trim();
+                                    if ($(this).find('td').length > 1) {
+                                        if (key !== 'Network tools') {
+                                            block.push([key, $(this).find('td').last().text().trim()]);
+                                        }
+                                    } else {
+                                        if (key === 'No domains found.') {
+                                            string += '\nNo domains found.';
                                         }
                                     }
-                                }
-                            });
-                            if (block) {
+                                });
+                            }
+                            if (block.length > 0) {
                                 string += formatBlock(block);
                             }
                         });
                         sprunge(string, function (err, url) {
                             if (err) {
                                 event.channel.reply(event.user, 'Gratz. You broke it. (' + error + ')');
-                                debug('[ipinfo] %s', error);
+                                scriptLoader.debug('sprunge error: %s', error);
                             } else {
                                 event.channel.reply(event.user, url);
                             }
                         });
                     } else {
+                        error = error || ('HTTP ' + response.statusCode);
                         event.channel.reply(event.user, 'Gratz. You broke it. (' + error + ')');
-                        debug('[ipinfo] %s', error);
+                        scriptLoader.debug('reqeust error: %s', error);
                     }
                 });
             } else {

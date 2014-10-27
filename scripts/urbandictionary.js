@@ -1,15 +1,13 @@
-'use strict';
 var request = require('request');
-var debug = require('debug')('GLaDOS:script:urbandictionary');
 
-module.exports = function (scriptLoader, irc) {
-    scriptLoader.registerCommand(['ud', 'urban', 'urbandictionary'], function (event) {
+module.exports = function (scriptLoader) {
+    scriptLoader.on('command', ['ud', 'urban', 'urbandictionary'], function (event) {
         if (event.params.length > 0) {
             request({
-                "uri": 'http://api.urbandictionary.com/v0/define?term=' + encodeURIComponent(event.text),
-                "json": true,
-                "headers": {
-                    "User-Agent": irc.config.userAgent
+                'uri': 'http://api.urbandictionary.com/v0/define?term=' + encodeURIComponent(event.text),
+                'json': true,
+                'headers': {
+                    'User-Agent': scriptLoader.connection.config.userAgent
                 }
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
@@ -24,7 +22,7 @@ module.exports = function (scriptLoader, irc) {
                     }
                 } else {
                     event.channel.reply(event.user, 'Gratz. You broke it. (' + error + ')');
-                    debug('%s', error);
+                    scriptLoader.debug('%s', error);
                 }
             });
         } else {

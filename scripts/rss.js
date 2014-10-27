@@ -1,47 +1,48 @@
-'use strict';
-var debug = require('debug')('GLaDOS:script:rss');
 var request = require('request');
 var CronJob = require('cron').CronJob;
-var async = require('async');
-var _ = require('underscore');
+var async   = require('async');
+var _       = require('underscore');
+var ircC    = require('irc-colors');
 
-module.exports = function (scriptLoader, irc) {
+module.exports = function (scriptLoader) {
 
     var cronJob, checkFeed, shortLink, subscribe, unsubscribe, isSubscribed, listSubscriptions, sortSubscriptions, checkedCache, checkEntries, fetchNewEntries, rssdb;
 
-    rssdb               = irc.database('rss');
-    rssdb.useragent     = rssdb.useragent || irc.config.userAgent;
-    rssdb.subscriptions = rssdb.subscriptions || {};
+    rssdb                                                   = scriptLoader.database('rss');
+    rssdb.useragent                                         = rssdb.useragent || scriptLoader.connection.config.userAgent;
+    rssdb.cronTime                                          = rssdb.cronTime || '*/10 * * * *';
+    rssdb.subscriptions                                     = rssdb.subscriptions || {};
+    rssdb.subscriptions[scriptLoader.connection.getId()]    = rssdb.subscriptions[scriptLoader.connection.getId()] || {};
     rssdb.save();
 
     checkedCache = [];
 
     sortSubscriptions = function () {
         var subscriptions = {}, tmpArr = [];
-        _.each(rssdb.subscriptions, function (array, name) {
+        _.each(rssdb.subscriptions[scriptLoader.connection.getId()], function (array, name) {
             _.each(array, function (url) {
                 subscriptions[url] = subscriptions[url] || [];
                 subscriptions[url].push(name);
             });
         });
-        debug(subscriptions);
+        scriptLoader.debug(subscriptions);
         _.each(subscriptions, function (value, key) {
             tmpArr.push({
                 url: key,
                 subscribers: value
             });
         });
-        debug(tmpArr);
+        scriptLoader.debug(tmpArr);
         return tmpArr;
     };
 
     shortLink = function (url, fn) {
         request.post({
-            "uri": "https://www.googleapis.com/urlshortener/v1/url",
-            "body": {
-                "longUrl": url
+            'uri': 'https://www.googleapis.com/urlshortener/v1/url',
+            'body': {
+                'longUrl': url
             },
-            "json": true
+            'json': true
         }, function (err, res, data) {
             if (!err) {
                 if (res.statusCode === 200) {
@@ -53,13 +54,13 @@ module.exports = function (scriptLoader, irc) {
     };
 
     fetchNewEntries = function (url, fn) {
-        debug('Fetching entries from %s.', url);
+        scriptLoader.debug('Fetching entries from %s.', url);
         request({
-            "uri": 'http://ajax.googleapis.com/ajax/services/feed/load?v=1.0&num=20&q=' + encodeURIComponent(url),
-            "headers": {
-                "User-Agent": rssdb.useragent
+            'uri': 'http://ajax.googleapis.com/ajax/services/feed/load?v=1.0&num=20&q=' + encodeURIComponent(url),
+            'headers': {
+                'User-Agent': rssdb.useragent
             },
-            "json": true
+            'json': true
         }, function (err, res, data) {
             if (!err) {
                 if (res.statusCode === 200) {
@@ -67,14 +68,14 @@ module.exports = function (scriptLoader, irc) {
                         var newEntries = [];
                         _.each(data.responseData.feed.entries, function (entry) {
                             if (!_.contains(checkedCache, entry.link)) {
-                                debug('added %s to cache', entry.link);
+                                scriptLoader.debug('added %s to cache', entry.link);
                                 checkedCache.push(entry.link);
                                 newEntries.push(entry);
                             }
                         });
                         if (fn) {
                             async.map(newEntries, function (entry, callback) {
-                                debug('%s is new => ship', entry.link);
+                                scriptLoader.debug('%s is new => ship', entry.link);
                                 shortLink(entry.link, function (surl) {
                                     entry.shortlink = surl;
                                     callback(null, entry);
@@ -89,7 +90,7 @@ module.exports = function (scriptLoader, irc) {
                     }
                 }
             } else {
-                debug(err);
+                scriptLoader.debug(err);
                 if (fn) {
                     fn(err, null);
                 }
@@ -118,8 +119,8 @@ module.exports = function (scriptLoader, irc) {
                 _.each(results, function (feed) {
                     if (feed.entries.length > 0) {
                         _.each(feed.subscribers, function (subscriber) {
-                            irc.send(subscriber, '[' + feed.title + '] ' + _.map(feed.entries, function (entry) {
-                                return irc.clrs('{B}' + entry.title + '{R} (' + entry.shortlink + ')');
+                            scriptLoader.connection.send(subscriber, '[' + feed.title + '] ' + _.map(feed.entries, function (entry) {
+                                return ircC.bold(entry.title) + ' (' + entry.shortlink + ')';
                             }).join(', '));
                         });
                     }
@@ -130,24 +131,24 @@ module.exports = function (scriptLoader, irc) {
     checkEntries(false);
 
     cronJob = new CronJob({
-        cronTime: '*/10 * * * *',
+        cronTime: rssdb.cronTime,
         onTick: function () {
             checkEntries(true);
         },
         start: true
     });
 
-    scriptLoader.unload(function () {
+    scriptLoader.on('unload', function () {
         cronJob.stop();
     });
 
     checkFeed = function (url, fn) {
         request({
-            "uri": 'http://ajax.googleapis.com/ajax/services/feed/load?v=1.0&num=20&q=' + encodeURIComponent(url),
-            "headers": {
-                "User-Agent": rssdb.useragent
+            'uri': 'http://ajax.googleapis.com/ajax/services/feed/load?v=1.0&num=20&q=' + encodeURIComponent(url),
+            'headers': {
+                'User-Agent': rssdb.useragent
             },
-            "json": true
+            'json': true
         }, function (err, res, data) {
             if (!err) {
                 if (res.statusCode === 200) {
@@ -155,7 +156,7 @@ module.exports = function (scriptLoader, irc) {
                         return fn(data.responseData.feed.title);
                     }
                 } else {
-                    debug(err);
+                    scriptLoader.debug(err);
                 }
             }
             return fn(null);
@@ -163,28 +164,28 @@ module.exports = function (scriptLoader, irc) {
     };
 
     subscribe = function (target, url) {
-        rssdb.subscriptions[target] = rssdb.subscriptions[target] || [];
-        rssdb.subscriptions[target].push(url);
-        rssdb.subscriptions[target] = _.uniq(rssdb.subscriptions[target]);
+        rssdb.subscriptions[scriptLoader.connection.getId()][target] = rssdb.subscriptions[scriptLoader.connection.getId()][target] || [];
+        rssdb.subscriptions[scriptLoader.connection.getId()][target].push(url);
+        rssdb.subscriptions[scriptLoader.connection.getId()][target] = _.uniq(rssdb.subscriptions[scriptLoader.connection.getId()][target]);
         rssdb.save();
     };
 
     unsubscribe = function (target, url) {
-        rssdb.subscriptions[target] = rssdb.subscriptions[target] || [];
-        rssdb.subscriptions[target] = _.without(rssdb.subscriptions[target], url);
+        rssdb.subscriptions[scriptLoader.connection.getId()][target] = rssdb.subscriptions[scriptLoader.connection.getId()][target] || [];
+        rssdb.subscriptions[scriptLoader.connection.getId()][target] = _.without(rssdb.subscriptions[scriptLoader.connection.getId()][target], url);
         rssdb.save();
     };
 
     isSubscribed = function (target, url) {
-        rssdb.subscriptions[target] = rssdb.subscriptions[target] || [];
-        return rssdb[target].indexOf(url) > -1;
+        rssdb.subscriptions[scriptLoader.connection.getId()][target] = rssdb.subscriptions[scriptLoader.connection.getId()][target] || [];
+        return rssdb.subscriptions[scriptLoader.connection.getId()][target].indexOf(url) > -1;
     };
 
     listSubscriptions = function (target) {
-        return rssdb.subscriptions[target] || [];
+        return rssdb.subscriptions[scriptLoader.connection.getId()][target] || [];
     };
 
-    scriptLoader.registerCommand('rss', function (event) {
+    scriptLoader.on('command', 'rss', function (event) {
         if (event.params.length > 0) {
             var feedUrl, feeds;
             if (event.params[0].toUpperCase() === 'SUBSCRIBE') {
@@ -229,7 +230,7 @@ module.exports = function (scriptLoader, irc) {
             event.user.notice('Use: !rss <subscribe/unsubscribe/list> [feed url]');
         }
     });
-    scriptLoader.registerCommand('chanrss', function (event) {
+    scriptLoader.on('command', 'chanrss', function (event) {
         if (event.channel.userHasMode(event.user, '!') || event.channel.userHasMode(event.user, '~') ||
                 event.channel.userHasMode(event.user, '&') || event.channel.userHasMode(event.user, '@') || event.channel.userHasMode(event.user, '%')) {
             if (event.params.length > 0) {

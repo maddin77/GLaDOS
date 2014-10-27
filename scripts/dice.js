@@ -1,8 +1,7 @@
-'use strict';
 var _ = require('underscore');
 
-module.exports = function (scriptLoader, irc) {
-    scriptLoader.registerCommand(['roll', 'dice'], function (event) {
+module.exports = function (scriptLoader) {
+    scriptLoader.on('command', ['roll', 'dice'], function (event) {
         var min, max;
         if (event.params.length === 0) {
             event.channel.reply(event.user, _.random(100));

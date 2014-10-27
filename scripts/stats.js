@@ -1,16 +1,25 @@
-'use strict';
 var _ = require('underscore');
-var debug = require('debug')('GLaDOS:script:stats');
 
-module.exports = function (scriptLoader, irc) {
-    var smileys, smileyRegexp, countSmileys, statsdb, statsAdd;
+module.exports = function (scriptLoader) {
+    var smileys, smileyRegexp, countSmileys, statsdb, stats;
 
-    statsdb = irc.database('stats');
+    statsdb = scriptLoader.database('stats');
+    statsdb[scriptLoader.connection.getId()] = statsdb[scriptLoader.connection.getId()] || {};
+    statsdb.save();
 
-    statsAdd = function (namespace, key, ammount) {
-        statsdb[namespace] = statsdb[namespace] || {};
-        statsdb[namespace][key] = (statsdb[namespace][key] || 0) + ammount;
-        statsdb.save();
+    stats = {
+        set: function (namespace, key, value) {
+            statsdb[scriptLoader.connection.getId()][namespace]         = statsdb[scriptLoader.connection.getId()][namespace] || {};
+            statsdb[scriptLoader.connection.getId()][namespace][key]    = value;
+            statsdb.save();
+        },
+        get: function (namespace, key) {
+            statsdb[scriptLoader.connection.getId()][namespace] = statsdb[scriptLoader.connection.getId()][namespace] || {};
+            return statsdb[scriptLoader.connection.getId()][namespace][key];
+        },
+        add: function (namespace, key, ammount) {
+            this.set(namespace, key, (this.get(namespace, key) || 0) + ammount);
+        }
     };
 
     smileys = [
@@ -38,111 +47,106 @@ module.exports = function (scriptLoader, irc) {
         'ಠ_ಠ', '¯\\_(ツ)_/¯', '(╯°□°）╯'
     ];
     smileyRegexp = new RegExp(_.map(smileys, function (smiley) {
-        return '(' + smiley.replace(/[\[\]{}()*+?.\\|\^$\-,&#\s]/g, "\\$&") + ')';
+        return '(' + smiley.replace(/[\[\]{}()*+?.\\|\^$\-,&#\s]/g, '\\$&') + ')';
     }).join('|'), 'gi');
 
     countSmileys = function (msg) {
         return (msg.match(smileyRegexp) || []).length;
     };
 
-    scriptLoader.registerEvent('message', function (event) {
-        statsAdd(event.channel.getName(), 'messages', 1);
-        statsAdd(event.channel.getName(), 'characters', event.message.length);
-        statsAdd(event.channel.getName(), 'words', event.message.split(' ').length);
-        statsAdd(event.channel.getName(), 'smileys', countSmileys(event.message));
+    scriptLoader.on('message', function (event) {
+        stats.add(event.channel.getName(), 'messages', 1);
+        stats.add(event.channel.getName(), 'characters', event.message.length);
+        stats.add(event.channel.getName(), 'words', event.message.split(' ').length);
+        stats.add(event.channel.getName(), 'smileys', countSmileys(event.message));
         if (event.isAction) {
-            statsAdd(event.channel.getName(), 'actions', 1);
+            stats.add(event.channel.getName(), 'actions', 1);
         }
         if (event.message.match(/(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?\^=%&amp;:\/~\+#]*[\w\-\@?\^=%&amp;\/~\+#])?/i)) {
-            statsAdd(event.channel.getName(), 'urls', 1);
+            stats.add(event.channel.getName(), 'urls', 1);
         }
         if (event.message.toUpperCase() === event.message) {
-            statsAdd(event.channel.getName(), 'allcaps', 1);
+            stats.add(event.channel.getName(), 'allcaps', 1);
         }
         if (event.message.slice(-1) === '?') {
-            statsAdd(event.channel.getName(), 'questions', 1);
+            stats.add(event.channel.getName(), 'questions', 1);
         }
     });
-    scriptLoader.registerEvent('command', function (event) {
-        statsAdd(event.channel.getName(), 'commands', 1);
+    scriptLoader.on('allcommands', function (name, event) {
+        stats.add(event.channel.getName(), 'commands', 1);
     });
-    scriptLoader.registerEvent('join', function (event) {
-        statsdb[event.channel.getName()] = statsdb[event.channel.getName()] || {};
-
-        if (event.user.getNick() === irc.config.irc.nick && !_.has(statsdb[event.channel.getName()], 'start')) {
-            statsdb[event.channel.getName()].start = Date.now();
-            statsdb.save();
+    scriptLoader.on('join', function (event) {
+        if (event.user.getNick() === scriptLoader.connection.config.nick && !stats.get(event.channel.getName(), 'start')) {
+            stats.set(event.channel.getName(), 'start', Date.now());
         }
 
-        statsAdd(event.channel.getName(), 'joins', 1);
+        stats.add(event.channel.getName(), 'joins', 1);
 
         var count = Object.keys(event.channel.getNames()).length;
-        if (!_.has(statsdb[event.channel.getName()], 'peak') || count > statsdb[event.channel.getName()].peak.users) {
-            statsdb[event.channel.getName()].peak = {
-                "users": count,
-                "timestamp": Date.now()
-            };
-            statsdb.save();
+        if (!stats.get(event.channel.getName(), 'peak') || count > stats.get(event.channel.getName(), 'peak').users) {
+            stats.set(event.channel.getName(), 'peak', {
+                'users': count,
+                'timestamp': Date.now()
+            });
         }
     });
-    scriptLoader.registerEvent('names', function (event) {
+    scriptLoader.on('names', function (event) {
         var count = Object.keys(event.channel.getNames()).length;
-        if (!_.has(statsdb[event.channel.getName()], 'peak') || count > statsdb[event.channel.getName()].peak.users) {
-            statsdb[event.channel.getName()].peak = {
-                "users": count,
-                "timestamp": Date.now()
-            };
-            statsdb.save();
+        if (!stats.get(event.channel.getName(), 'peak') || count > stats.get(event.channel.getName(), 'peak').users) {
+            stats.set(event.channel.getName(), 'peak', {
+                'users': count,
+                'timestamp': Date.now()
+            });
         }
     });
-    scriptLoader.registerEvent('part', function (event) {
+    scriptLoader.on('part', function (event) {
         event.channels.forEach(function (channel) {
-            statsAdd(channel.getName(), 'parts', 1);
+            stats.add(channel.getName(), 'parts', 1);
         });
     });
-    scriptLoader.registerEvent('kick', function (event) {
-        statsAdd(event.channel.getName(), 'kicks', 1);
+    scriptLoader.on('kick', function (event) {
+        stats.add(event.channel.getName(), 'kicks', 1);
     });
-    scriptLoader.registerEvent('mode', function (event) {
+    scriptLoader.on('mode', function (event) {
         if (event.channel !== null) {
-            statsAdd(event.channel.getName(), 'modes', 1);
+            stats.add(event.channel.getName(), 'modes', 1);
             if (event.mode === 'b') {
-                statsAdd(event.channel.getName(), 'bans', 1);
+                stats.add(event.channel.getName(), 'bans', 1);
             }
         }
     });
-    scriptLoader.registerEvent('topic', function (event) {
+    scriptLoader.on('topic', function (event) {
         if (event.topicChanged) {
-            statsAdd(event.channel.getName(), 'topicchanges', 1);
+            stats.add(event.channel.getName(), 'topicchanges', 1);
         }
     });
-    scriptLoader.registerCommand('stats', function (event) {
-        var stats = _.defaults(statsdb[event.channel.getName()] || {}, {
-            "joins": "0",
-            "start": "1395000994802",
-            "peak": {
-                "users": 0,
-                "timestamp": Date.now()
+    scriptLoader.on('command', 'stats', function (event) {
+        var s = _.defaults(statsdb[scriptLoader.connection.getId()][event.channel.getName()] || {}, {
+            'joins': '0',
+            'start': '1395000994802',
+            'peak': {
+                'users': 0,
+                'timestamp': Date.now()
             },
-            "messages": "0",
-            "characters": "0",
-            "words": "0",
-            "smileys": "0",
-            "questions": "0",
-            "allcaps": "0",
-            "modes": "0",
-            "commands": "0",
-            "kicks": "0",
-            "urls": "0",
-            "actions": "0",
-            "bans": "0",
-            "parts": "0",
-            "quits": "0",
-            "topicchanges": "0"
+            'messages': '0',
+            'characters': '0',
+            'words': '0',
+            'smileys': '0',
+            'questions': '0',
+            'allcaps': '0',
+            'modes': '0',
+            'commands': '0',
+            'kicks': '0',
+            'urls': '0',
+            'actions': '0',
+            'bans': '0',
+            'parts': '0',
+            'quits': '0',
+            'topicchanges': '0'
         });
-        event.channel.say('On ' + event.channel.getName() + ' there have been ' + stats.messages + ' messages, containing ' + stats.characters + ' characters, ' + stats.words + ' words and ' + stats.smileys + ' smileys; ' + stats.actions + ' of those messages were ACTIONs.');
-        event.channel.say('There have been ' + stats.joins + ' joins, ' + stats.parts + ' parts, ' + stats.quits + ' quits, ' + stats.kicks + ' kicks, ' + stats.modes + ' mode changes, and ' + stats.topicchanges + ' topic changes.');
-        event.channel.say('There are currently ' + Object.keys(event.channel.getNames()).length + ' users and the channel has peaked at ' + stats.peak.split(',')[0] + ' users.');
+        event.channel.say('On ' + event.channel.getName() + ' there have been ' + s.messages + ' messages, containing ' + s.characters + ' characters, ' + s.words + ' words and ' + s.smileys + ' smileys; ' + s.actions + ' of those messages were ACTIONs.');
+        event.channel.say('There have been ' + s.joins + ' joins, ' + s.parts + ' parts, ' + s.quits + ' quits, ' + s.kicks + ' kicks, ' + s.modes + ' mode changes, and ' + s.topicchanges + ' topic changes.');
+        event.channel.say('There are currently ' + Object.keys(event.channel.getNames()).length + ' users and the channel has peaked at ' + new Date(s.peak.timestamp) + ' with ' + s.peak.users + ' users.');
     });
 };
 /*

@@ -1,25 +1,40 @@
-'use strict';
-var utils   = require(__dirname + '/../lib/utils');
-var debug   = require('debug')('GLaDOS:script:control');
+var utils   = require('./../lib/utils');
 var _       = require('underscore');
+var ircC    = require('irc-colors');
 
-module.exports = function (scriptLoader, irc) {
-    scriptLoader.registerCommand(['mem', 'memory'], function (event) {
-        if (irc.config.admin.indexOf(event.user.getNick()) > -1) {
+module.exports = function (scriptLoader) {
+    scriptLoader.on('command', 'version', function (event) {
+        var p = require('./../package.json');
+        event.user.notice(p.name + ' - ' + p.version);
+    });
+    scriptLoader.on('command', ['sinfo', 'mem', 'memory'], function (event) {
+        if (event.user.isAdmin()) {
             var mem = process.memoryUsage();
-            event.user.notice(utils.readableNumber(mem.rss) + " (v8: " + utils.readableNumber(mem.heapUsed) + " / " + utils.readableNumber(mem.heapTotal) + ")");
+            event.user.say('    %s', ircC.bold.underline('System'));
+            event.user.say('            %s: %s', ircC.bold('Plattform'), process.platform);
+            event.user.say('            %s: %s', ircC.bold('Processor architecture'), process.arch);
+            event.user.say('            %s: %s', ircC.bold('Uptime (Node)'), utils.formatTime(process.uptime()));
+            event.user.say('   %s', ircC.bold.underline('Process'));
+            event.user.say('            %s: %s', ircC.bold('PID'), process.pid);
+            event.user.say('            %s: %s', ircC.bold('Group ID'), process.platform !== 'win32' ? process.getgid() : 'only available on POSIX platforms');
+            event.user.say('            %s: %s', ircC.bold('User ID'), process.platform !== 'win32' ? process.getuid() : 'only available on POSIX platforms');
+            event.user.say('            %s: %s (V8 Heap: %s Used / %s Total)', ircC.bold('Memory'), utils.readableNumber(mem.rss), utils.readableNumber(mem.heapUsed), utils.readableNumber(mem.heapTotal));
+            event.user.say('  %s', ircC.bold.underline('Versions'));
+            _.each(process.versions, function (version, name) {
+                event.user.say('            %s: %s', ircC.bold(name), version);
+            });
         } else {
             event.user.notice('You don\'t have the permissions to use this command.');
         }
     });
-    scriptLoader.registerCommand('join', function (event) {
-        if (irc.config.admin.indexOf(event.user.getNick()) > -1) {
+    scriptLoader.on('command', 'join', function (event) {
+        if (event.user.isAdmin()) {
             if (event.params.length > 0) {
                 var channelName = event.params[0];
-                irc.join(channelName);
-                if (irc.config.irc.channel.indexOf(channelName) === -1) {
-                    irc.config.irc.channel.push(channelName);
-                    irc.config.save();
+                scriptLoader.connection.join(channelName);
+                if (scriptLoader.connection.config.channels.indexOf(channelName) === -1) {
+                    scriptLoader.connection.config.channels.push(channelName);
+                    scriptLoader.connection.config.save();
                 }
             } else {
                 event.user.notice('Use: !join <#channel>');
@@ -28,8 +43,8 @@ module.exports = function (scriptLoader, irc) {
             event.user.notice('You don\'t have the permissions to use this command.');
         }
     });
-    scriptLoader.registerCommand('part', function (event) {
-        if (irc.config.admin.indexOf(event.user.getNick()) > -1) {
+    scriptLoader.on('command', 'part', function (event) {
+        if (event.user.isAdmin()) {
             var channelName, msg;
             if (event.params.length > 0) {
                 if (event.params[0][0] === '#') {
@@ -43,15 +58,15 @@ module.exports = function (scriptLoader, irc) {
                 channelName = event.channel.getName();
                 msg = '';
             }
-            irc.part(channelName, msg);
-            irc.config.irc.channel = _.without(irc.config.irc.channel, channelName);
-            irc.config.save();
+            scriptLoader.connection.part(channelName, msg);
+            scriptLoader.connection.config.channels = _.without(scriptLoader.connection.config.channels, channelName);
+            scriptLoader.connection.config.save();
         } else {
             event.user.notice('You don\'t have the permissions to use this command.');
         }
     });
-    scriptLoader.registerCommand('cycle', function (event) {
-        if (irc.config.admin.indexOf(event.user.getNick()) > -1) {
+    scriptLoader.on('command', ['cycle', 'rejoin'], function (event) {
+        if (event.user.isAdmin()) {
             var channelName, msg;
             if (event.params.length > 0) {
                 if (event.params[0][0] === '#') {
@@ -65,29 +80,32 @@ module.exports = function (scriptLoader, irc) {
                 channelName = event.channel.getName();
                 msg = '';
             }
-            irc.part(channelName, msg);
-            irc.join(channelName);
+            scriptLoader.connection.part(channelName, msg);
+            scriptLoader.connection.join(channelName);
         }
     });
-    scriptLoader.registerCommand('raw', function (event) {
-        if (irc.config.admin.indexOf(event.user.getNick()) > -1) {
-            irc.write(event.text);
+    scriptLoader.on('command', 'raw', function (event) {
+        if (event.user.isAdmin()) {
+            scriptLoader.connection.write(event.text);
         } else {
             event.user.notice('You don\'t have the permissions to use this command.');
         }
     });
-    scriptLoader.registerCommand('exit', function (event) {
-        if (irc.config.admin.indexOf(event.user.getNick()) > -1) {
-            irc.quit(event.text);
+    scriptLoader.on('command', 'exit', function (event) {
+        if (event.user.isAdmin()) {
+            scriptLoader.connection.quit(event.text);
+            scriptLoader.connection.getConnectionManager().forEach(function (connection) {
+                connection.disconnect();
+            });
         } else {
             event.user.notice('You don\'t have the permissions to use this command.');
         }
     });
-    scriptLoader.registerCommand(['say', 'msg'], function (event) {
-        if (irc.config.admin.indexOf(event.user.getNick()) > -1) {
+    scriptLoader.on('command', ['say', 'msg'], function (event) {
+        if (event.user.isAdmin()) {
             if (event.params.length > 1) {
                 var parts = event.params;
-                irc.send(parts.shift(), parts.join(' '));
+                scriptLoader.connection.send(parts.shift(), parts.join(' '));
             } else {
                 event.user.notice('Use: !say <target> <message>');
             }
@@ -96,8 +114,8 @@ module.exports = function (scriptLoader, irc) {
         }
     });
 
-    scriptLoader.registerCommand('script', function (event) {
-        if (irc.config.admin.indexOf(event.user.getNick()) > -1) {
+    scriptLoader.on('command', 'script', function (event) {
+        if (event.user.isAdmin()) {
             if (event.params.length > 1) {
                 if (event.params[0].toUpperCase() === 'LOAD') {
                     scriptLoader.loadScript(event.params[1], function (err) {
@@ -114,24 +132,25 @@ module.exports = function (scriptLoader, irc) {
                 } else {
                     event.user.notice('Use: !script <load/unload/reload> <scriptname>');
                 }
+            } else if (event.params.length === 1 && event.params[0].toUpperCase() === 'LIST') {
+                event.user.notice('Scripts loaded on %s: %s', scriptLoader.connection.getId(), scriptLoader.listScripts().join(', '));
             } else {
-                event.user.notice('Use: !script <load/unload/reload> <scriptname>');
+                event.user.notice('Use: !script <load/unload/reload/list> [scriptname]');
             }
         } else {
             event.user.notice('You don\'t have the permissions to use this command.');
         }
     });
-
-    scriptLoader.registerCommand('admin', function (event) {
-        if (irc.config.admin.indexOf(event.user.getNick()) > -1) {
+    scriptLoader.on('command', 'admin', function (event) {
+        if (event.user.isAdmin()) {
             if (event.params.length > 0) {
                 if (event.params[0].toUpperCase() === 'ADD') {
                     if (event.params.length > 1) {
-                        if (_.contains(irc.config.admin, event.params[1])) {
+                        if (_.contains(scriptLoader.connection.config.admin, event.params[1])) {
                             event.user.notice(event.params[1] + ' is already admin.');
                         } else {
-                            irc.config.admin.push(event.params[1]);
-                            irc.config.save();
+                            scriptLoader.connection.config.admin.push(event.params[1]);
+                            scriptLoader.connection.config.save();
                             event.user.notice(event.params[1] + ' is now admin.');
                         }
                     } else {
@@ -139,18 +158,18 @@ module.exports = function (scriptLoader, irc) {
                     }
                 } else if (event.params[0].toUpperCase() === 'REM') {
                     if (event.params.length > 1) {
-                        if (!_.contains(irc.config.admin, event.params[1])) {
+                        if (!_.contains(scriptLoader.connection.config.admin, event.params[1])) {
                             event.user.notice('There is no admin called "' + event.params[1] + '".');
                         } else {
-                            irc.config.admin = _.without(irc.config.admin, event.params[1]);
-                            irc.config.save();
-                            event.user.notice('Admin ' + event.params[1] + ' has been removed.');
+                            scriptLoader.connection.config.admin = _.without(scriptLoader.connection.config.admin, event.params[1]);
+                            scriptLoader.connection.config.save();
+                            event.user.notice('Admin %s has been removed.', event.params[1]);
                         }
                     } else {
                         event.user.notice('Use: !admin REM <nick>');
                     }
                 } else if (event.params[0].toUpperCase() === 'LIST') {
-                    event.user.notice('The following nicks have admin privileges: ' + irc.config.admin.join(', ') + '.');
+                    event.user.notice('The following nicks have admin privileges: ' + scriptLoader.connection.config.admin.join(', ') + '.');
                 } else {
                     event.user.notice('Use: !admin <add/rem/list> [nick]');
                 }
@@ -161,12 +180,11 @@ module.exports = function (scriptLoader, irc) {
             event.user.notice('You don\'t have the permissions to use this command.');
         }
     });
-
-    scriptLoader.registerEvent('privatemessage', function (event) {
-        if (irc.config.admin.indexOf(event.user.getNick()) > -1 && !event.isAction) {
+    scriptLoader.on('privatemessage', function (event) {
+        if (event.user.isAdmin()) {
             var params = event.message.split(' ');
             if (params[0] === 'RAW') {
-                irc.write(event.message.substr(params[0].length + 1));
+                scriptLoader.connection.write(event.message.substr(params[0].length + 1));
             }
         }
     });

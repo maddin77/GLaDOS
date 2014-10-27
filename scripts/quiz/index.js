@@ -1,24 +1,22 @@
-'use strict';
-
 var moment = require('moment');
 var Quiz = require(__dirname + '/Quiz.js');
 
 module.exports = function (scriptLoader, irc) {
     moment.lang('precise-en', {
-        "relativeTime" : {
-            "future" : "in %s",
-            "past" : "%s ago",
-            "s" : "%d seconds", //see https://github.com/timrwood/moment/pull/232#issuecomment-4699806
-            "m" : "a minute",
-            "mm" : "%d minutes",
-            "h" : "an hour",
-            "hh" : "%d hours",
-            "d" : "a day",
-            "dd" : "%d days",
-            "M" : "a month",
-            "MM" : "%d months",
-            "y" : "a year",
-            "yy" : "%d years"
+        'relativeTime' : {
+            'future' : 'in %s',
+            'past' : '%s ago',
+            's' : '%d seconds', //see https://github.com/timrwood/moment/pull/232#issuecomment-4699806
+            'm' : 'a minute',
+            'mm' : '%d minutes',
+            'h' : 'an hour',
+            'hh' : '%d hours',
+            'd' : 'a day',
+            'dd' : '%d days',
+            'M' : 'a month',
+            'MM' : '%d months',
+            'y' : 'a year',
+            'yy' : '%d years'
         }
     });
     moment.lang('precise-en');
@@ -139,9 +137,9 @@ module.exports = function (scriptLoader, irc) {
         if (event.channel.getName() === quizChannelName) {
             var scores = quiz.getToplist(),
                 userscore = {
-                    "nick": event.user.getNick(),
-                    "score": -1,
-                    "index": -1
+                    'nick': event.user.getNick(),
+                    'score': -1,
+                    'index': -1
                 },
                 index;
             for (index = 0; index < scores.length; index += 1) {

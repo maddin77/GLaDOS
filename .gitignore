@@ -4,7 +4,8 @@ node_modules
 *.txt
 _OLD_VERSIONS_
 data/*
-!data/config.default.json
+config/*
+!config/rename-me.json
 *.sublime-project
 *.sublime-workspace
 test.*

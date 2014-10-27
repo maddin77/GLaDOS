@@ -1,23 +1,21 @@
-'use strict';
-
 var debug = require('debug')('GLaDOS:script:Quiz');
 var _ = require('underscore');
 var moment = require('moment');
 moment.lang('precise-en', {
-    "relativeTime" : {
-        "future" : "in %s",
-        "past" : "%s ago",
-        "s" : "%d seconds", //see https://github.com/timrwood/moment/pull/232#issuecomment-4699806
-        "m" : "a minute",
-        "mm" : "%d minutes",
-        "h" : "an hour",
-        "hh" : "%d hours",
-        "d" : "a day",
-        "dd" : "%d days",
-        "M" : "a month",
-        "MM" : "%d months",
-        "y" : "a year",
-        "yy" : "%d years"
+    'relativeTime' : {
+        'future' : 'in %s',
+        'past' : '%s ago',
+        's' : '%d seconds', //see https://github.com/timrwood/moment/pull/232#issuecomment-4699806
+        'm' : 'a minute',
+        'mm' : '%d minutes',
+        'h' : 'an hour',
+        'hh' : '%d hours',
+        'd' : 'a day',
+        'dd' : '%d days',
+        'M' : 'a month',
+        'MM' : '%d months',
+        'y' : 'a year',
+        'yy' : '%d years'
     }
 });
 moment.lang('precise-en');
@@ -88,8 +86,8 @@ Quiz.prototype.getToplist = function () {
     Object.keys(_scores).forEach(function (nick) {
         var score = _scores[nick];
         scores.push({
-            "nick": nick,
-            "score": score
+            'nick': nick,
+            'score': score
         });
     });
     scores.sort(function (a, b) {
@@ -128,7 +126,7 @@ Quiz.prototype.getTotalQuestionCount = function () {
     return this.quizdata[this.lang].questions;
 };
 Quiz.prototype.getQuizdataCreationDate = function () {
-    return moment(this.quizdata[this.lang].created).format("dddd, MMMM Do YYYY, HH:mm:ss");
+    return moment(this.quizdata[this.lang].created).format('dddd, MMMM Do YYYY, HH:mm:ss');
 };
 Quiz.prototype.getQuestionString = function () {
     var str = '';
@@ -186,12 +184,12 @@ Quiz.prototype.isRight = function (text) {
     } else {
         var answer, tr;
         answer = this.question.answer.replace(/\#/g, '').toLowerCase();
-        answer = answer.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+        answer = answer.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
         tr = {
-            "ä": "ae",
-            "ü": "ue",
-            "ö": "oe",
-            "ß": "ss"
+            'ä': 'ae',
+            'ü': 'ue',
+            'ö': 'oe',
+            'ß': 'ss'
         };
         if (text.search(answer) !== -1) {
             debug('search: %s', answer);
@@ -240,7 +238,7 @@ Quiz.prototype.getHint = function () {
         self.channel.say(self.irc.clrs('[{B}QUIZ{R}] The answer is: {B}' + self.getAnswer()));
         self.delayNewQuestion();
     } else {
-        hint = "";
+        hint = '';
         parts = self.question.answer.replace(/\#/g, '').match(new RegExp('.{1,' + self.MAX_HINTS + '}', 'g'));
         for (p = 0; p < parts.length; p += 1) {
             part = parts[p];
@@ -248,7 +246,7 @@ Quiz.prototype.getHint = function () {
                 if (j + 1 <= self.hintcount) {
                     hint += part.charAt(j);
                 } else {
-                    if (part.charAt(j) === " ") {
+                    if (part.charAt(j) === ' ') {
                         hint += ' ';
                     } else {
                         hint += '_';

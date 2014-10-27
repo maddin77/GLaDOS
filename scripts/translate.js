@@ -1,18 +1,16 @@
-'use strict';
 var request = require('request');
-var debug = require('debug')('GLaDOS:script:translate');
 
-module.exports = function (scriptLoader, irc) {
-    scriptLoader.registerCommand(['t', 'translate'], function (event) {
+module.exports = function (scriptLoader) {
+    scriptLoader.on('command', ['t', 'translate'], function (event) {
         if (event.params.length > 2) {
             var source = event.params[0],
                 target = event.params[1],
                 sentence = event.text.substring(source.length + target.length + 2);
             request({
-                "uri": 'http://api.mymemory.translated.net/get?q=' + encodeURIComponent(sentence) + '&langpair=' + source + '|' + target,
-                "json": true,
-                "headers": {
-                    "User-Agent": irc.config.userAgent
+                'uri': 'http://api.mymemory.translated.net/get?q=' + encodeURIComponent(sentence) + '&langpair=' + source + '|' + target,
+                'json': true,
+                'headers': {
+                    'User-Agent': scriptLoader.connection.config.userAgent
                 }
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
@@ -23,7 +21,7 @@ module.exports = function (scriptLoader, irc) {
                     }
                 } else {
                     event.channel.reply(event.user, 'Gratz. You broke it. (' + error + ')');
-                    debug('%s', error);
+                    scriptLoader.debug('%s', error);
                 }
             });
         } else {

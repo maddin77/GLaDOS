@@ -1,16 +1,14 @@
-'use strict';
 var request = require('request');
-var debug = require('debug')('GLaDOS:script:heartbleed');
 
-module.exports = function (scriptLoader, irc) {
-    scriptLoader.registerCommand('heartbleed', function (event) {
+module.exports = function (scriptLoader) {
+    scriptLoader.on('command', 'heartbleed', function (event) {
         if (event.params.length > 0) {
             request({
-                "uri": 'https://hbelb.filippo.io/bleed/' + encodeURIComponent(event.text),
-                "headers": {
-                    "User-Agent": irc.config.userAgent
+                'uri': 'https://hbelb.filippo.io/bleed/' + encodeURIComponent(event.text),
+                'headers': {
+                    'User-Agent': scriptLoader.connection.config.userAgent
                 },
-                "json": true
+                'json': true
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
                     if (data.error) {
@@ -24,7 +22,7 @@ module.exports = function (scriptLoader, irc) {
                     }
                 } else {
                     event.channel.reply(event.user, 'Gratz. You broke it. (' + error + ')');
-                    debug('%s', error);
+                    scriptLoader.debug('%s', error);
                 }
             });
         } else {
