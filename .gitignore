@@ -8,5 +8,4 @@ config/*
 !config/rename-me.json
 *.sublime-project
 *.sublime-workspace
-test.*
 ignore_me
