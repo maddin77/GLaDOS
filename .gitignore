@@ -9,3 +9,4 @@ config/*
 *.sublime-project
 *.sublime-workspace
 ignore_me
+scripts/quiz
