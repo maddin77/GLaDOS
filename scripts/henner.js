@@ -14,6 +14,7 @@ module.exports = function (scriptLoader) {
         'TV Total Stock Car 2010 - ich war dabei', // http://forum.sa-mp.de/index.php?page=User&userID=23377
         'Soo ich bin der Henner alias Kai bin fast 33 und verheiratet und habe 2 Kinder', // http://sa-mp.de/B++/p1150653-/
         'wenn man brennt hat man pech dabei sein ist doch alles manche würden sich freuen das mal mit zuerleben', //http://sa-mp.de/B++/p1150721-/
+	'Ich bin eh nur verwarnt worden, weil IMexiz mich nicht mag', // aus ner PN an seegras vom 23.10.2014, 22:37 Uhr
     ];
 
     scriptLoader.on('command', 'henner', function (event) {
