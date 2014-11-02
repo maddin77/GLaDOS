@@ -1,7 +1,7 @@
 var debug = require('debug')('GLaDOS:script:Quiz');
 var _ = require('underscore');
 var moment = require('moment');
-moment.lang('precise-en', {
+moment.locale('precise-en', {
     'relativeTime' : {
         'future' : 'in %s',
         'past' : '%s ago',
@@ -18,7 +18,7 @@ moment.lang('precise-en', {
         'yy' : '%d years'
     }
 });
-moment.lang('precise-en');
+moment.locale('precise-en');
 
 
 var Quiz = function (irc) {

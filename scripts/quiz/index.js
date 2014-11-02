@@ -2,7 +2,7 @@ var moment = require('moment');
 var Quiz = require(__dirname + '/Quiz.js');
 
 module.exports = function (scriptLoader, irc) {
-    moment.lang('precise-en', {
+    moment.locale('precise-en', {
         'relativeTime' : {
             'future' : 'in %s',
             'past' : '%s ago',
@@ -19,7 +19,7 @@ module.exports = function (scriptLoader, irc) {
             'yy' : '%d years'
         }
     });
-    moment.lang('precise-en');
+    moment.locale('precise-en');
 
 
     var quiz = new Quiz(irc),
