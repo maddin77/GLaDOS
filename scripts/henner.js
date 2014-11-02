@@ -14,8 +14,8 @@ module.exports = function (scriptLoader) {
         'TV Total Stock Car 2010 - ich war dabei', // http://forum.sa-mp.de/index.php?page=User&userID=23377
         'Soo ich bin der Henner alias Kai bin fast 33 und verheiratet und habe 2 Kinder', // http://sa-mp.de/B++/p1150653-/
         'wenn man brennt hat man pech dabei sein ist doch alles manche würden sich freuen das mal mit zuerleben', //http://sa-mp.de/B++/p1150721-/
-	'Ich bin eh nur verwarnt worden, weil IMexiz mich nicht mag', // aus ner PN an seegras vom 23.10.2014, 22:37 Uhr
-	'Ein Forum das Online ist ohne Impressum ist gefährlich', // http://sa-mp.de/B++/p1985231-/
+        'Ich bin eh nur verwarnt worden, weil IMexiz mich nicht mag', // aus ner PN an seegras vom 23.10.2014, 22:37 Uhr
+        'Ein Forum das Online ist ohne Impressum ist gefährlich', // http://sa-mp.de/B++/p1985231-/
         'ich finde es hier lustig ich bleibe', // http://sa-mp.de/B++/p1985116-/
         'bin schon viel zu alt für die Samp Szene', // http://sa-mp.de/B++/p1985020-/
         'man redet doch immer seine eigene Projekte gut', // http://sa-mp.de/B++/p1981636-/
@@ -23,8 +23,16 @@ module.exports = function (scriptLoader) {
         'Its henner Time' //sagt er zu oft für eine Quelle. Eine: http://youtu.be/J_nzc-dpqAQ?t=2m53s
     ];
 
+    var hennerify = function (msg) { //Für die extra Portion Henner (alles klein -> satzezeichen entfernen)
+        return msg.toLowerCase().replace(/[\.,-\/#!§"$%\^&\*;:{}=\-_`~()]/g, '');
+    };
+
     scriptLoader.on('command', 'henner', function (event) {
-        var text = _.sample(phrases).toLowerCase().replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g, ''); //Für die extra Portion Henner (alles klein -> satzezeichen entfernen)
+        var text = hennerify(_.sample(phrases));
         event.channel.say('"' + text + '" — Henner');
+    });
+    scriptLoader.on('command', 'hennertranslate', function (event) {
+        var text = hennerify(event.text.trim());
+        event.channel.say(text);
     });
 };
