@@ -24,7 +24,7 @@ module.exports = function (scriptLoader) {
     ];
 
     scriptLoader.on('command', 'henner', function (event) {
-        var text = _.sample(phrases).toLowerCase().replace(/[^\w\s]|_/g, ''); //Für die extra Portion Henner (alles klein -> satzezeichen entfernen)
+        var text = _.sample(phrases).toLowerCase().replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g, ''); //Für die extra Portion Henner (alles klein -> satzezeichen entfernen)
         event.channel.say('"' + text + '" — Henner');
     });
 };
