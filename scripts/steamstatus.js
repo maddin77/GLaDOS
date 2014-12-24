@@ -45,4 +45,35 @@ module.exports = function (scriptLoader) {
             }
         });
     });
+
+    scriptLoader.on('command', 'csgo', function (event) {
+        request({
+            'uri': 'https://steamdb.info/api/SteamRailgun/',
+            'json': true,
+            'headers': {
+                'User-Agent': scriptLoader.connection.config.userAgent
+            }
+        }, function (error, response, data) {
+            if (!error && response.statusCode === 200) {
+                event.channel.say('%s: %s (%s), %s: %s, %s: %s, %s: %s, %s: %s, %s: %s',
+                    ircC.bold('CS:GO'), formatColor(data.services.csgo), formatTime(data.services.csgo.time),
+                    ircC.bold('CS:GO Community'), formatColor(data.services.csgo_community),
+                    ircC.bold('CS:GO Sessions Logon'), formatColor(data.services.csgo_sessions),
+                    ircC.bold('CS:GO Matchmaking Scheduler'), formatColor(data.services.csgo_mm_scheduler),
+                    ircC.bold('CS:GO Players Searching'), formatColor(data.services.csgo_mm_searching),
+                    ircC.bold('CS:GO Average Wait Time'), formatColor(data.services.csgo_mm_average)
+                );
+                event.channel.say('%s: %s, %s: %s, %s: %s, %s: %s, %s: %s',
+                    ircC.bold('CS:GO EU East'), formatColor(data.services.csgo_dc_eu_east),
+                    ircC.bold('CS:GO EU North'), formatColor(data.services.csgo_dc_eu_north),
+                    ircC.bold('CS:GO EU West'), formatColor(data.services.csgo_dc_eu_west),
+                    ircC.bold('CS:GO US East'), formatColor(data.services.csgo_dc_us_east),
+                    ircC.bold('CS:GO US West'), formatColor(data.services.csgo_dc_us_west)
+                );
+            } else {
+                event.channel.reply(event.user, 'Gratz. You broke it. (' + error + ')');
+                scriptLoader.debug('%s', error);
+            }
+        });
+    });
 };
