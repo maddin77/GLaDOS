@@ -23,7 +23,7 @@ module.exports = function (scriptLoader) {
 
     scriptLoader.on('command', ['steam', 'steamstatus'], function (event) {
         request({
-            'uri': 'http://steamstat.us/status.json',
+            'uri': 'https://steamdb.info/api/SteamRailgun/',
             'json': true,
             'headers': {
                 'User-Agent': scriptLoader.connection.config.userAgent
