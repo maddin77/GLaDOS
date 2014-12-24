@@ -105,7 +105,7 @@ module.exports = function (scriptLoader) {
                 if (!error && response.statusCode === 200) {
                     var entry = data.entry,
                         title = entry.title.$t,
-                        time = utils.formatTime(entry.media$group.yt$duration.seconds);
+                        time = entry.media$group.yt$duration.seconds === '0' ? 'LIVE' : utils.formatTime(entry.media$group.yt$duration.seconds);
                     fn(true, 'YouTube: ' + title + ' [' + time + ']');
                 } else {
                     scriptLoader.debug('[youtube] %s', error);
