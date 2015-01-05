@@ -87,10 +87,14 @@ module.exports = function (scriptLoader) {
                                 });
                             });
                         }
+                    } else {
+                        scriptLoader.debug('Wrong rss statuscode: %s', data.responseStatus);
                     }
+                } else {
+                    scriptLoader.debug('Wrong googleapis statuscode: %s', res.statusCode);
                 }
             } else {
-                scriptLoader.debug(err);
+                scriptLoader.debug('Error fetching entries: %s', err);
                 if (fn) {
                     fn(err, null);
                 }
@@ -119,9 +123,9 @@ module.exports = function (scriptLoader) {
                 _.each(results, function (feed) {
                     if (feed.entries.length > 0) {
                         _.each(feed.subscribers, function (subscriber) {
-                            scriptLoader.connection.send(subscriber, '[' + feed.title + '] ' + _.map(feed.entries, function (entry) {
-                                return ircC.bold(entry.title) + ' (' + entry.shortlink + ')';
-                            }).join(', '));
+                            scriptLoader.connection.send(subscriber, _.map(feed.entries, function (entry) {
+                                return '[' + feed.title + '] ' + ircC.bold(entry.title) + ' (' + entry.shortlink + ')';
+                            }).join('\n'));
                         });
                     }
                 });
@@ -194,7 +198,7 @@ module.exports = function (scriptLoader) {
                     checkFeed(feedUrl, function (title) {
                         if (title !== null) {
                             fetchNewEntries(feedUrl);//Set cache so we dont get the first X messages.
-                            event.user.notice('You successfully subscribed to the "' + title + '" rss feed. I\'ll now notice you every time i find a new entry.');
+                            event.user.notice('You successfully subscribed to the "' + title + '" rss feed. I\'ll message you every time i find a new entry.');
                             event.user.notice('To unsubscribe, use "!rss UNSUBSCRIBE ' + feedUrl + '".');
                             subscribe(event.user.getNick(), feedUrl);
                         } else {
@@ -241,7 +245,7 @@ module.exports = function (scriptLoader) {
                         checkFeed(feedUrl, function (title) {
                             if (title !== null) {
                                 fetchNewEntries(feedUrl);//Set cache so we dont get the first X messages.
-                                event.user.notice('You successfully subscribed ' + event.channel.getName() + ' to the "' + title + '" rss feed. I\'ll send a notice to the channel every time i find a new entry.');
+                                event.user.notice('You successfully subscribed ' + event.channel.getName() + ' to the "' + title + '" rss feed. I\'ll send a message to the channel every time i find a new entry.');
                                 event.user.notice('To unsubscribe, use "!chanrss UNSUBSCRIBE ' + feedUrl + '".');
                                 subscribe(event.channel.getName(), feedUrl);
                             } else {
