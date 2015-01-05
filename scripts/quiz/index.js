@@ -267,7 +267,7 @@ Quiz.prototype.resetHaltTimer = function () {
     var self = this;
     this.haltTimer = setTimeout(function () {
         self.halt();
-        self.channel.say('[%s] Quiz unterbrochen. Nutze "!ask" for new questions.', ircC.bold('QUIZ'));
+        self.channel.say('[%s] Quiz unterbrochen. Nutze "!ask" für neue Fragen.', ircC.bold('QUIZ'));
     }, this.haltDelay);
 };
 
@@ -293,18 +293,18 @@ module.exports = function (scriptLoader) {
 
     scriptLoader.on('command', 'quiz', function (event) {
         if (!event.channel.userHasMinMode(event.user, '%')) {
-            return event.user.notice('You don\'t have the permissions to use this command.');
+            return event.user.notice('Du darfst diesen Befehl nicht ausführen, dir fehlen die benötigten Rechte.');
         }
         if (event.params.length === 0) {
             return event.user.notice('Use: !quiz <START|STOP|HALT|NEXT> [...]');
         }
         if (event.params[0].toUpperCase() === 'START') {
             if (quiz.isRunning()) {
-                return event.user.notice('The quiz is already running.');
+                return event.user.notice('Die Quizrunde läuft bereits.');
             }
             var lang = event.params.length > 1 ? event.params[1] : 'de';
             if (!_.has(quiz.quizdata, lang)) {
-                return event.user.notice('I don\'t have any questions in this language.');
+                return event.user.notice('Ich habe keine Fragen in dieser Sprache.');
             }
             quiz.start(lang, event.channel);
             event.channel.say('[%s] %s hat das Quiz gestartet: %s Fragen in Datenbank "%s" (%s).',
@@ -318,30 +318,30 @@ module.exports = function (scriptLoader) {
             return;
         } else if (event.params[0].toUpperCase() === 'STOP') {
             if (!quiz.isRunning()) {
-                return event.user.notice('The quiz is not running.');
+                return event.user.notice('Es läuft aktuell keine Quizrunde.');
             }
             quiz.stop();
             event.channel.say('[%s] Quiz stopped.', ircC.bold('QUIZ'));
         } else if (event.params[0].toUpperCase() === 'HALT') {
             if (!quiz.isRunning()) {
-                return event.user.notice('The quiz is not running.');
+                return event.user.notice('Es läuft aktuell keine Quizrunde.');
             }
             if (quiz.isHalted()) {
-                return event.user.notice('The quiz is already halted.');
+                return event.user.notice('Die aktuelle Quizrunde wurde bereits angehalten.');
             }
             quiz.halt();
-            event.channel.say('[%s] Quiz halted. Say "!ask" for new questions.', ircC.bold('QUIZ'));
+            event.channel.say('[%s] Quizrunde beendet. Schreibe "!ask" für neue Fragen.', ircC.bold('QUIZ'));
         } else if (event.params[0].toUpperCase() === 'NEXT') {
             if (!quiz.isRunning()) {
-                return event.user.notice('The quiz is not running.');
+                return event.user.notice('Es läuft aktuell keine Quizrunde.');
             }
             var question = quiz.getQuestion();
             question.solved = true;
-            event.channel.say('[%s] Manually solved after %s by %s.',
+            event.channel.say('[%s] Manuell aufgelöst nach %s durch %s.',
                 ircC.bold('QUIZ'),
                 moment.duration(quiz.getQuestionTime().diff(moment()), 'milliseconds').humanize(),
                 event.user.getNick());
-            event.channel.say('[%s] The answer is: %s',
+            event.channel.say('[%s] Die Antwort lautet: %s',
                 ircC.bold('QUIZ'),
                 quiz.getAnswer());
             quiz.delayNewQuestion();
@@ -349,23 +349,23 @@ module.exports = function (scriptLoader) {
     });
     scriptLoader.on('command', 'ask', function (event) {
         if (!quiz.isRunning()) {
-            return event.user.notice('The quiz is not running.');
+            return event.user.notice('Es läuft aktuell keine Quizrunde.');
         }
         if (!quiz.isChannel(event.channel.getName())) {
-            return event.user.notice('This only works in ' + quiz.channel.getName() + '.');
+            return event.user.notice('Das funktioniert nur in ' + quiz.channel.getName() + '.');
         }
         if (quiz.isHalted()) {
             quiz.unhalt();
         }
-        event.channel.say('[%s] The question no. %s is:', ircC.bold('QUIZ'), ircC.bold(quiz.getCounter()));
+        event.channel.say('[%s] Die Frage Nr. %s lautet:', ircC.bold('QUIZ'), ircC.bold(quiz.getCounter()));
         event.channel.say('[%s] %s', ircC.bold('QUIZ'), quiz.getQuestionString());
     });
     scriptLoader.on('command', 'rules', function (event) {
         if (!quiz.isRunning()) {
-            return event.user.notice('The quiz is not running.');
+            return event.user.notice('Es läuft aktuell keine Quizrunde.');
         }
         if (!quiz.isChannel(event.channel.getName())) {
-            return event.user.notice('This only works in %s.', quiz.channel.getName());
+            return event.user.notice('Das funktioniert nur in %s.', quiz.channel.getName());
         }
         _.each(quiz.rules, function (rule) {
             event.user.notice(rule);
@@ -407,27 +407,27 @@ module.exports = function (scriptLoader) {
     });
     scriptLoader.on('command', 'setscore', function (event) {
         if (!event.user.isAdmin()) {
-            return event.user.notice('You don\'t have the permissions to use this command.');
+            return event.user.notice('Du darfst diesen Befehl nicht ausführen, dir fehlen die benötigten Rechte.');
         }
         if (event.params.length === 0) {
-            return event.user.notice('use: !setscore [nick] <score>');
+            return event.user.notice('Verwendung: !setscore [nick] <score>');
         }
         var nick, score;
         if (event.params.length === 1) {
             nick = event.user.getNick();
             score = parseInt(event.params[0], 10);
             if (isNaN(score)) {
-                return event.user.notice('score was NaN.');
+                return event.user.notice('score war NaN.');
             }
         } else if (event.params.length === 2) {
             nick = event.params[0];
             score = parseInt(event.params[1], 10);
             if (isNaN(score)) {
-                return event.user.notice('score was NaN.');
+                return event.user.notice('score war NaN.');
             }
         }
         quiz.setScore(nick, score);
-        event.channel.say('%s now has <%s> points.',
+        event.channel.say('%s hat jetzt <%s> Punkte.',
             nick,
             score
         );
@@ -442,7 +442,7 @@ module.exports = function (scriptLoader) {
                     score = quiz.addScore(nick, points),
                     rank = quiz.getRank(nick);
                 question.solved = true;
-                event.channel.say('[%s] %s solved after %s and now has <%s> points (+%s) on rank %s.',
+                event.channel.say('[%s] %s hat die Frage nach %s aufgelöst und hat jetzt <%s> (+%s) Punkte und befindet sich jetzt auf Rang %s.',
                     ircC.bold('QUIZ'),
                     ircC.bold(nick),
                     ircC.bold(time),
@@ -450,7 +450,7 @@ module.exports = function (scriptLoader) {
                     ircC.bold(points),
                     ircC.bold(rank)
                 );
-                event.channel.say('[%s] The answer was: %s',
+                event.channel.say('[%s] Die Antwort war: %s',
                     ircC.bold('QUIZ'),
                     ircC.bold(quiz.getAnswer())
                 );
