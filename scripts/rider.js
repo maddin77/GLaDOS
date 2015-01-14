@@ -14,6 +14,9 @@ module.exports = function (scriptLoader) {
         'ich hab nen nervenzusammenbruch. Und ihr macht euch einfach lustig drüber',
         'ey wisst ihr was ich schreib nen abschiedsbrief, und mach den server für meinen selbstmord veratnwrotlich',
         'kein arsch freut sich wenn ich On komme'
+        'Auf Google findet man nichts'
+        'ich habe mit RiderNET mehr erreicht als ihr mit GEF'
+        'GLORIOUS PC MASTER RACE'
     ];
 
     scriptLoader.on('command', 'rider', function (event) {
