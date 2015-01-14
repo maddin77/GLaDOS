@@ -3,10 +3,9 @@
 node_modules
 *.txt
 _OLD_VERSIONS_
-data/*
-config/*
+data/*.json
+config/*.json
 !config/rename-me.json
 *.sublime-project
 *.sublime-workspace
 ignore_me
-scripts/quiz
