@@ -53,9 +53,7 @@ var chars = {
 module.exports = function (scriptLoader) {
     scriptLoader.on('command', ['flip', 'flipme'], function (event) {
         if (event.params.length > 0) {
-            event.channel.reply(event.user, '(\u256F\u00B0\u25A1\u00B0\uFF09\u256F\uFE35 ' + event.text.toLowerCase().split('').map(function (c) {
-                return chars[c] || c;
-            }).reverse().join(''));
+            event.channel.reply(event.user, 'flop');
         } else {
             event.user.notice('Use: !flip <what>');
         }
