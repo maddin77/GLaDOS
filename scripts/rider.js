@@ -4,7 +4,7 @@ module.exports = function (scriptLoader) {
     var phrases = [
         'Ich bin ein Rider ich bereue nichts!',
         'Na toll, wegen euch verliere ich wieder die Beherrschung',
-        'Leute hat wer Ideen für ZW2:NW?',
+        'Leute hat wer Ideen für ZW3:NW?',
         'Ich hab mit ZW2:NW mehr erreicht als du in deinem leben, würd ich sagen',
         'Leck mich doch am Asphalt',
         'lasst mich einfach in ruhe und fertig, mehr will ich nicht',
