@@ -13,7 +13,16 @@ module.exports = function (scriptLoader) {
         'ich bin aufm server hier eh immer ne lachnummer',
         'ich hab nen nervenzusammenbruch. Und ihr macht euch einfach lustig drüber',
         'ey wisst ihr was ich schreib nen abschiedsbrief, und mach den server für meinen selbstmord veratnwrotlich',
-        'kein arsch freut sich wenn ich On komme'
+        'kein arsch freut sich wenn ich On komme',
+        'Auf Google findet man nichts',
+        'ich habe mit RiderNET mehr erreicht als ihr mit GEF',
+        'GLORIOUS PC MASTER RACE',
+        'Shut the f**k up!',
+        'Die ganzen Kiddies mit ihren lambos .. da kommt mein Ford GT trotz bestem Tuning nicht mit',
+        'Ich bin ein Halbwolf, und ich mag mich so',
+        'Die neuen Karren können alle nichts, die altem Amis hatten wenigstens noch Stil',
+        'oah .. schon wieder so einer, der denkt, Anime ist das gleiche wie Hentai ...',
+        'Geographie ist unnötig'
     ];
 
     scriptLoader.on('command', 'rider', function (event) {
