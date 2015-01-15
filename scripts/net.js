@@ -1,7 +1,6 @@
 /*jshint camelcase: false */
 var request         = require('request');
 var dns             = require('dns');
-var whoisAvailable  = require('whois-available');
 var url             = require('url');
 var net             = require('net');
 var _               = require('underscore');
@@ -217,12 +216,23 @@ module.exports = function (scriptLoader) {
     });
     scriptLoader.on('command', 'avail', function (event) {
         if (event.params.length > 0) {
-            whoisAvailable(event.text, function (error, whoisResponse, isAvailable) {
-                if (!error) {
-                    event.channel.reply(event.user, '"' + event.text + '" is ' + (isAvailable ? '' : 'not ') + 'available.');
+            var text    = event.text.trim();
+            var split   = text.split('.');
+            var tld     = _.last(split);
+            var domain  = text.replace('.' + tld, '');
+            request({
+                'uri': 'https://domaintyper.com/DomainCheckHandler.ashx?domain=' + domain + '&TDLS=["' + tld + '"]',
+                'json': true,
+                'headers': {
+                    'User-Agent': scriptLoader.connection.config.userAgent
+                }
+            }, function (error, response, json) {
+                scriptLoader.debug('[avail] %s', JSON.stringify(json));
+                if (!error && response.statusCode === 200) {
+                    event.channel.reply(event.user, '"' + event.text + '" is ' + (json.OtherDomainValues[0] === 'True' ? '' : 'not ') + 'available.');
                 } else {
                     event.channel.reply(event.user, 'Gratz. You broke it. (' + error + ')');
-                    scriptLoader.debug('[avail] %s', getError(error.code), error);
+                    scriptLoader.debug('[avail] %s', error);
                 }
             });
         } else {
