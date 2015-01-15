@@ -21,7 +21,8 @@ module.exports = function (scriptLoader) {
         'Die ganzen Kiddies mit ihren lambos .. da kommt mein Ford GT trotz bestem Tuning nicht mit',
         'Ich bin ein Halbwolf, und ich mag mich so',
         'Die neuen Karren können alle nichts, die altem Amis hatten wenigstens noch Stil',
-        'oah .. schon wieder so einer, der denkt, Anime ist das gleiche wie Hentai ...'
+        'oah .. schon wieder so einer, der denkt, Anime ist das gleiche wie Hentai ...',
+        'Geographie ist unnötig'
     ];
 
     scriptLoader.on('command', 'rider', function (event) {
