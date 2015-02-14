@@ -1,50 +1,36 @@
 {
-  "name": "GLaDOS",
-  "version": "4.0.4",
-  "author": "Martin Rump <admin@maddin.cc>",
-  "description": "GLaDOS IRC-Bot",
-  "contributors": [
-    {
-      "name": "Martin Rump",
-      "email": "admin@maddin.cc"
+    "name": "GLaDOS",
+    "version": "0.3.5",
+    "author": "Martin Rump <admin@maddin.cc>",
+    "description": "GLaDOS IRC-Bot",
+    "contributors": [ 
+        {
+            "name": "Martin Rump",
+            "email": "admin@maddin.cc"
+        } 
+    ],
+    "main": "index.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/maddin77/GLaDOS.git"
+    },
+    "bugs": {
+        "url": "https://github.com/maddin77/GLaDOS/issues"
+    },
+    "dependencies": {
+        "cheerio": "~0.12.2",
+        "crypto": "~0.0.3",
+        "irc": "~0.3.6",
+        "google": "~0.3.2",
+        "mathjs": "~0.13.0",
+        "morse": "~0.1.0",
+        "nconf": "~0.6.7",
+        "redis": "~0.8.4",
+        "request": "~2.27.0",
+        "winston": "~0.7.2"
+    },
+    "license": "MIT",
+    "engines": {
+        "node": "0.10.17"
     }
-  ],
-  "private": true,
-  "main": "index.js",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/maddin77/GLaDOS.git"
-  },
-  "bugs": {
-    "url": "https://github.com/maddin77/GLaDOS/issues"
-  },
-  "dependencies": {
-    "async": "^0.9.0",
-    "cheerio": "^0.18.0",
-    "cleverbot-node": "^0.1.8",
-    "cron": "^1.0.6",
-    "debug": "^2.1.1",
-    "easy-table": "^0.3.0",
-    "extend": "^2.0.0",
-    "google": "^0.6.0",
-    "html-entities": "^1.1.2",
-    "irc-colors": "^1.1.0",
-    "irc-message": "^2.0.1",
-    "irc-message-stream": "^1.1.0",
-    "irc-replies": "^2.0.0",
-    "lastfm": "^0.9.2",
-    "moment": "^2.9.0",
-    "morse": "^0.1.0",
-    "request": "^2.51.0",
-    "sandbox": "^0.8.6",
-    "underscore": "^1.7.0",
-    "xml2js": "^0.4.4"
-  },
-  "scripts": {
-    "start": "NODE_ENV=production node index.js"
-  },
-  "license": "MIT",
-  "engines": {
-    "node": "0.10.20"
-  }
 }

@@ -1,3 +1,2 @@
-process.env.DEBUG = '*';
-
-(require('./lib/glados')).fireUp();
+var GLaDOS = require('./lib/GLaDOS.js');
+new GLaDOS('./config/config.json');
