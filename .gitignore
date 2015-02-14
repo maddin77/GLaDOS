@@ -1,6 +1,11 @@
 *.log
-Thumbs.db
 node_modules
-config/config.json
+v1
+util
+data/config.json
 .afignore
-TODO.md
+*.sublime-workspace
+*.sublime-project
+*.bat
+*.rdb
+test.js
