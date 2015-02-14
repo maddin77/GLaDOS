@@ -1,3 +1,8 @@
+See [Wiki](https://github.com/maddin77/GLaDOS/wiki/) for more informations on configuration and writing scripts.
+
+
+LICENSE
+=======
 The MIT License (MIT)
 
 Copyright (c) 2014 Martin Rump
