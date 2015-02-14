@@ -1,0 +1,15 @@
+{
+    "camelcase": true,
+    "curly": true,
+    "eqeqeq": true,
+    "forin": true,
+    "indent": 4,
+    "latedef": true,
+    "noempty": true,
+    "quotmark": true,
+    "undef": true,
+    "unused": true,
+    "node": true,
+    "strict": false,
+    "predef": [  ]
+}

@@ -1,11 +1,3 @@
-*.rdb
-*.log
 node_modules
-*.txt
-_OLD_VERSIONS_
-data/*
-!data/config.default.json
 *.sublime-project
 *.sublime-workspace
-test.*
-ignore_me
