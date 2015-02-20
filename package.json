@@ -19,8 +19,16 @@
     "url": "https://github.com/maddin77/GLaDOS/issues"
   },
   "dependencies": {
+    "async": "^0.9.0",
+    "cleverbot-node": "^0.1.8",
+    "debug": "^2.1.1",
+    "handlebars": "^3.0.0",
+    "hapi": "^8.2.0",
+    "html-entities": "^1.1.2",
+    "irc-factory": "^1.10.1",
     "lowdb": "^0.7.1",
-    "nconf": "^0.7.1"
+    "swag": "^0.7.0",
+    "underscore": "^1.7.0"
   },
   "scripts": {
     "start": "NODE_ENV=production node index.js"

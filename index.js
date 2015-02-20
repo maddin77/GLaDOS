@@ -1,3 +1,3 @@
 process.env.DEBUG = '*';
 
-(require('./lib/glados')).fireUp();
+require('./lib/glados');

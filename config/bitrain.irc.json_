@@ -1,0 +1,23 @@
+{
+  "userAgent": "GLaDOS IRC-Bot - https://github.com/maddin77/GLaDOS",
+  "admin": [
+    "maddin"
+  ],
+  "callsign": "!",
+  "scripts": [],
+  "connection": {
+    "nick": "GLaDOS_test",
+    "user": "GLaDOS",
+    "realname": "GLaDOS",
+    "server": "de.trine.io",
+    "port": 6667
+  },
+  "channels": [
+    {
+      "name": "#glados",
+      "disabled": [
+        "pong"
+      ]
+    }
+  ]
+}
