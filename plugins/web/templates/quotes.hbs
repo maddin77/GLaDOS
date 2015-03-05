@@ -1,0 +1,56 @@
+<div class="container-fluid quotes">
+    <br>
+    {{#if __admin}}
+    <div class="row add">
+        <div class="col-xs-12">
+            <form class="form-horizontal" action="/quotes/add" method="POST">
+                <div class="form-group {{#is error 'fullname'}}has-error{{/is}}">
+                    <label for="fullname" class="col-sm-2 control-label">Voller Name</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="fullname" name="fullname" placeholder="Dr. Axel Stoll">
+                    </div>
+                </div>
+                <div class="form-group {{#is error 'name'}}has-error{{/is}}">
+                    <label for="name" class="col-sm-2 control-label">Zitatname</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="name" name="name" placeholder="stoll">
+                    </div>
+                </div>
+                <div class="form-group {{#is error 'quote'}}has-error{{/is}}">
+                    <label for="quote" class="col-sm-2 control-label">Zitat</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="quote" name="quote" placeholder="Das habe ich nie gesagt!">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-block" type="submit">Speichern</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {{/if}}
+    <div class="row">
+        <div class="col-xs-12">
+            <table class="table table-bordered">
+                <tbody>
+                    {{#each quotes}}
+                    {{#empty this.quotes}}{{else}}
+                    <tr id="{{@key}}">
+                        <td colspan="2" class="table-sep">
+                            <strong>{{this.name}}</strong>
+                            <code>!q {{@key}} [#]</code>
+                        </td>
+                    </tr>
+                    {{#each this.quotes}}
+                    <tr id="{{@../key}}-{{@index}}">
+                        <td style="text-align:center;">{{@index}}</td>
+                        <td>{{this}} {{#if ../../__admin}}<a class="del" href="/quotes/del?n={{@../key}}&i={{@index}}">&times;</a>{{/if}}</td>
+                    </tr>
+                    {{/each}}
+                    {{/empty}}
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

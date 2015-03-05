@@ -1,0 +1,27 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xs-12 mainnav">
+            <ul class="nav nav-pills pull-left">
+                <li{{#if mainnav}}{{#is mainnav "/"}} class="active"{{/is}}{{/if}}>
+                    <a href="/">Hilfe</a>
+                </li>
+                <li{{#if mainnav}}{{#is mainnav "/plugins"}} class="active"{{/is}}{{/if}}>
+                    <a href="/plugins">Plugins</a>
+                </li>
+                <li{{#if mainnav}}{{#is mainnav "/quotes"}} class="active"{{/is}}{{/if}}>
+                    <a href="/quotes">Zitate</a>
+                </li>
+                <li{{#if mainnav}}{{#is mainnav "/logs"}} class="active"{{/is}}{{/if}}>
+                    <a href="/logs">Logs</a>
+                </li>
+            </ul>
+            {{#if __admin}}
+            <ul class="nav nav-pills pull-right">
+                <li{{#if mainnav}}{{#is mainnav "/sinfo"}} class="active"{{/is}}{{/if}}>
+                    <a href="/sinfo">System Info</a>
+                </li>
+            </ul>
+            {{/if}}
+        </div>
+    </div>
+</div>

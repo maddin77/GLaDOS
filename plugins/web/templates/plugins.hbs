@@ -1,0 +1,110 @@
+<div class="container-fluid plugins">
+    <br>
+    {{#each plugins}}
+    <div class="row">
+        <div class="col-xs-12">
+            <table class="table table-bordered">
+                <tbody>
+
+                    <tr id="{{this.name}}">
+                        <td colspan="3" class="table-sep">
+                            <a href="#{{this.name}}">{{this.displayName}}</a>
+                            <code>v{{this.version}}</code>
+                        </td>
+                    </tr>
+                    {{#if this.desc}}
+                    <tr>
+                        <td colspan="3" class="desc">
+                        {{#each this.desc}}
+                            <p>{{{this}}}</p>
+                        {{/each}}
+                        </td>
+                    </tr>
+                    {{/if}}
+                    {{#each this.commands}}
+                    <tr id="{{../this.name}}-{{this.name}}">
+                        <td class="type"><a href="#{{../this.name}}-{{this.name}}">Befehl</a></td>
+                        <td class="command">
+                            !{{this.name}}{{#each this.params}}<span class="param-{{this}}">{{@key}}</span>{{/each}}
+                            {{#if this.alias}}
+                            <p class="alias">!{{join this.alias ", !"}}</p>
+                            {{/if}}
+                        </td>
+                        <td class="desc">
+                        {{#each this.desc}}
+                            <p>{{this}}</p>
+                        {{/each}}
+                        </td>
+                    </tr>
+                    {{/each}}
+                    {{#each this.hear}}
+                    <tr id="{{../this.name}}-{{this.name}}">
+                        <td class="type"><a href="#{{../this.name}}-{{this.name}}">Interaktion</a></td>
+                        <td class="hear">{{this.hear}}</td>
+                        <td class="desc">
+                        {{#each this.desc}}
+                            <p>{{this}}</p>
+                        {{/each}}
+                        </td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {{/each}}
+    {{!--
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="panel-group" id="accordion" role="tablist">
+                {{#each plugins}}
+                <div class="panel">
+                    <div class="panel-heading" role="tab">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" class="collapsed" href="#{{this.id}}">
+                                {{this.displayName}}
+                                <small class="pull-right">v{{this.version}}</small>
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="{{this.id}}" class="panel-collapse collapse" role="tabpanel">
+                        <div class="panel-body">
+                            <h4>Befehle</h4>
+                            <table class="table">
+                            {{#each this.commands}}
+                                <tr>
+                                    <td>{{@key}}</td>
+                                    <td>
+                                    {{#each this}}
+                                        <p>{{this}}</p>
+                                    {{/each}}
+                                    </td>
+                                </tr>
+
+                            {{else}}
+                                <p>Dieses Plugin hat keine Befehle.</p>
+                            {{/each}}
+                            </table>
+
+                            <h2>Interaktionen</h2>
+                            {{#each this.hear}}
+                                <dl class="dl-horizontal">
+                                    <dt>{{@key}}</dt>
+                                    <dd>
+                                        {{#each this}}
+                                            <p>{{this}}</p>
+                                        {{/each}}
+                                    </dd>
+                                </dl>
+                            {{else}}
+                                <p>Dieses Plugin hat keine Interaktionen.</p>
+                            {{/each}}
+                        </div>
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+        </div>
+    </div>
+    --}}
+</div>

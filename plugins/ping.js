@@ -1,4 +1,4 @@
-var _ = require('underscore');
+var _ = require('lodash');
 
 var phrases = [
     'Yes, master?',
@@ -45,7 +45,7 @@ var phrases = [
 
 exports.register = function (glados, next) {
 
-    glados.hear(/^!ping(.*)?$/, function (match, event, client) {
+    glados.hear(/^!ping( .*)?$/i, function (match, event) {
         var reply = null;
         if (_.isUndefined(match[1])) {
             reply = _.sample(phrases);
@@ -54,13 +54,28 @@ exports.register = function (glados, next) {
         } else {
             reply = match[1].trim();
         }
-        client.irc.privmsg(event.target, event.nickname + ': ' + reply);
+        event.channel.reply(event.user, reply);
     });
 
 
     return next();
 };
-exports.attributes = {
+exports.info = {
     name: 'ping',
+    displayName: 'Ping',
+    desc: ['Pong'],
     version: '1.0.0',
+    commands: [{
+        name: 'ping',
+        desc: ['GLaDOS antwortet mit einem Zufälligen Satz.']
+    },{
+        name: 'ping time',
+        desc: ['GLaDOS antwortet mit der aktuellen Uhrzeit.']
+    },{
+        name: 'ping',
+        params: {
+            'Text': 'required'
+        },
+        desc: ['Gibt den aktuellen Text wieder.']
+    }]
 };

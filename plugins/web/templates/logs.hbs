@@ -1,0 +1,111 @@
+<div class="logs">
+    {{#is type 'channelList'}}
+    <div class="container-fluid channelList">
+        <div class="row">
+            <div class="col-xs-12">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <td class="table-sep">Channel Archiv</td>
+                        </tr>
+                        {{#each channelList}}
+                        <tr>
+                            <td>
+                                <a href="/logs/{{this}}">#{{this}}</a>
+                            </td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {{/is}}
+    {{#is type 'logList'}}
+    <div class="container-fluid logList">
+        <div class="row">
+            <div class="col-xs-12">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <td class="table-sep">#{{channel}} Archiv</td>
+                        </tr>
+                        {{#eachIndex files}}
+                        <tr>
+                            <td>
+                                <a href="/logs/{{../channel}}/{{item}}">{{item}}</a>
+                                {{#lte index 0}} (<a href="/logs/{{../../channel}}/latest">aktuellste</a>){{/lte}}
+                            </td>
+                        </tr>
+                        {{/eachIndex}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {{/is}}
+    {{#is type 'logFile'}}
+    <div class="container-fluid logFile">
+        <div class="row">
+            <div class="col-xs-12">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <td class="table-sep" colspan="3">#{{channel}} {{logFile}}</td>
+                        </tr>
+                        {{#each data}}
+                        <tr class="event event-{{this.event}}" >
+                            <td class="time">
+                                <a href="#{{formatDate this.date "%T.%L"}}" id="{{formatDate this.date "%T.%L"}}">
+                                {{formatDate this.date "%H:%M:%S"}}
+                                </a>
+                            </td>
+
+                            {{#is this.event "message"}}
+                            <td class="nick"><span>{{this.who}}</span></td>
+                            {{else}}
+                            <td class="nick action"><span>{{this.who}}</span></td>
+                            {{/is}}
+
+                            {{#is this.event "join"}}
+                            <td class="content">hat den Channel betreten</td>
+                            {{/is}}
+                            {{#is this.event "part"}}
+                            <td class="content">hat den Channel verlassen{{#if this.info.reason}} ({{this.info.reason}}){{/if}}</td>
+                            {{/is}}
+                            {{#is this.event "kick"}}
+                            <td class="content">wurde von {{this.info.by}} aus dem Channel gekickt{{#if this.info.reason}} ({{this.info.reason}}){{/if}}</td>
+                            {{/is}}
+                            {{#is this.event "mode"}}
+                            <td class="content">setzte den Mode {{#if this.info.adding}}+{{else}}-{{/if}}{{this.info.mode}} {{this.info.argument}}</td>
+                            {{/is}}
+                            {{#is this.event "nick"}}
+                            <td class="content">heisst nun {{this.info.newNick}}</td>
+                            {{/is}}
+                            {{#is this.event "topic"}}
+                            <td class="content">hat das Topic in "{{this.info.topic}}" geändert</td>
+                            {{/is}}
+                            {{#is this.event "quit"}}
+                            <td class="content">hat den Server verlassen ({{this.info.reason}})</td>
+                            {{/is}}
+                            {{#is this.event "kill"}}
+                            <td class="content">wurde von server gekickt ({{this.info.reason}})</td>
+                            {{/is}}
+                            {{#is this.event "message"}}
+                            <td class="content">{{{this.info.message}}}</td>
+                            {{/is}}
+                            {{#is this.event "notice"}}
+                            <td class="content">{{{this.info.message}}}</td>
+                            {{/is}}
+                            {{#is this.event "invite"}}
+                            <td class="content">hat {{{this.info.target}}} in den Channel eingeladen</td>
+                            {{/is}}
+                        </tr>
+                    {{/each}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {{/is}}
+</div>

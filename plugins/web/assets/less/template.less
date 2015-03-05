@@ -1,0 +1,252 @@
+@foreground: rgb(213, 214, 216);
+@foregroundDark: rgb(91, 84, 81);
+@foregroundLight: rgb(249, 247, 250);
+
+@backgroundDefault: rgb(65, 69, 78);
+@backgroundLight: rgb(213, 214, 216);
+@backgroundDark: rgb(37, 41, 44);
+@backgroundRed: rgb(243, 86, 86);
+
+body {
+    background-color: @backgroundDark;
+    color: @foregroundLight;
+    font-family: 'Roboto', sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+code, pre {
+    background: rgb(34, 34, 34);
+    color: #f9f7fa;
+    font: 12px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}
+.mainnav {
+    background: @backgroundDefault;
+
+    li {
+        a {
+            border-radius: 0;
+            background-color: transparent;
+            color: @foreground;
+            transition: all ease-in-out .15s;
+            box-shadow: inset 0 0px 0 0 @backgroundRed;
+            background: transparent;
+
+            &:hover {
+                box-shadow: inset 0 -5px 0 0 @backgroundRed;
+                background-color: transparent;
+                color: @foreground;
+            }
+        }
+        &.active {
+            a {
+                background-color: transparent !important;
+                color: #FFF;
+                box-shadow: inset 0 -5px 0 0 @backgroundRed;
+                //box-shadow: 0 10px 0 0 #2b303b;
+            }
+        }
+    }
+}
+.plugins {
+    .alias {
+        margin: 8px 0 0 0;
+        font-size: 13px;
+
+        &:before {
+            content: "Alias: ";
+            color: #BBB;
+        }
+    }
+    .type {
+        width: 1px;
+        vertical-align: middle;
+        text-align: center;
+        background-color: #f35656;
+
+        padding: 0;
+        a {
+            color: #F8F8F0;
+            display: block;
+            padding: 8px;
+
+            &:hover, &:focus {
+                text-decoration: none;
+            }
+        }
+    }
+    .command, .hear {
+        font: 14px Consolas,"Liberation Mono",Menlo,Courier,monospace;
+        width: 1px;
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+    .desc {
+        vertical-align: middle;
+        p:last-child {
+            margin: 0;
+        }
+    }
+    .param-required {
+        &:before {
+            content: " <";
+        }
+        &:after {
+            content: ">"
+        }
+    }
+    .param-optional {
+        &:before {
+            content: " [";
+        }
+        &:after {
+            content: "]"
+        }
+    }
+
+    .table-sep {
+        padding: 0;
+        a {
+            color: #F8F8F0;
+            display: block;
+            padding: 8px;
+
+            &:hover, &:focus {
+                text-decoration: none;
+            }
+        }
+    }
+}
+.table-bordered {
+    tbody>tr>td,
+    tbody>tr>th,
+    tfoot>tr>td,
+    tfoot>tr>th,
+    thead>tr>td,
+    thead>tr>th {
+        border: 5px solid @backgroundDefault;
+    }
+
+    .table-sep {
+        background-color: @backgroundRed;
+        color: #F8F8F0;
+        position: relative;
+        font-weight: bold;
+
+        code {
+            font-weight: normal;
+            border-radius: 0;
+            position: absolute;
+            top: 0;
+            right: 0;
+            border-left: 5px solid @backgroundDefault;
+            line-height: 32px;
+            padding: 2px 10px;
+        }
+    }
+}
+.quotes {
+    .add {
+        .form-horizontal {
+            border: 5px solid @backgroundDefault;
+            margin-bottom: 15px;
+        }
+        .form-group {
+            margin: 0;
+            border-bottom: 5px solid @backgroundDefault;
+            &:last-child {
+                border-bottom-width: 0;
+            }
+
+            &.has-error label {
+                color: @backgroundRed;
+            }
+        }
+        .form-control {
+            box-shadow: none;
+            border-radius: 0;
+            background-color: transparent;
+            border-color: @backgroundDefault;
+            border-width: 0;
+            color: @foregroundLight;
+        }
+        .btn {
+            border-radius: 0;
+            border-width: 0;
+            background-color: @backgroundRed;
+        }
+    }
+    .table {
+        .del {
+            color: @backgroundRed;
+            float: right;
+            font-weight: bold;
+
+            &:hover {
+                text-decoration: none;
+            }
+        }
+    }
+}
+.logs {
+    padding-top: 15px;
+    a {
+        color: @foregroundLight;
+        &:hover {
+            color: #FFF;
+            text-decoration: none;
+        }
+    }
+    .logFile {
+        tr {
+            color: #bbb;
+            .time, .nick, .content {
+                border-width: 0;
+                padding: 0 10px;
+            }
+            .time {
+                border-left-width: 5px;
+                width: 1px;
+
+                a:focus {
+                    color: @backgroundRed;
+                }
+            }
+            .nick {
+                text-align: right;
+                white-space: nowrap;
+                width: 1px;
+
+                &.action span {
+                    &:before {content: "* ";}
+                }
+                &:not(.action) span {
+                    &:before {content: "<";}
+                    &:after {content: ">";}
+                }
+            }
+            .content {
+                border-right-width: 5px;
+                text-align: left;
+
+                a {
+                    text-decoration: underline;
+                }
+            }
+
+            &:last-child {
+                .time, .nick, .content {
+                    border-bottom-width: 5px;
+                }
+            }
+            &.event.event-message {
+                color: #FFF;
+            }
+        }
+    }
+}
+@media (min-width: 768px) {
+    .quotes {
+        .form-control {
+            border-left-width: 5px !important;
+        }
+    }
+}

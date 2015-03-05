@@ -1,0 +1,108 @@
+<div class="container-fluid sinfo">
+    <br>
+    <div class="row">
+        <div class="col-xs-12">
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <td colspan="2" class="table-sep"><strong>System</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Hostname</td>
+                        <td>{{os.hostname}}</td>
+                    </tr>
+                    <tr>
+                        <td>Betriebssystem Type</td>
+                        <td>{{os.type}}</td>
+                    </tr>
+                    <tr>
+                        <td>Platform</td>
+                        <td>{{process.platform}}</td>
+                    </tr>
+                    <tr>
+                        <td>Prozessor Architektur</td>
+                        <td>{{process.arch}}</td>
+                    </tr>
+                    <tr>
+                        <td>Release</td>
+                        <td>{{os.release}}</td>
+                    </tr>
+                    <tr>
+                        <td>Load Durchschnitt</td>
+                        <td>{{os.loadavg}}</td>
+                    </tr>
+                    <tr>
+                        <td>Laufzeit (OS)</td>
+                        <td>{{os.uptime}}</td>
+                    </tr>
+                    <tr>
+                        <td>Arbeitsspeicher (gesamt)</td>
+                        <td>{{os.totalmem}}</td>
+                    </tr>
+                    <tr>
+                        <td>Arbeitsspeicher (frei)</td>
+                        <td>{{os.freemem}}</td>
+                    </tr>
+                    <tr>
+                        <td>CPUs</td>
+                        <td>
+                            {{#each os.cpus}}
+                            <p>{{this.model}} @ {{this.speed}} MHz</p>
+                            {{/each}}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="2" class="table-sep"><strong>Prozess</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Laufzeit (Node)</td>
+                        <td>{{process.uptime}}</td>
+                    </tr>
+                    <tr>
+                        <td>Prozess ID</td>
+                        <td>{{process.pid}}</td>
+                    </tr>
+                    <tr>
+                        <td>Gruppen ID</td>
+                        <td>{{process.gid}}</td>
+                    </tr>
+                    <tr>
+                        <td>User ID</td>
+                        <td>{{process.uid}}</td>
+                    </tr>
+                    <tr>
+                        <td>Arbeitsspeicher</td>
+                        <td>{{process.mem.rss}} (V8 Heap: {{process.mem.heapUsed}} Used / {{process.mem.heapTotal}} Total)</td>
+                    </tr>
+                    <tr>
+                        <td>Arbeitsverzeichniss</td>
+                        <td>{{process.cwd}}</td>
+                    </tr>
+                    <tr>
+                        <td>Node Executable</td>
+                        <td>{{process.execPath}}</td>
+                    </tr>
+                    <tr>
+                        <td>Executable Parameter</td>
+                        <td>{{process.execArgv}}</td>
+                    </tr>
+                    <tr>
+                        <td>Kommandozeilenparameter</td>
+                        <td>{{process.argv}}</td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="2" class="table-sep"><strong>Versionen</strong></td>
+                    </tr>
+                    {{#each process.versions}}
+                    <tr>
+                        <td>{{@key}}</td>
+                        <td>{{this}}</td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
