@@ -101,7 +101,7 @@ exports.register = function (server, options, next) {
 
                 data = _.map(data, function (d) {
                     d.date = new Date(d.ts);
-                    if (d.event === 'message') {
+                    if (d.event === 'message' || d.event === 'notice') {
                         d.info.message = handlebars.Utils.escapeExpression(d.info.message);
                         d.info.message = autolinker.link(d.info.message, {
                             stripPrefix: false,

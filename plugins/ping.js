@@ -1,4 +1,6 @@
 var _ = require('lodash');
+var moment = require('moment');
+moment.locale('de');
 
 var phrases = [
     'Yes, master?',
@@ -50,7 +52,7 @@ exports.register = function (glados, next) {
         if (_.isUndefined(match[1])) {
             reply = _.sample(phrases);
         } else if (match[1].trim() === 'time') {
-            reply = new Date().toString();
+            reply = moment().format('dddd, DD. MMMM YYYY, HH:mm:ss');
         } else {
             reply = match[1].trim();
         }

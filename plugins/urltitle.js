@@ -63,7 +63,7 @@ exports.register = function (glados, next) {
                 if (res.statusCode !== 200) {
                     return callback(null);
                 }
-                var title = cheerio(body).find('title').text();
+                var title = cheerio(body).find('title').first().text();
                 if (title.length > 0) {
                     title = title.replace(/(\r\n|\n|\r)/gm, '').trim();
                     callback('Title: ' + entities.decode(title) + ' (at ' + url.host + ')');

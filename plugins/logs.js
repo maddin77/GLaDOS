@@ -5,6 +5,7 @@ var os      = require('os');
 var mkdirp  = require('mkdirp');
 var path    = require('path');
 var rimraf  = require('rimraf');
+var ircC    = require('irc-colors');
 
 exports.register = function (glados, next) {
     var database = glados.brain('logs');
@@ -47,7 +48,6 @@ exports.register = function (glados, next) {
         if (!event.channel.userHasMinMode(event.user, '@')) {
             return event.user.notice('Nur Channel-Operatoren können Logs löschen.');
         }
-        //TODO
         rimraf(path.join(__dirname, '..', 'brain', 'logs', event.channel.getName()), function () {
             event.user.notice('Alle Channellogs für %s wurden gelöscht.', event.channel.getName());
         });
@@ -98,7 +98,7 @@ exports.register = function (glados, next) {
     glados.on('kick', function (event) {
         writeToLog(event.channel.getName(), 'kick', event.user.getNick(), {
             by: event.by.getNick(),
-            reason: event.reason === event.by.getNick() ? null : event.reason
+            reason: event.reason === event.by.getNick() ? null : ircC.stripColorsAndStyle(event.reason)
         });
     });
     glados.on('mode', function (event) {
@@ -124,40 +124,40 @@ exports.register = function (glados, next) {
         if (event.to[0] === '#') {
             var from = typeof event.from === 'string' ? event.from : event.from.getNick();
             writeToLog(event.to, 'notice', from, {
-                message: event.message
+                message: ircC.stripColorsAndStyle(event.message)
             });
         }
     });
     glados.on('sendnotice', function (event) {
         if (event.target[0] === '#') {
             writeToLog(event.target, 'notice', this.me.getNick(), {
-                message: event.message
+                message: ircC.stripColorsAndStyle(event.message)
             });
         }
     });
     glados.on('part', function (event) {
         _.each(event.channels, function (channel) {
             writeToLog(channel.getName(), 'part', event.user.getNick(), {
-                reason: event.message
+                reason: ircC.stripColorsAndStyle(event.message)
             });
         });
     });
     glados.on('message', function (event) {
         writeToLog(event.channel.getName(), 'message', event.user.getNick(), {
-            message: event.message,
+            message: ircC.stripColorsAndStyle(event.message),
             isAction: event.isAction
         });
     });
     glados.on('sendmessage', function (event) {
         writeToLog(event.target, 'message', this.me.getNick(), {
-            message: event.message,
+            message: ircC.stripColorsAndStyle(event.message),
             isAction: false
         });
     });
     glados.on('quit', function (event) {
         _.each(_.keys(event.user.getChannels()), function (chanName) {
             writeToLog(chanName, 'quit', event.user.getNick(), {
-                message: event.message
+                message: ircC.stripColorsAndStyle(event.message)
             });
         });
     });
@@ -165,7 +165,7 @@ exports.register = function (glados, next) {
         if (event.changed) {
             var user = typeof event.user === 'string' ? event.user : event.user.getNick();
             writeToLog(event.channel.getName(), 'topic', user, {
-                topic: event.topic
+                topic: ircC.stripColorsAndStyle(event.topic)
             });
         }
     });
