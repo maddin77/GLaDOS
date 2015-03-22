@@ -42,7 +42,7 @@ exports.register = function (glados, next) {
             event.channel.ban(data.nick + '!' + data.username + '@' + data.hostname);
         });
     });
-    glados.hear(/^!(?:ub|unban)?( \S+)?$/i, function (match, event) {
+    glados.hear(/^!(?:ub|unban)( \S+)?$/i, function (match, event) {
         if (!event.channel.userHasMinMode(this.me.nick, '%')) {
             return event.user.notice('Ich habe nicht die nötigen Rechte um User in diesem Channel zu entbannen.');
         }
@@ -55,7 +55,7 @@ exports.register = function (glados, next) {
         }
         return event.channel.unban(mask.trim());
     });
-    glados.hear(/^!(?:kb|kickban)?( \S+)?( .+)?$/i, function (match, event) {
+    glados.hear(/^!(?:kb|kickban)( \S+)?( .+)?$/i, function (match, event) {
         if (!event.channel.userHasMinMode(this.me.nick, '%')) {
             return event.user.notice('Ich habe nicht die nötigen Rechte um User aus diesem Channel zu bannen.');
         }
