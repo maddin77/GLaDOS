@@ -53,7 +53,8 @@ exports.register = function (glados, next) {
             request({
                 'uri': url.href,
                 'headers': {
-                    'User-Agent': glados.config.object.userAgent
+                    'User-Agent': glados.config.object.userAgent,
+                    'Accept-Language': glados.config.object.requestLanguage
                 }
             }, function (error, res, body) {
                 if (error) {
