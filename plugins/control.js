@@ -1,5 +1,7 @@
 var path    = require('path');
 var _       = require('lodash');
+var numeral = require('numeral');
+var os      = require('os');
 
 exports.register = function (glados, next) {
     glados.on('invite', function (event) {
@@ -106,6 +108,50 @@ exports.register = function (glados, next) {
             return event.user.notice('Benutze: !say <#channel/Nick> <Nachricht>');
         }
         this.send(match[1].trim(), match[2].trim());
+    });
+
+
+
+    glados.web().route({
+        path: '/sinfo',
+        method: 'GET',
+        handler: function (request, reply) {
+            if (!request.state.admin) {
+                return reply.redirect('/');
+            }
+            var mem = process.memoryUsage();
+            return reply.view('sinfo', {
+                mainnav: '/sinfo',
+                process: {
+                    platform: process.platform,
+                    arch: process.arch,
+                    uptime: numeral(process.uptime()).format('00:00:00'),
+                    pid: process.pid,
+                    gid: process.getgid(),
+                    uid: process.getuid(),
+                    versions: process.versions,
+                    mem: {
+                        rss: numeral(mem.rss).format('0.000 b'),
+                        heapTotal: numeral(mem.heapTotal).format('0.000 b'),
+                        heapUsed: numeral(mem.heapUsed).format('0.000 b')
+                    },
+                    cwd: process.cwd(),
+                    argv: _.drop(process.argv, 2),
+                    execPath: process.execPath,
+                    execArgv: process.execArgv
+                },
+                os: {
+                    hostname: os.hostname(),
+                    type: os.type(),
+                    release: os.release(),
+                    uptime: numeral(os.uptime()).format('00:00:00'),
+                    loadavg: os.loadavg(),
+                    totalmem: numeral(os.totalmem()).format('0.000 b'),
+                    freemem: numeral(os.freemem()).format('0.000 b'),
+                    cpus: os.cpus()
+                }
+            });
+        }
     });
     return next();
 };

@@ -1,0 +1,31 @@
+{
+  "userAgent": "GLaDOS IRC-Bot - https://github.com/maddin77/GLaDOS",
+  "AUTH": {
+    "imgur": "",
+    "lastfm": "",
+    "wolframalpha": "",
+    "soundcloud": "",
+    "goo.gl": ""
+  },
+  "admin": [""],
+  "connection": {
+    "host": "de.bitrain.co",
+    "port": 6667,
+    "ssl": false,
+    "nick": "GLaDOS_test",
+    "user": "GLaDOS",
+    "realname": "GLaDOS",
+    "rejectUnauthorized": true,
+    "password": null,
+    "autoRejoin": false,
+    "autoConnect": false,
+    "messageSplit": 512,
+    "quitmsg": "Pyah",
+    "username": "GLaDOS"
+  },
+  "channels": [],
+  "web": {
+    "port": 13357,
+    "cached": false
+  }
+}

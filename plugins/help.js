@@ -1,5 +1,5 @@
-exports.register = function (server, options, next) {
-    server.route({
+exports.register = function (glados, next) {
+    glados.web().route({
         path: '/',
         method: 'GET',
         handler: function (request, reply) {
@@ -8,10 +8,10 @@ exports.register = function (server, options, next) {
             });
         }
     });
-
     return next();
 };
-exports.register.attributes = {
-    name: 'web-help',
-    version: '1.0.0'
+exports.info = {
+    name: 'help',
+    version: '1.0.0',
+    list: false
 };
