@@ -1,5 +1,6 @@
 {
   "userAgent": "GLaDOS IRC-Bot - https://github.com/maddin77/GLaDOS",
+  "requestLanguage": "de, en",
   "AUTH": {
     "imgur": "",
     "lastfm": "",
@@ -26,6 +27,7 @@
   "channels": [],
   "web": {
     "port": 13357,
-    "cached": false
+    "cached": false,
+    "uri": "http://my.webserver.com"
   }
 }
