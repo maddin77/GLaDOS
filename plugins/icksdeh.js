@@ -21,7 +21,6 @@ exports.register = function (glados, next) {
             icksdeh.object[nick] += count;
         }
         icksdeh.save();
-        console.log(match, count);
     });
     return next();
 };
