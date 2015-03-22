@@ -14,7 +14,7 @@ exports.register = function (glados, next) {
         google(text, function (error, next, links) {
             if (error) {
                 glados.debug(error);
-                return event.channel.reply(event.user, '（╯°□°）╯︵ Error:' + error);
+                return event.channel.reply(event.user, '（╯°□°）╯︵ Error');
             }
             var results = [];
             if (links.length > 0) {
