@@ -5,15 +5,16 @@ exports.register = function (glados, next) {
         return nick + (nick.indexOf('s', nick.length - 1) !== -1 ? '\'' : 's');
     };
     glados.hear(/^!icksdeh( \S+)?$/i, function (match, event) {
-        var nick = match[1] ? match[1].trim() : event.user.getNick();
+        var displaynick = match[1] ? match[1].trim() : event.user.getNick();
+        var nick = displaynick.toLowerCase();
         var xD = glados.brain('icksdeh').object[nick] || 0;
-        event.channel.say('%s Anti Benis: %s € (%sx)', seegras(nick), Math.round((xD * 0.1) * 100) / 100, xD);
+        event.channel.say('%s Anti Benis: %s € (%sx)', seegras(displaynick), Math.round((xD * 0.1) * 100) / 100, xD);
     });
     glados.hear(/\bx(d+)\b/gmi, function (match, event) {
         var count = _.reduce(match, function (sum, n) {
             return sum + n.length - 1;
         }, 0);
-        var nick = event.user.getNick();
+        var nick = event.user.getNick().toLowerCase();
         var icksdeh = glados.brain('icksdeh');
         if (!_.has(icksdeh.object, nick)) {
             icksdeh.object[nick] = count;
