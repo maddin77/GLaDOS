@@ -29,7 +29,7 @@ exports.register = function (glados, next) {
         event.user.notice(glados.getWeburl() + '/sinfo/?sid=' + s.sid);
         event.user.notice('Der Link kann ein mal genutzt werden und verfällt automatisch in 60 Sekunden.');
     });
-    glados.hear(/^!join( \S+)?$/i, function (match, event) {
+    glados.hear(/^!join( .+)?$/i, function (match, event) {
         if (!event.user.isAdmin()) {
             return event.user.notice('Du hast nicht die nötigen Rechte um diesen Befehl nutzen zu können.');
         }
