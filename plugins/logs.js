@@ -202,7 +202,7 @@ exports.register = function (glados, next) {
             return callback(files);
         });
     };
-    glados.web().route({
+    /*glados.web().route({
         path: '/logs',
         method: 'GET',
         handler: function (request, reply) {
@@ -282,7 +282,7 @@ exports.register = function (glados, next) {
                 });
             });
         }
-    });
+    });*/
     return next();
 };
 exports.info = {
