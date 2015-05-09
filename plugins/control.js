@@ -20,7 +20,7 @@ exports.register = function (glados, next) {
         var p = require(path.join(__dirname, '..', 'package.json'));
         event.user.notice(p.name + ' - ' + p.version);
     });
-    /*glados.hear(/^!sinfo$/i, function (match, event) {
+    glados.hear(/^!sinfo$/i, function (match, event) {
         if (!event.user.isAdmin()) {
             return event.user.notice('Nein (ಠ_ಠ)');
         }
@@ -28,7 +28,7 @@ exports.register = function (glados, next) {
         event.user.notice('Eine Session wurde auf deinen Nick (%s) registriert. Du kannst dich nun über folgenden Link anmelden:', s.nick);
         event.user.notice(glados.getWeburl() + '/sinfo/?sid=' + s.sid);
         event.user.notice('Der Link kann ein mal genutzt werden und verfällt automatisch in 60 Sekunden.');
-    });*/
+    });
     glados.hear(/^!join( .+)?$/i, function (match, event) {
         if (!event.user.isAdmin()) {
             return event.user.notice('Du hast nicht die nötigen Rechte um diesen Befehl nutzen zu können.');
@@ -112,7 +112,7 @@ exports.register = function (glados, next) {
 
 
 
-    /*glados.web().route({
+    glados.web().route({
         path: '/sinfo',
         method: 'GET',
         handler: function (request, reply) {
@@ -152,7 +152,7 @@ exports.register = function (glados, next) {
                 }
             });
         }
-    });*/
+    });
     return next();
 };
 exports.info = {
@@ -188,7 +188,7 @@ exports.info = {
         },
         desc: [
             'Lässt GLaDOS einen Channel verlassen.',
-            'Wird kein Channel angegeben, so wird der Channel verlassen in dem der Befehl ausgeführt wurde.',,
+            'Wird kein Channel angegeben, so wird der Channel verlassen in dem der Befehl ausgeführt wurde.',
             'Optional kann auch noch eine Nachricht angegeben werden, die in der PART-nachricht angegeben wird.',
             'Kann nur von Administratoren genutzt werden.'
         ]

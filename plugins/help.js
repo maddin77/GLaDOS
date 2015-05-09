@@ -1,5 +1,5 @@
 exports.register = function (glados, next) {
-    /*glados.web().route({
+    glados.web().route({
         path: '/',
         method: 'GET',
         handler: function (request, reply) {
@@ -7,7 +7,7 @@ exports.register = function (glados, next) {
                 mainnav: '/'
             });
         }
-    });*/
+    });
     return next();
 };
 exports.info = {

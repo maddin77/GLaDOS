@@ -7,7 +7,7 @@ exports.register = function (glados, next) {
         if (!name) {
             return event.user.notice('Benutze: !quote <Wer> [#]');
         }
-        /*if (name === 'list') {
+        if (name === 'list') {
             return event.user.notice(glados.getWeburl() + '/quotes');
         }
         if (name === 'add') {
@@ -16,7 +16,7 @@ exports.register = function (glados, next) {
             event.user.notice(glados.getWeburl() + '/quotes/?sid=' + s.sid);
             event.user.notice('Der Link kann ein mal genutzt werden und verfällt automatisch in 60 Sekunden.');
             return;
-        }*/
+        }
         var quotes = glados.brain('quotes').object;
 
         if (!_.has(quotes, name) || quotes[name].quotes.length === 0) {
@@ -30,7 +30,7 @@ exports.register = function (glados, next) {
     });
 
     //========
-    /*glados.web().route({
+    glados.web().route({
         path: '/quotes',
         method: 'GET',
         handler: function (request, reply) {
@@ -99,7 +99,7 @@ exports.register = function (glados, next) {
             quotes.save();
             return reply.redirect('/quotes');
         }
-    });*/
+    });
     return next();
 };
 exports.info = {

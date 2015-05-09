@@ -7,6 +7,7 @@ var cheerio     = require('cheerio');
 var _           = require('lodash');
 var async       = require('async');
 var util        = require('util');
+var moment      = require('moment');
 
 exports.register = function (glados, next) {
     var entities = new Entities();
@@ -73,6 +74,7 @@ exports.register = function (glados, next) {
         });
     };
 
+
     var youtube = function (url, callback) {
         var videoID = null;
         if (url.hostname === 'youtube.com' || url.hostname === 'www.youtube.com') {
@@ -85,17 +87,18 @@ exports.register = function (glados, next) {
         if (!videoID) {
             return callback(url);
         }
+
         request({
-            'url': 'http://gdata.youtube.com/feeds/api/videos/' + videoID + '?v=2&alt=json',
+            'url': 'https://www.googleapis.com/youtube/v3/videos?part=contentDetails,snippet&id=' + videoID + '&key=' + glados.config.object.AUTH['goo.gl'],
             'json': true,
             'headers': {
                 'User-Agent': glados.config.object.userAgent
             }
         }, function (error, response, data) {
-            if (!error && response.statusCode === 200) {
-                var seconds = data.entry.media$group.yt$duration.seconds;
+            if (!error && response.statusCode === 200 && data.items.length > 0) {
+                var seconds = moment.duration(data.items[0].contentDetails.duration).asSeconds();
                 return callback(util.format('YouTube: %s [%s]',
-                    data.entry.title.$t,
+                    data.items[0].snippet.title,
                     seconds === '0' ? 'LIVE' : numeral(~~seconds).format('00:00:00')
                 ));
             } else {
