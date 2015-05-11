@@ -1,7 +1,6 @@
 /*jshint camelcase: false */
 var Entities    = require('html-entities').AllHtmlEntities;
 var urlRegex    = require('url-regex');
-var request     = require('request');
 var numeral     = require('numeral');
 var cheerio     = require('cheerio');
 var _           = require('lodash');
@@ -12,6 +11,14 @@ var moment      = require('moment');
 exports.register = function (glados, next) {
     var entities = new Entities();
     var database = glados.brain('urltitle');
+
+    var request = require('request').defaults({
+        headers: {
+            'User-Agent': glados.config.object.userAgent,
+            'Accept-Language': glados.config.object.requestLanguage
+        },
+        timeout: 5000
+    });
 
     var isDisabled = function (channel) {
         var disabled = database.object.disabled;
@@ -36,10 +43,7 @@ exports.register = function (glados, next) {
 
     var website = function (url, callback) {
         request.head({
-            'uri': url.href,
-            'headers': {
-                'User-Agent': glados.config.object.userAgent
-            }
+            'uri': url.href
         }, function (error, res) {
             if (error) {
                 glados.debug('[website] %s', error);
@@ -52,11 +56,7 @@ exports.register = function (glados, next) {
                 return callback(null);
             }
             request({
-                'uri': url.href,
-                'headers': {
-                    'User-Agent': glados.config.object.userAgent,
-                    'Accept-Language': glados.config.object.requestLanguage
-                }
+                'uri': url.href
             }, function (error, res, body) {
                 if (error) {
                     glados.debug('[website] %s', error);
@@ -90,10 +90,7 @@ exports.register = function (glados, next) {
 
         request({
             'url': 'https://www.googleapis.com/youtube/v3/videos?part=contentDetails,snippet&id=' + videoID + '&key=' + glados.config.object.AUTH['goo.gl'],
-            'json': true,
-            'headers': {
-                'User-Agent': glados.config.object.userAgent
-            }
+            'json': true
         }, function (error, response, data) {
             if (!error && response.statusCode === 200 && data.items.length > 0) {
                 var seconds = moment.duration(data.items[0].contentDetails.duration).asSeconds();
@@ -114,7 +111,6 @@ exports.register = function (glados, next) {
                 'url': 'https://api.imgur.com/3/image/' + match[1],
                 'json': true,
                 'headers': {
-                    'User-Agent': glados.config.object.userAgent,
                     'Authorization': 'Client-ID ' + glados.config.object.AUTH.imgur
                 }
             }, function (error, response, data) {
@@ -137,7 +133,6 @@ exports.register = function (glados, next) {
                 'url': 'https://api.imgur.com/3/album/' + match[1],
                 'json': true,
                 'headers': {
-                    'User-Agent': glados.config.object.userAgent,
                     'Authorization': 'Client-ID ' + glados.config.object.AUTH.imgur
                 }
             }, function (error, response, data) {
@@ -160,10 +155,7 @@ exports.register = function (glados, next) {
         var videoId = url.pathname.substr(1);
         request({
             'url': 'http://vimeo.com/api/v2/video/' + videoId + '.json',
-            'json': true,
-            'headers': {
-                'User-Agent': glados.config.object.userAgent
-            }
+            'json': true
         }, function (error, response, data) {
             if (!error && response.statusCode === 200) {
                 return callback(util.format('Vimeo: %s [%s]',
@@ -186,10 +178,7 @@ exports.register = function (glados, next) {
             }
             request({
                 'uri': 'http://www.reddit.com/comments/' + id + '.json',
-                'json': true,
-                'headers': {
-                    'User-Agent': glados.config.object.userAgent
-                }
+                'json': true
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
                     if (data instanceof Array) {
@@ -212,10 +201,7 @@ exports.register = function (glados, next) {
             id = url.pathname.split('/')[2];
             request({
                 'uri': 'http://www.reddit.com/r/' + id + '/about.json',
-                'json': true,
-                'headers': {
-                    'User-Agent': glados.config.object.userAgent
-                }
+                'json': true
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
                     data = data.data;
@@ -233,10 +219,7 @@ exports.register = function (glados, next) {
             id = url.pathname.split('/')[2];
             request({
                 'uri': 'http://www.reddit.com/user/' + id + '/about.json',
-                'json': true,
-                'headers': {
-                    'User-Agent': glados.config.object.userAgent
-                }
+                'json': true
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
                     data = data.data;
@@ -259,10 +242,7 @@ exports.register = function (glados, next) {
         if ((match = url.href.match(/^(?:http|https):\/\/gist\.github\.com\/(?:[A-Za-z0-9]+)\/([A-Za-z0-9]+)(?:\/?)$/i)) !== null) {
             request({
                 'uri': 'https://api.github.com/gists/' + match[1],
-                'json': true,
-                'headers': {
-                    'User-Agent': glados.config.object.userAgent
-                }
+                'json': true
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
                     return callback(util.format('GitHub Gists: %s - von %s (%s Kommentare, %s Forks)',
@@ -279,10 +259,7 @@ exports.register = function (glados, next) {
         } else if ((match = url.href.match(/^(?:http|https):\/\/github\.com\/([_a-zA-Z0-9\-]+)\/([_a-zA-Z0-9\-]+)\/issues\/([0-9]+)(?:\/?)/i)) !== null) {
             request({
                 'uri': 'https://api.github.com/repos/' + match[1] + '/' + match[2] + '/issues/' + match[3],
-                'json': true,
-                'headers': {
-                    'User-Agent': glados.config.object.userAgent
-                }
+                'json': true
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
                     return callback(util.format('GitHub Issues: "%s - von %s - in %s (#%s, %s Kommentare)',
@@ -300,10 +277,7 @@ exports.register = function (glados, next) {
         } else if ((match = url.href.match(/^(?:http|https):\/\/github\.com\/([_a-zA-Z0-9\-]+)\/([_a-zA-Z0-9\-]+)\/pull\/([0-9]+)(?:\/?)/i)) !== null) {
             request({
                 'uri': 'https://api.github.com/repos/' + match[1] + '/' + match[2] + '/pulls/' + match[3],
-                'json': true,
-                'headers': {
-                    'User-Agent': glados.config.object.userAgent
-                }
+                'json': true
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
                     return callback(util.format('GitHub Pull Request: %s - von %s - in %s (#%s, %s Kommentare)',
@@ -321,10 +295,7 @@ exports.register = function (glados, next) {
         } else if ((match = url.href.match(/^(?:http|https):\/\/github\.com\/([_a-zA-Z0-9\-]+)\/([_a-zA-Z0-9\-]+)(?:\/?)/i)) !== null) {
             request({
                 'uri': 'https://api.github.com/repos/' + match[1] + '/' + match[2],
-                'json': true,
-                'headers': {
-                    'User-Agent': glados.config.object.userAgent
-                }
+                'json': true
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
                     return callback(util.format('GitHub Repository: %s - %s (%s Watchers, %s Stargazers, %s Forks)',
@@ -342,10 +313,7 @@ exports.register = function (glados, next) {
         } else if ((match = url.href.match(/^(?:http|https):\/\/github\.com\/([_a-zA-Z0-9\-]+)(?:\/?)$/i)) !== null) {
             request({
                 'uri': 'https://api.github.com/users/' + match[1],
-                'json': true,
-                'headers': {
-                    'User-Agent': glados.config.object.userAgent
-                }
+                'json': true
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
                     return callback(util.format('GitHub User: %s - %s (%s Followers, %s Repositorys, %s Gists)',
@@ -369,10 +337,7 @@ exports.register = function (glados, next) {
         if ((match = url.href.match(/^(?:http|https):\/\/boards\.4chan\.org\/([a-zA-Z0-9]*)\/thread\/([0-9]*)(?:\/?)$/i)) !== null) {
             request({
                 'uri': 'https://a.4cdn.org/' + match[1] + '/res/' + match[2] + '.json',
-                'json': true,
-                'headers': {
-                    'User-Agent': glados.config.object.userAgent
-                }
+                'json': true
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
                     var msg = data.posts[0].com || null;
@@ -398,10 +363,7 @@ exports.register = function (glados, next) {
         var match = url.href.match(/(https?:\/\/(www\.)?soundcloud\.com\/)([\d\w\-\/]+)/i);
         request({
             'uri': 'http://api.soundcloud.com/resolve.json?client_id=' + glados.config.object.AUTH.soundcloud + '&url=' + match[0],
-            'json': true,
-            'headers': {
-                'User-Agent': glados.config.object.userAgent
-            }
+            'json': true
         }, function (error, response, data) {
             if (!error && response.statusCode === 200) {
                 if (data.kind === 'track') {
@@ -427,10 +389,7 @@ exports.register = function (glados, next) {
     };
     var breadfish = function (url, callback) {
         request({
-            'uri': url.href,
-            'headers': {
-                'User-Agent': glados.config.object.userAgent
-            }
+            'uri': url.href
         }, function (error, res, body) {
             if (error) {
                 glados.debug('[breadfish] %s', error);
@@ -451,10 +410,7 @@ exports.register = function (glados, next) {
         if ((match = url.href.match(/^(?:http|https):\/\/twitter\.com\/(?:\w){1,15}\/status\/([0-9]+)(?:\/?)/i) || url.href.match(/^(?:http|https):\/\/twitter\.com\/(?:\w){1,15}\/status\/([0-9]+)(?:\/photo\/[0-9]+?)(?:\/?)/i)) !== null) {
             request({
                 'uri': 'http://noauth.jit.su/1/statuses/show.json?id=' + match[1],
-                'json': true,
-                'headers': {
-                    'User-Agent': glados.config.object.userAgent
-                }
+                'json': true
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
                     return callback(util.format('Twitter: %s - @%s',
