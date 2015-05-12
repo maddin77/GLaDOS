@@ -75,7 +75,7 @@ exports.register = function (glados, next) {
     };
 
 
-    var youtube = function (url, callback) {
+    /*var youtube = function (url, callback) {
         var videoID = null;
         if (url.hostname === 'youtube.com' || url.hostname === 'www.youtube.com') {
             videoID = url.query.v;
@@ -423,11 +423,11 @@ exports.register = function (glados, next) {
                 }
             });
         }
-    };
+    };*/
 
     var getTitel = function (originalUrl, callback) {
         var url = require('url').parse(originalUrl, true, true);
-        if (_.indexOf(['youtube.com', 'www.youtube.com', 'youtu.be', 'www.youtu.be', 'www.y2u.be', 'y2u.be'], url.hostname) !== -1) {
+        /*if (_.indexOf(['youtube.com', 'www.youtube.com', 'youtu.be', 'www.youtu.be', 'www.y2u.be', 'y2u.be'], url.hostname) !== -1) {
             return youtube(url, callback);
         }
         if (_.indexOf(['i.imgur.com', 'www.i.imgur.com', 'imgur.com', 'www.imgur.com'], url.hostname) !== -1) {
@@ -453,7 +453,7 @@ exports.register = function (glados, next) {
         }
         if (_.indexOf(['twitter.com'], url.hostname) !== -1) {
             return twitter(url, callback);
-        }
+        }*/
         return callback(url);
     };
 
