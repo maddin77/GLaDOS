@@ -7,6 +7,7 @@ var _           = require('lodash');
 var async       = require('async');
 var util        = require('util');
 var moment      = require('moment');
+var Url         = require('url');
 
 exports.register = function (glados, next) {
     var entities = new Entities();
@@ -47,28 +48,28 @@ exports.register = function (glados, next) {
         }, function (error, res) {
             if (error) {
                 glados.debug('[website] %s', error);
-                return callback(null);
+                return callback(error);
             }
             if (res.statusCode !== 200) {
-                return callback(null);
+                return callback('Status !== 200');
             }
             if (!res.headers.hasOwnProperty('content-type') || res.headers['content-type'].indexOf('text/html') === -1) {
-                return callback(null);
+                return callback('content-type != text/html');
             }
             request({
                 'uri': url.href
             }, function (error, res, body) {
                 if (error) {
                     glados.debug('[website] %s', error);
-                    return callback(null);
+                    return callback(error);
                 }
                 if (res.statusCode !== 200) {
-                    return callback(null);
+                    return callback('Status !== 200');
                 }
                 var title = cheerio(body).find('title').first().text();
                 if (title.length > 0) {
                     title = title.replace(/(\r\n|\n|\r)/gm, '').trim();
-                    callback('Title: ' + entities.decode(title) + ' (at ' + url.host + ')');
+                    callback(null, 'Title: ' + entities.decode(title) + ' (at ' + url.host + ')');
                 }
             });
         });
@@ -426,7 +427,7 @@ exports.register = function (glados, next) {
     };*/
 
     var getTitel = function (originalUrl, callback) {
-        var url = require('url').parse(originalUrl, true, true);
+        var url = Url.parse(originalUrl, true, true);
         /*if (_.indexOf(['youtube.com', 'www.youtube.com', 'youtu.be', 'www.youtu.be', 'www.y2u.be', 'y2u.be'], url.hostname) !== -1) {
             return youtube(url, callback);
         }
@@ -454,24 +455,28 @@ exports.register = function (glados, next) {
         if (_.indexOf(['twitter.com'], url.hostname) !== -1) {
             return twitter(url, callback);
         }*/
-        return callback(url);
+        return callback(url, null);
     };
 
     glados.hear(urlRegex(), function (match, event) {
         if (isDisabled(event.channel.getName())) {
             return;
         }
+        glados.debug('found urls: ', match);
         async.map(match, function (originalUrl, callback) {
-            getTitel(originalUrl, function (title) {
+            glados.debug('map->', originalUrl);
+            getTitel(originalUrl, function (url, title) {
                 glados.debug('getTitel->%s', title);
-                if (_.isString(title)) {
+                if (title) {
                     return callback(null, title);
                 }
-                website(title, function (title) {
-                    if (_.isString(title)) {
-                        return callback(null, title);
+                website(url, function (error, title) {
+                    glados.debug('website->%s', title);
+                    if (error) {
+                        glados.debug('glados.hear->map->getTitel->website:', error);
+                        return callback(null, null);
                     }
-                    return callback(null, null);
+                    return callback(null, title);
                 });
             });
         }, function (error, results) {
