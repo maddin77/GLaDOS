@@ -38,7 +38,7 @@ exports.register = function (glados, next) {
     var formatReponse = function (coinName, currency, callback) {
         var availableCurrencies = ['usd', 'btc', 'eur', 'cny', 'gbp', 'cad', 'rub', 'hkd'];
         if (!_.contains(availableCurrencies, currency)) {
-            return callback(util.format('Unknwon currency "%s". Available currencies are: %s', currency, availableCurrencies.join(', ')), null);
+            return callback(util.format('Unbekannte Währung "%s". Verfügbare Währungen sind: %s', currency, availableCurrencies.join(', ')), null);
         }
         getCoinData(coinName, function (error, coin) {
             if (error) {
@@ -55,7 +55,7 @@ exports.register = function (glados, next) {
                 marketCap = formatMoney(coin.marketCap[currency]);
                 price = formatMoney(coin.price[currency]);
             }
-            callback(null, util.format('%s (%s). Price: %s. Market Cap: %s. Available Supply: %s %s.', coin.name, coin.symbol, price, marketCap, coin.availableSupply, coin.symbol));
+            callback(null, util.format('%s (%s). Preis: %s. Marktkapitalisierung: %s. Verfügbar: %s %s.', coin.name, coin.symbol, price, marketCap, coin.availableSupply, coin.symbol));
         });
     };
     glados.hear(/^!crypto( \S+)?( \S+)?$/i, function (match, event) {
@@ -108,7 +108,7 @@ exports.info = {
         'Die Standardwährung bei allen Befehlen ist Euro (eur) und kann optional durch eine der folgenden Währungen ersetzt werden:',
         'US Dollar (usd), Bitcoin (btc), Euro (eur), Yuan (cny), Pfund Sterling (gbp), Kanadischer Dollar (cad), Russischer Rubel (rub), Hongkong-Dollar (hkd), Yen (jpy), Australischer Dollar (aud).',
     ],
-    version: '1.0.0',
+    version: '1.0.1',
     commands: [{
         name: 'bitcoin',
         alias: ['btc'],
@@ -129,6 +129,6 @@ exports.info = {
             'Coin': 'required',
             'Währung': 'optional'
         },
-        desc: ['Gibt den aktuellen Kurs der angegebenen Kryptowährung zurück.']
+        desc: ['Gibt den aktuellen Kurs der angegebenen Kryptowährung zurück. Eine vollständige Liste findet man auf coinmarketcap.com']
     }]
 };
