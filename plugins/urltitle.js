@@ -458,7 +458,7 @@ exports.register = function (glados, next) {
         return callback(url, null);
     };
 
-    glados.hear(urlRegex(), function (match, event) {
+    glados.hear(/(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?\^=%&amp;:\/~\+#]*[\w\-\@?\^=%&amp;\/~\+#])?/gmi, function (match, event) {
         if (isDisabled(event.channel.getName())) {
             return;
         }
@@ -508,7 +508,7 @@ exports.info = {
         'Youtube, Imgur, Vimeo, Reddit, GitHub, 4chan, SoundCloud, Breadfish & Twitter.',
         'Sollte der Link zu keiner der Seiten passen wird der Titel der Webseite ausgegeben.'
     ],
-    version: '1.0.0',
+    version: '1.1.0',
     commands: [{
         name: 'urltitle',
         desc: [
