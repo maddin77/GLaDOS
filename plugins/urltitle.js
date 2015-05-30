@@ -1,6 +1,5 @@
 /*jshint camelcase: false */
 var Entities    = require('html-entities').AllHtmlEntities;
-var urlRegex    = require('url-regex');
 var numeral     = require('numeral');
 var cheerio     = require('cheerio');
 var _           = require('lodash');
@@ -76,7 +75,7 @@ exports.register = function (glados, next) {
     };
 
 
-    /*var youtube = function (url, callback) {
+    var youtube = function (url, callback) {
         var videoID = null;
         if (url.hostname === 'youtube.com' || url.hostname === 'www.youtube.com') {
             videoID = url.query.v;
@@ -86,7 +85,7 @@ exports.register = function (glados, next) {
             videoID = url.pathname.substr(1);
         }
         if (!videoID) {
-            return callback(url);
+            return callback(null);
         }
 
         request({
@@ -101,13 +100,54 @@ exports.register = function (glados, next) {
                 ));
             } else {
                 glados.debug('[youtube] %s', error);
-                return callback(url);
+                return callback(null);
             }
         });
     };
     var imgur = function (url, callback) {
         var match;
-        if ((match = url.href.match(/^(?:http|https):\/\/(?:i\.)?imgur\.com\/([A-Za-z0-9]{2,})/i)) !== null) {
+        if ((match = url.href.match(/^(?:http|https):\/\/imgur\.com\/gallery\/([A-Za-z0-9]+)/i)) !== null) {
+            request({
+                'url': 'https://api.imgur.com/3/gallery/' + match[1],
+                'json': true,
+                'headers': {
+                    'Authorization': 'Client-ID ' + glados.config.object.AUTH.imgur
+                }
+            }, function (error, response, data) {
+                console.log(error, data);
+                if (!error && response.statusCode === 200) {
+                    return callback(util.format('Imgur Gallery: %s [%s Bild%s%s]',
+                        data.data.title || 'null',
+                        data.data.is_album ? data.data.images_count : 1,
+                        data.data.is_album ? (data.data.images_count === 1 ? '' : 'er') : '',
+                        data.data.nsfw ? ', NSFW' : ''
+                    ));
+                } else {
+                    glados.debug('[imgur/gallery] %s', error, data);
+                    return callback(null);
+                }
+            });
+        } else if ((match = url.href.match(/^(?:http|https):\/\/imgur\.com\/a\/([A-Za-z0-9]+)/i)) !== null) {
+            request({
+                'url': 'https://api.imgur.com/3/album/' + match[1],
+                'json': true,
+                'headers': {
+                    'Authorization': 'Client-ID ' + glados.config.object.AUTH.imgur
+                }
+            }, function (error, response, data) {
+                console.log(error, data);
+                if (!error && response.statusCode === 200) {
+                    return callback(util.format('Imgur Album: %s [%s Bilder%s]',
+                        data.data.title || 'null',
+                        data.data.images_count,
+                        data.data.nsfw ? ', NSFW' : ''
+                    ));
+                } else {
+                    glados.debug('[imgur/album] %s', error, data);
+                    return callback(null);
+                }
+            });
+        } else if ((match = url.href.match(/^(?:http|https):\/\/(?:i\.)?imgur\.com\/([A-Za-z0-9]{2,})/i)) !== null) {
             request({
                 'url': 'https://api.imgur.com/3/image/' + match[1],
                 'json': true,
@@ -126,30 +166,11 @@ exports.register = function (glados, next) {
                     ));
                 } else {
                     glados.debug('[imgur/image] %s', error, data);
-                    return callback(url);
-                }
-            });
-        } else if ((match = url.href.match(/^(?:http|https):\/\/imgur\.com\/a\/([A-Za-z0-9]+)/i)) !== null) {
-            request({
-                'url': 'https://api.imgur.com/3/album/' + match[1],
-                'json': true,
-                'headers': {
-                    'Authorization': 'Client-ID ' + glados.config.object.AUTH.imgur
-                }
-            }, function (error, response, data) {
-                if (!error && response.statusCode === 200) {
-                    return callback(util.format('Imgur Album: %s [%s Bilder%s]',
-                        data.data.title || 'null',
-                        data.data.images_count,
-                        data.data.nsfw ? ', NSFW' : ''
-                    ));
-                } else {
-                    glados.debug('[imgur/image] %s', error, data);
-                    return callback(url);
+                    return callback(null);
                 }
             });
         } else {
-            return callback(url);
+            return callback(null);
         }
     };
     var vimeo = function (url, callback) {
@@ -165,7 +186,7 @@ exports.register = function (glados, next) {
                 ));
             } else {
                 glados.debug('[vimeo] %s', error);
-                return callback(url);
+                return callback(null);
             }
         });
     };
@@ -195,7 +216,7 @@ exports.register = function (glados, next) {
                     ));
                 } else {
                     glados.debug('[reddit/thread] %s', error);
-                    return callback(url);
+                    return callback(null);
                 }
             });
         } else if (url.path.match(/^\/(?:r)\/([a-z0-9][a-z0-9_]{2,20})(?:\/?)$/i)) { //subreddit
@@ -208,12 +229,12 @@ exports.register = function (glados, next) {
                     data = data.data;
                     return callback(util.format('Reddit: %s - %s - %s Subscribers',
                         data.title.replace(/(\r\n|\n|\r)/gm, ''),
-                        _.unescape(data.public_description),
+                        _.unescape(data.public_description.replace(/(\r\n|\n|\r)/gm, ' ')),
                         numeral(data.subscribers).format('0,0')
                     ));
                 } else {
                     glados.debug('[reddit/subreddit] %s', error);
-                    return callback(url);
+                    return callback(null);
                 }
             });
         } else if (url.path.match(/^\/(?:user|u)\/([_a-zA-Z0-9\-]{3,20})(?:\/?)$/i)) { //subreddit
@@ -231,11 +252,11 @@ exports.register = function (glados, next) {
                     ));
                 } else {
                     glados.debug('[reddit/user] %s', error);
-                    return callback(url);
+                    return callback(null);
                 }
             });
         } else {
-            return callback(url);
+            return callback(null);
         }
     };
     var github = function (url, callback) {
@@ -246,15 +267,15 @@ exports.register = function (glados, next) {
                 'json': true
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
-                    return callback(util.format('GitHub Gists: %s - von %s (%s Kommentare, %s Forks)',
-                        data.description,
+                    return callback(util.format('GitHub Gists: %s - von %s (%s Kommentare, %s Gabeln)',
+                        data.description || _.map(data.files)[0].filename,
                         data.owner.login,
                         data.comments,
                         data.forks.length
                     ));
                 } else {
                     glados.debug('[github/gist] %s', error);
-                    return callback(url);
+                    return callback(null);
                 }
             });
         } else if ((match = url.href.match(/^(?:http|https):\/\/github\.com\/([_a-zA-Z0-9\-]+)\/([_a-zA-Z0-9\-]+)\/issues\/([0-9]+)(?:\/?)/i)) !== null) {
@@ -272,7 +293,7 @@ exports.register = function (glados, next) {
                     ));
                 } else {
                     glados.debug('[github/issues] %s', error);
-                    return callback(url);
+                    return callback(null);
                 }
             });
         } else if ((match = url.href.match(/^(?:http|https):\/\/github\.com\/([_a-zA-Z0-9\-]+)\/([_a-zA-Z0-9\-]+)\/pull\/([0-9]+)(?:\/?)/i)) !== null) {
@@ -290,7 +311,7 @@ exports.register = function (glados, next) {
                     ));
                 } else {
                     glados.debug('[github/pulls] %s', error);
-                    return callback(url);
+                    return callback(null);
                 }
             });
         } else if ((match = url.href.match(/^(?:http|https):\/\/github\.com\/([_a-zA-Z0-9\-]+)\/([_a-zA-Z0-9\-]+)(?:\/?)/i)) !== null) {
@@ -299,7 +320,7 @@ exports.register = function (glados, next) {
                 'json': true
             }, function (error, response, data) {
                 if (!error && response.statusCode === 200) {
-                    return callback(util.format('GitHub Repository: %s - %s (%s Watchers, %s Stargazers, %s Forks)',
+                    return callback(util.format('GitHub Repository: %s - %s (%s Spanner, %s Sterndeuter, %s Gabeln)',
                         data.full_name,
                         data.description,
                         data.subscribers_count,
@@ -308,7 +329,7 @@ exports.register = function (glados, next) {
                     ));
                 } else {
                     glados.debug('[github/repos] %s', error);
-                    return callback(url);
+                    return callback(null);
                 }
             });
         } else if ((match = url.href.match(/^(?:http|https):\/\/github\.com\/([_a-zA-Z0-9\-]+)(?:\/?)$/i)) !== null) {
@@ -326,11 +347,11 @@ exports.register = function (glados, next) {
                     ));
                 } else {
                     glados.debug('[github/users] %s', error);
-                    return callback(url);
+                    return callback(null);
                 }
             });
         } else {
-            return callback(url);
+            return callback(null);
         }
     };
     var halfchan = function (url, callback) {
@@ -353,11 +374,11 @@ exports.register = function (glados, next) {
                     ));
                 } else {
                     glados.debug('[4chan] %s', error);
-                    return callback(url);
+                    return callback(null);
                 }
             });
         } else {
-            return callback(url);
+            return callback(null);
         }
     };
     var soundcloud = function (url, callback) {
@@ -381,10 +402,10 @@ exports.register = function (glados, next) {
                         numeral(data.duration / 1000).format('00:00:00')
                     ));
                 }
-                return callback(url);
+                return callback(null);
             } else {
                 glados.debug('[soundcloud] %s', error);
-                return callback(url);
+                return callback(null);
             }
         });
     };
@@ -394,10 +415,10 @@ exports.register = function (glados, next) {
         }, function (error, res, body) {
             if (error) {
                 glados.debug('[breadfish] %s', error);
-                return callback(url);
+                return callback(null);
             }
             if (!res.headers.hasOwnProperty('content-type') || res.headers['content-type'].indexOf('text/html') === -1) {
-                return callback(url);
+                return callback(null);
             }
             var title = cheerio(body).find('title').text();
             if (title.length > 0) {
@@ -420,15 +441,14 @@ exports.register = function (glados, next) {
                     ));
                 } else {
                     glados.debug('[twitter/status] %s', error);
-                    return callback(url);
+                    return callback(null);
                 }
             });
         }
-    };*/
+    };
 
-    var getTitel = function (originalUrl, callback) {
-        var url = Url.parse(originalUrl, true, true);
-        /*if (_.indexOf(['youtube.com', 'www.youtube.com', 'youtu.be', 'www.youtu.be', 'www.y2u.be', 'y2u.be'], url.hostname) !== -1) {
+    var getTitel = function (url, callback) {
+        if (_.indexOf(['youtube.com', 'www.youtube.com', 'youtu.be', 'www.youtu.be', 'www.y2u.be', 'y2u.be'], url.hostname) !== -1) {
             return youtube(url, callback);
         }
         if (_.indexOf(['i.imgur.com', 'www.i.imgur.com', 'imgur.com', 'www.imgur.com'], url.hostname) !== -1) {
@@ -454,8 +474,8 @@ exports.register = function (glados, next) {
         }
         if (_.indexOf(['twitter.com'], url.hostname) !== -1) {
             return twitter(url, callback);
-        }*/
-        return callback(url, null);
+        }
+        return callback(null);
     };
 
     glados.hear(/(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?\^=%&amp;:\/~\+#]*[\w\-\@?\^=%&amp;\/~\+#])?/gmi, function (match, event) {
@@ -465,7 +485,8 @@ exports.register = function (glados, next) {
         glados.debug('found urls: ', match);
         async.map(match, function (originalUrl, callback) {
             glados.debug('map->', originalUrl);
-            getTitel(originalUrl, function (url, title) {
+            var url = Url.parse(originalUrl, true, true);
+            getTitel(url, function (title) {
                 glados.debug('getTitel->%s', title);
                 if (title) {
                     return callback(null, title);
@@ -508,7 +529,7 @@ exports.info = {
         'Youtube, Imgur, Vimeo, Reddit, GitHub, 4chan, SoundCloud, Breadfish & Twitter.',
         'Sollte der Link zu keiner der Seiten passen wird der Titel der Webseite ausgegeben.'
     ],
-    version: '1.1.0',
+    version: '1.1.1',
     commands: [{
         name: 'urltitle',
         desc: [
