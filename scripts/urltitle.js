@@ -198,7 +198,7 @@ module.exports = function (scriptLoader) {
                         data = data[0];
                     }
                     data = data.data.children[0].data;
-                    fn(true, 'Reddit: ' + data.title + ' - /r/' + data.subreddit + ' - Score: ' + data.score + ' (↑' + data.ups + ', ↓' + data.downs + ')');
+                    fn(true, 'Reddit: ' + data.title + ' - /r/' + data.subreddit + ' - Score: ' + data.score + ' (↑' + Math.round(data.upvote_ratio * data.score) + ', ↓' + Math.round((1 - data.upvote_ratio) * data.score) + ')');
                 } else {
                     scriptLoader.debug('[reddit/thread] %s', error);
                     getTitle(URL, fn);
