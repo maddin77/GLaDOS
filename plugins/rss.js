@@ -251,7 +251,7 @@ exports.info = {
             'Kann nur von Channel-Operatoren genutzt werden.'
         ]
     },{
-        name: 'rss unsubscribe',
+        name: 'chanrss unsubscribe',
         params: {
             'Feed-URL': 'required'
         },
@@ -260,7 +260,7 @@ exports.info = {
             'Kann nur von Channel-Operatoren genutzt werden.'
         ]
     },{
-        name: 'rss list',
+        name: 'chanrss list',
         desc: [
             'Listet alle deine abbonierten RSS Feeds für den aktuellen Channel auf.',
             'Kann nur von Channel-Operatoren genutzt werden.'
