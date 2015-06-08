@@ -1,0 +1,39 @@
+<div class="container-fluid react">
+    <br>
+    <div class="row">
+        <div class="col-xs-12">
+            <table class="table table-bordered">
+                <tbody>
+                    {{#each react}}
+                    <tr id="{{this.id}}">
+                        <td class="table-sep">
+                            <strong>Erstellt von {{this.by}} ({{formatDate this.time "%d. %m. %Y, %H:%M:%S"}})</strong>
+                            {{!--<a href="#{{this.id}}"><code>#{{this.id}}</code></a>--}}
+                            <code>!react
+                            {{#is this.channel "*"}} -g{{/is}}
+                            {{#isnt this.user "*"}} -u {{this.user}}{{/isnt}}
+                            {{#lengthEqual this.message 0}}{{else}} -m "{{this.message}}"{{/lengthEqual}}
+                            {{#if this.join}} -j{{/if}}
+                            {{#if this.part}} -p{{/if}}
+                            {{#if this.kick}} -k{{/if}}
+                            -r "{{this.response}}"
+                            </code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="desc">
+                            <p><strong>Channel:</strong> {{#is this.channel "*"}}Alle{{else}}{{this.channel}}{{/is}}</p>
+                            <p><strong>Benutzer:</strong> {{#is this.user "*"}}Alle{{else}}{{this.user}}{{/is}}</p>
+                            <p><strong>Nachricht:</strong> {{#lengthEqual this.message 0}}Keine Reaktion auf Nachrichten{{else}}{{this.message}}{{/lengthEqual}}</p>
+                            <p><strong>Join:</strong> {{#if this.join}}Ja{{else}}Keine Reaktion auf JOINs{{/if}}</p>
+                            <p><strong>Part:</strong> {{#if this.part}}Ja{{else}}Keine Reaktion auf PARTs{{/if}}</p>
+                            <p><strong>Kick:</strong> {{#if this.kick}}Ja{{else}}Keine Reaktion auf KICKs{{/if}}</p>
+                            <p><strong>Reaktion:</strong> {{this.response}}</p>
+                        </td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

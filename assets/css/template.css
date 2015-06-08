@@ -1,1 +1,216 @@
-body{background-color:#25292c;color:#f9f7fa;font-family:'Roboto',sans-serif;-webkit-font-smoothing:antialiased}code,pre{background:#222;color:#f9f7fa;font:12px Consolas,"Liberation Mono",Menlo,Courier,monospace}.mainnav{background:#41454e}.mainnav li a{border-radius:0;background-color:transparent;color:#d5d6d8;transition:all ease-in-out .15s;box-shadow:inset 0 0 0 0 #f35656;background:transparent}.mainnav li a:hover{box-shadow:inset 0 -5px 0 0 #f35656;background-color:transparent;color:#d5d6d8}.mainnav li.active a{background-color:transparent !important;color:#fff;box-shadow:inset 0 -5px 0 0 #f35656}.plugins .alias{margin:8px 0 0 0;font-size:13px}.plugins .alias:before{content:"Alias: ";color:#bbb}.plugins .type{width:1px;vertical-align:middle;text-align:center;background-color:#f35656;padding:0}.plugins .type a{color:#f8f8f0;display:block;padding:8px}.plugins .type a:hover,.plugins .type a:focus{text-decoration:none}.plugins .command,.plugins .hear{font:14px Consolas,"Liberation Mono",Menlo,Courier,monospace;width:1px;white-space:nowrap;vertical-align:middle}.plugins .desc{vertical-align:middle}.plugins .desc p:last-child{margin:0}.plugins .param-required:before{content:" <"}.plugins .param-required:after{content:">"}.plugins .param-optional:before{content:" ["}.plugins .param-optional:after{content:"]"}.plugins .table-sep{padding:0}.plugins .table-sep a{color:#f8f8f0;display:block;padding:8px}.plugins .table-sep a:hover,.plugins .table-sep a:focus{text-decoration:none}.table-bordered tbody>tr>td,.table-bordered tbody>tr>th,.table-bordered tfoot>tr>td,.table-bordered tfoot>tr>th,.table-bordered thead>tr>td,.table-bordered thead>tr>th{border:5px solid #41454e}.table-bordered .table-sep{background-color:#f35656;color:#f8f8f0;position:relative;font-weight:bold}.table-bordered .table-sep code{font-weight:normal;border-radius:0;position:absolute;top:0;right:0;border-left:5px solid #41454e;line-height:32px;padding:2px 10px}.quotes .add .form-horizontal{border:5px solid #41454e;margin-bottom:15px}.quotes .add .form-group{margin:0;border-bottom:5px solid #41454e}.quotes .add .form-group:last-child{border-bottom-width:0}.quotes .add .form-group.has-error label{color:#f35656}.quotes .add .form-control{box-shadow:none;border-radius:0;background-color:transparent;border-color:#41454e;border-width:0;color:#f9f7fa}.quotes .add .btn{border-radius:0;border-width:0;background-color:#f35656}.quotes .table .del{color:#f35656;float:right;font-weight:bold}.quotes .table .del:hover{text-decoration:none}.logs{padding-top:15px}.logs a{color:#f9f7fa}.logs a:hover{color:#fff;text-decoration:none}.logs .logFile tr{color:#bbb}.logs .logFile tr .time,.logs .logFile tr .nick,.logs .logFile tr .content{border-width:0;padding:0 10px}.logs .logFile tr .time{border-left-width:5px;width:1px}.logs .logFile tr .time a:focus{color:#f35656}.logs .logFile tr .nick{text-align:right;white-space:nowrap;width:1px}.logs .logFile tr .nick.action span:before{content:"* "}.logs .logFile tr .nick:not(.action) span:before{content:"<"}.logs .logFile tr .nick:not(.action) span:after{content:">"}.logs .logFile tr .content{border-right-width:5px;text-align:left}.logs .logFile tr .content a{text-decoration:underline}.logs .logFile tr:last-child .time,.logs .logFile tr:last-child .nick,.logs .logFile tr:last-child .content{border-bottom-width:5px}.logs .logFile tr.event.event-message{color:#fff}@media (min-width:768px){.quotes .form-control{border-left-width:5px !important}}
+body {
+  background-color: #25292c;
+  color: #f9f7fa;
+  font-family: 'Roboto', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+code,
+pre {
+  background: #222222;
+  color: #f9f7fa;
+  font: 12px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}
+.mainnav {
+  background: #41454e;
+}
+.mainnav li a {
+  border-radius: 0;
+  background-color: transparent;
+  color: #d5d6d8;
+  transition: all ease-in-out 0.15s;
+  box-shadow: inset 0 0px 0 0 #f35656;
+  background: transparent;
+}
+.mainnav li a:hover {
+  box-shadow: inset 0 -5px 0 0 #f35656;
+  background-color: transparent;
+  color: #d5d6d8;
+}
+.mainnav li.active a {
+  background-color: transparent !important;
+  color: #FFF;
+  box-shadow: inset 0 -5px 0 0 #f35656;
+}
+.plugins .alias {
+  margin: 8px 0 0 0;
+  font-size: 13px;
+}
+.plugins .alias:before {
+  content: "Alias: ";
+  color: #BBB;
+}
+.plugins .type {
+  width: 1px;
+  vertical-align: middle;
+  text-align: center;
+  background-color: #f35656;
+  padding: 0;
+}
+.plugins .type a {
+  color: #F8F8F0;
+  display: block;
+  padding: 8px;
+}
+.plugins .type a:hover,
+.plugins .type a:focus {
+  text-decoration: none;
+}
+.plugins .command,
+.plugins .hear {
+  font: 14px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  width: 1px;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.plugins .desc {
+  vertical-align: middle;
+}
+.plugins .desc p:last-child {
+  margin: 0;
+}
+.plugins .param-required:before {
+  content: " <";
+}
+.plugins .param-required:after {
+  content: ">";
+}
+.plugins .param-optional:before {
+  content: " [";
+}
+.plugins .param-optional:after {
+  content: "]";
+}
+.plugins .param-cli:before {
+  content: " ";
+}
+.plugins .table-sep {
+  padding: 0;
+}
+.plugins .table-sep a {
+  color: #F8F8F0;
+  display: block;
+  padding: 8px;
+}
+.plugins .table-sep a:hover,
+.plugins .table-sep a:focus {
+  text-decoration: none;
+}
+.table-bordered tbody > tr > td,
+.table-bordered tbody > tr > th,
+.table-bordered tfoot > tr > td,
+.table-bordered tfoot > tr > th,
+.table-bordered thead > tr > td,
+.table-bordered thead > tr > th {
+  border: 5px solid #41454e;
+}
+.table-bordered .table-sep {
+  background-color: #f35656;
+  color: #F8F8F0;
+  position: relative;
+  font-weight: bold;
+}
+.table-bordered .table-sep code {
+  font-weight: normal;
+  border-radius: 0;
+  position: absolute;
+  top: 0;
+  right: 0;
+  border-left: 5px solid #41454e;
+  line-height: 32px;
+  padding: 2px 10px;
+}
+.quotes .add .form-horizontal {
+  border: 5px solid #41454e;
+  margin-bottom: 15px;
+}
+.quotes .add .form-group {
+  margin: 0;
+  border-bottom: 5px solid #41454e;
+}
+.quotes .add .form-group:last-child {
+  border-bottom-width: 0;
+}
+.quotes .add .form-group.has-error label {
+  color: #f35656;
+}
+.quotes .add .form-control {
+  box-shadow: none;
+  border-radius: 0;
+  background-color: transparent;
+  border-color: #41454e;
+  border-width: 0;
+  color: #f9f7fa;
+}
+.quotes .add .btn {
+  border-radius: 0;
+  border-width: 0;
+  background-color: #f35656;
+}
+.quotes .table .del {
+  color: #f35656;
+  float: right;
+  font-weight: bold;
+}
+.quotes .table .del:hover {
+  text-decoration: none;
+}
+.logs {
+  padding-top: 15px;
+}
+.logs a {
+  color: #f9f7fa;
+}
+.logs a:hover {
+  color: #FFF;
+  text-decoration: none;
+}
+.logs .logFile tr {
+  color: #bbb;
+}
+.logs .logFile tr .time,
+.logs .logFile tr .nick,
+.logs .logFile tr .content {
+  border-width: 0;
+  padding: 0 10px;
+}
+.logs .logFile tr .time {
+  border-left-width: 5px;
+  width: 1px;
+}
+.logs .logFile tr .time a:focus {
+  color: #f35656;
+}
+.logs .logFile tr .nick {
+  text-align: right;
+  white-space: nowrap;
+  width: 1px;
+}
+.logs .logFile tr .nick.action span:before {
+  content: "* ";
+}
+.logs .logFile tr .nick:not(.action) span:before {
+  content: "<";
+}
+.logs .logFile tr .nick:not(.action) span:after {
+  content: ">";
+}
+.logs .logFile tr .content {
+  border-right-width: 5px;
+  text-align: left;
+}
+.logs .logFile tr .content a {
+  text-decoration: underline;
+}
+.logs .logFile tr:last-child .time,
+.logs .logFile tr:last-child .nick,
+.logs .logFile tr:last-child .content {
+  border-bottom-width: 5px;
+}
+.logs .logFile tr.event.event-message {
+  color: #FFF;
+}
+@media (min-width: 768px) {
+  .quotes .form-control {
+    border-left-width: 5px !important;
+  }
+}
